@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Nara | Nara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2596be',
+                        secondary: '#2596be',
+                        nara: {
+                            red: '#2596be',
+                            blue: '#2596be'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col">
+    <script src="../components/navbar.js"></script>
+    <custom-navbar></custom-navbar>
+
+    <!-- Page Header -->
+    <header class="relative h-96 flex items-center justify-center bg-gradient-to-b from-black to-gray-900 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="http://static.photos/japan/1200x630/3" alt="Header background" class="w-full h-full object-cover opacity-30">
+        </div>
+        <div class="relative z-10 text-center px-4">
+            <h1 class="text-6xl font-bold mb-4 text-primary">Join Nara</h1>
+            <p class="text-xl max-w-2xl mx-auto">Become part of our vibrant community</p>
+        </div>
+    </header>
+
+    <main class="flex-grow py-20 px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Introduction -->
+            <div class="mb-16 text-center">
+                <h2 class="text-4xl font-bold mb-6 text-primary">Welcome to Nara</h2>
+                <p class="text-xl text-gray-300">
+                    We're always looking for dedicated players who share our values of vibing, environmentalism, and quality building.
+                </p>
+            </div>
+
+            <!-- Requirements -->
+            <div class="mb-16">
+                <h3 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">What We Look For</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gray-900 p-6 rounded-lg">
+                        <div class="flex items-start mb-4">
+                            <i data-feather="check-circle" class="text-primary mr-3 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="text-xl font-bold mb-2">Good Vibes</h4>
+                                <p class="text-gray-300">Friendly, respectful players who enjoy collaborative gameplay and community building.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg">
+                        <div class="flex items-start mb-4">
+                            <i data-feather="check-circle" class="text-primary mr-3 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="text-xl font-bold mb-2">Active Participation</h4>
+                                <p class="text-gray-300">Regular players who contribute to the nation through building, industry, or community events.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg">
+                        <div class="flex items-start mb-4">
+                            <i data-feather="check-circle" class="text-primary mr-3 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="text-xl font-bold mb-2">Quality Building</h4>
+                                <p class="text-gray-300">Appreciation for Japanese aesthetics and environmental conservation in development.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg">
+                        <div class="flex items-start mb-4">
+                            <i data-feather="check-circle" class="text-primary mr-3 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="text-xl font-bold mb-2">Team Player</h4>
+                                <p class="text-gray-300">Willingness to work with others and contribute to national projects and goals.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How to Join -->
+            <div class="mb-16">
+                <h3 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">How to Join</h3>
+                <div class="bg-gray-900 p-8 rounded-lg">
+                    <ol class="space-y-6">
+                        <li class="flex items-start">
+                            <div class="bg-nara-red rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4 mt-1">
+                                <span class="font-bold">1</span>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold mb-2">Join Our Discord</h4>
+                                <p class="text-gray-300 mb-3">Connect with our community on Naracord to introduce yourself and learn more about our nation.</p>
+                                <a href="https://discord.gg/M8etHAEyBB" target="_blank" class="inline-flex items-center bg-[#5865F2] hover:bg-[#4752C4] text-white px-6 py-2 rounded-lg transition-colors">
+                                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" fill="currentColor">
+                                        <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+                                    </svg>
+                                    Join Naracord
+                                </a>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="bg-nara-red rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4 mt-1">
+                                <span class="font-bold">2</span>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold mb-2">Connect on CivMC</h4>
+                                <p class="text-gray-300">Join the CivMC server and visit Nara in the +,+ on the continent of Alenarith. Explore our cities and meet our citizens.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="bg-nara-red rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4 mt-1">
+                                <span class="font-bold">3</span>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold mb-2">Apply for Citizenship</h4>
+                                <p class="text-gray-300">After getting to know the community, speak with a government member about becoming a citizen. We're extremely friendly, some say too friendly.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- What You Get -->
+            <div class="mb-16">
+                <h3 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">What You Get as a Citizen</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gray-900 p-6 rounded-lg flex items-start">
+                        <i data-feather="home" class="text-primary mr-4 mt-1 flex-shrink-0"></i>
+                        <div>
+                            <h4 class="text-lg font-bold mb-2">Land & Property</h4>
+                            <p class="text-gray-300">Access to plots in our beautiful cities and the ability to build your own home or business.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg flex items-start">
+                        <i data-feather="shield" class="text-primary mr-4 mt-1 flex-shrink-0"></i>
+                        <div>
+                            <h4 class="text-lg font-bold mb-2">Protection & Security</h4>
+                            <p class="text-gray-300">Safety under Nara's military and strong international relations.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg flex items-start">
+                        <i data-feather="users" class="text-primary mr-4 mt-1 flex-shrink-0"></i>
+                        <div>
+                            <h4 class="text-lg font-bold mb-2">Community</h4>
+                            <p class="text-gray-300">Join a friendly, active community of players who share your interests.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg flex items-start">
+                        <i data-feather="trending-up" class="text-primary mr-4 mt-1 flex-shrink-0"></i>
+                        <div>
+                            <h4 class="text-lg font-bold mb-2">Growth Opportunities</h4>
+                            <p class="text-gray-300">Potential to advance in government, military, or guild positions based on your contributions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="bg-gradient-to-r from-nara-red to-gray-800 p-12 rounded-lg text-center">
+                <h3 class="text-3xl font-bold mb-4">Ready to Join?</h3>
+                <p class="text-xl mb-6">
+                    Take the first step and join our Discord community today!
+                </p>
+                <a href="https://discord.gg/M8etHAEyBB" target="_blank" class="inline-block bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition-colors">
+                    Join Naracord
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <custom-footer></custom-footer>
+    <script src="../components/footer.js"></script>
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>

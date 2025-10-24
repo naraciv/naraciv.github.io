@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shops | Nara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2596be',
+                        secondary: '#2596be',
+                        nara: {
+                            red: '#2596be',
+                            blue: '#2596be'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col">
+    <script src="../components/navbar.js"></script>
+    <custom-navbar></custom-navbar>
+
+    <!-- Page Header -->
+    <header class="relative h-96 flex items-center justify-center bg-gradient-to-b from-black to-gray-900 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="http://static.photos/japan/1200x630/2" alt="Header background" class="w-full h-full object-cover opacity-30">
+        </div>
+        <div class="relative z-10 text-center px-4">
+            <h1 class="text-6xl font-bold mb-4 text-primary">Shops</h1>
+            <p class="text-xl max-w-2xl mx-auto">Businesses and commerce in Nara</p>
+        </div>
+    </header>
+
+    <main class="flex-grow py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-16 text-center">
+                <h2 class="text-4xl font-bold mb-6 text-primary">Naran Commerce</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Nara hosts a thriving economy with various shops, cafes, and businesses serving both citizens and international visitors.
+                </p>
+            </div>
+
+            <!-- Featured Shops Section -->
+            <div class="mb-20">
+                <h3 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">Featured Shops</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Shop Card Template -->
+                    <div class="bg-gray-900 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:transform hover:scale-105">
+                        <div class="h-48 bg-gradient-to-br from-nara-red to-gray-800 flex items-center justify-center">
+                            <i data-feather="shopping-bag" class="text-white w-16 h-16"></i>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-2xl font-bold mb-2 text-primary">Zeal Corp Mob Drops</h4>
+                            <p class="text-gray-300 mb-4">
+                                All the drops you could need straight from Zeal Farms. Locally sourced and ethically harvested right here in Nara!
+                            </p>
+                            <div class="flex items-center text-sm text-gray-400">
+                                <i data-feather="map-pin" class="w-4 h-4 mr-2"></i>
+                                <span>Shiroyama</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-900 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:transform hover:scale-105">
+                        <div class="h-48 bg-gradient-to-br from-nara-red to-gray-800 flex items-center justify-center">
+                            <i data-feather="shield" class="text-white w-16 h-16"></i>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-2xl font-bold mb-2 text-primary">Takumi</h4>
+                            <p class="text-gray-300 mb-4">
+                               Every amarament you could need from diamond to netherite, from pickaxe to swords, from armor to netherite. Every premium item you could need is here.
+                            </p>
+                            <div class="flex items-center text-sm text-gray-400">
+                                <i data-feather="map-pin" class="w-4 h-4 mr-2"></i>
+                                <span>Shiroyama</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-900 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:transform hover:scale-105">
+                        <div class="h-48 bg-gradient-to-br from-nara-red to-gray-800 flex items-center justify-center">
+                            <i data-feather="dollar-sign" class="text-white w-16 h-16"></i>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-2xl font-bold mb-2 text-primary">Exchanges</h4>
+                            <p class="text-gray-300 mb-4">
+                                Floating exchange shops where you can trade in your items for diamonds. Shiroyama features both the Naran Free Exchange and the Griff Exchange I forgot the name of.
+                            </p>
+                            <div class="flex items-center text-sm text-gray-400">
+                                <i data-feather="map-pin" class="w-4 h-4 mr-2"></i>
+                                <span>Shiroyama</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shopping Districts -->
+            <div class="mb-20">
+                <h3 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">Shopping Districts</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-gray-900 p-8 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i data-feather="home" class="text-primary mr-3 w-8 h-8"></i>
+                            <h4 class="text-2xl font-bold">Old Shiroyama District</h4>
+                        </div>
+                        <p class="text-gray-300 mb-4">
+                            The capital's bustling commercial center features the largest concentration of shops, restaurants, and services. Connected to international rail via old_shiro and RyanICE/NordStream for easy access.
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-900 p-8 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i data-feather="columns" class="text-primary mr-3 w-8 h-8"></i>
+                            <h4 class="text-2xl font-bold">Modern Shiro Markets</h4>
+                        </div>
+                        <p class="text-gray-300 mb-4">
+                            A lively modern market district featuring large builds and even larger shops. Connected to international rail networks for easy access.
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-900 p-8 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i data-feather="trending-up" class="text-primary mr-3 w-8 h-8"></i>
+                            <h4 class="text-2xl font-bold">Orakuru</h4>
+                        </div>
+                        <p class="text-gray-300 mb-4">
+                            A bustling industrial zone in the center of Nara. Connected to international rail networks for easy access. Rapidly growing and vibrant with new shops and services opening frequently.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="bg-gradient-to-r from-nara-red to-gray-800 p-12 rounded-lg text-center">
+                <h3 class="text-3xl font-bold mb-4">Want to Open a Shop?</h3>
+                <p class="text-xl mb-6 max-w-2xl mx-auto">
+                    Nara welcomes entrepreneurs and merchants. Contact the Daimyo for the city where you'd like to open a shop to discuss opening your business in Nara.
+                </p>
+                <a href="https://discord.gg/M8etHAEyBB" target="_blank" class="inline-block bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition-colors">
+                    Join Naracord
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <custom-footer></custom-footer>
+    <script src="../components/footer.js"></script>
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>

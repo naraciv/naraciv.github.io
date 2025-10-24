@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    scroll-behavior: smooth;
+}
+
+/* --- Remove the line-art stroke --- */
+#flag-container svg path {
+    fill: #2596be; /* Use your Nara blue instead of stroke */
+    stroke: none;
+    transition: fill 1s ease-in-out;
+}
+
+/* --- Optional hover for subtle interactive shimmer (if you like) --- */
+#flag-container:hover svg path {
+    filter: drop-shadow(0 0 8px rgba(37, 150, 190, 0.6));
+}
+
+/* --- Glowing background once sun settles --- */
+#sun-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(37,150,190,0.25) 0%, rgba(37,150,190,0.05) 70%, transparent 100%);
+    filter: blur(60px);
+    opacity: 0;
+    mix-blend-mode: screen;
+    animation: sunGlowPulse 6s ease-in-out infinite;
+}
+
+/* --- Smooth glow pulsing effect --- */
+@keyframes sunGlowPulse {
+    0% {
+        opacity: 0.05;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(50px);
+    }
+    50% {
+        opacity: 0.15;
+        transform: translate(-50%, -50%) scale(1.05);
+        filter: blur(70px);
+    }
+    100% {
+        opacity: 0.1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(60px);
+    }
+}
+
+/* --- Custom scrollbar (unchanged) --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #111;
+}
+::-webkit-scrollbar-thumb {
+    background: #2596be;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #1d7a9c;
+}
+
+/* --- Optional: the old keyframe (flagRise) can stay or be removed if unused --- */
+@keyframes flagRise {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100%); }
+}

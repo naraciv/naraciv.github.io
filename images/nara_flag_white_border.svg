@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="240"
+   height="128"
+   viewBox="0 0 240 128"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  
+  <!-- Add this <style> block -->
+  <style>
+    path {
+      stroke: white;         /* outline color */
+      stroke-width: .5px;     /* thickness */
+      stroke-linejoin: round;/* smoother corners */
+      stroke-linecap: round; /* smoother ends */
+    }
+  </style>
+
+  <g id="g1">
+    <path
+       style="fill:#cd2e3a;fill-opacity:1"
+       d="m 150.48501,36.954401 14.40774,-12.662927 34.45214,-0.01957 16.17249,12.642988 z"
+       id="path922" />
+    <path
+       style="fill:#cd2e3a;fill-opacity:1"
+       d="M 229.23956,58.103382 H 186.82747 V 68.617139 H 229.2594 Z"
+       id="path923" />
+    <path
+       style="fill:#cd2e3a;fill-opacity:1"
+       d="M 215.25542,89.544493 199.80895,102.3763 H 167.08348 L 151.02704,89.546163 Z"
+       id="path924" />
+    <path
+       style="fill:#0047a0;fill-opacity:1"
+       d="M 73.308406,102.30989 H 39.945108 L 23.42203,89.529078 h 64.903032 c -4.896924,4.354958 -10.000481,8.543378 -15.016656,12.780812 z"
+       id="path925" />
+    <path
+       style="fill:#0047a0;fill-opacity:1"
+       d="M 10.762701,68.49021 H 53.377288 V 57.121085 H 10.755592 c 0.05786,3.785807 0.0071,7.580627 0.0071,11.369125 z"
+       id="path926" />
+    <path
+       style="fill:#0047a0;fill-opacity:1"
+       d="M 23.029195,37.058926 37.831806,24.430858 h 34.845085 l 16.099478,12.614969 z"
+       id="path927" />
+    <path
+       id="path916"
+       style="display:inline;fill:#000000;fill-opacity:1"
+       d="M 119.33984,18.658203 43.113281,63.177734 119.3125,107.66797 197.01367,63.296875 Z m 0.85547,10.644531 a 33.685112,33.982834 0 0 1 33.6836,33.984375 33.685112,33.982834 0 0 1 -33.6836,33.982422 A 33.685112,33.982834 0 0 1 86.509766,63.287109 33.685112,33.982834 0 0 1 120.19531,29.302734 Z" />
+  </g>
+</svg>
+
