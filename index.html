@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <link rel="icon" href="images/nara_flag_white_border.svg" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nara | CivMC Nation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+  // --- feather icons ---
+  if (typeof feather !== 'undefined' && feather.replace) {
+    feather.replace();
+  }
+
+  // Elements (guarded)
+  const flagContainer = document.getElementById('flag-container');
+  const flagImg = document.getElementById('flag-img');
+  const flagBg = document.getElementById('flag-bg');
+  const sunGlow = document.getElementById('sun-glow');
+  const title = document.getElementById('nara-title');
+  const subtitle = document.getElementById('hero-subtitle');
+
+  // Safe initialisation (only if flagContainer exists)
+  if (flagContainer) {
+    // If you still want flagBg to use the image, set it — guarded by flagImg existence
+    if (flagBg && flagImg && flagImg.src) {
+      flagBg.style.backgroundImage = `url(${flagImg.src})`;
+      flagBg.style.backgroundSize = 'contain';
+      flagBg.style.backgroundPosition = 'center';
+      flagBg.style.backgroundRepeat = 'no-repeat';
+      flagBg.style.opacity = '0';
+    }
+
+    // initial states
+    flagContainer.style.transform = 'translate(-50%, 80%) scale(0.8)';
+    flagContainer.style.opacity = '0';
+    if (sunGlow) sunGlow.style.opacity = '0';
+    if (title) { title.style.opacity = '0'; title.style.transition = 'opacity 1.2s ease-in'; }
+    if (subtitle) { subtitle.style.opacity = '0'; subtitle.style.transition = 'opacity 1.2s ease-in'; }
+
+    // sequence
+    setTimeout(() => {
+      // rise up
+      flagContainer.style.transition = 'transform 2.5s cubic-bezier(0.45, 0, 0.25, 1), opacity 2s ease-out';
+      flagContainer.style.transform = 'translate(-50%, -20%) scale(1)';
+      flagContainer.style.opacity = '1';
+
+      // title
+      setTimeout(() => {
+        if (title) title.style.opacity = '1';
+      }, 1000);
+
+      // subtitle
+      setTimeout(() => {
+        if (subtitle) subtitle.style.opacity = '1';
+      }, 2000);
+
+      // settle into background glow
+      setTimeout(() => {
+        // fade the visible flag out (we keep the single SVG element)
+        flagContainer.style.transition = 'transform 3s ease-in-out, opacity 3s ease-in-out, filter 3s ease-in-out';
+        // place it behind the title (translate to center-ish and fade)
+        flagContainer.style.transform = 'translate(-50%, -50%) scale(1.2)';
+        flagContainer.style.opacity = '0';
+
+        // show the CSS radial glow instead of a small leftover svg
+        if (sunGlow) {
+          sunGlow.style.transition = 'opacity 3s ease-in-out';
+          sunGlow.style.opacity = '1';
+        }
+
+        // subtle background flag (if desired)
+        if (flagBg) {
+          flagBg.style.transition = 'opacity 3s ease-in-out';
+          flagBg.style.opacity = '0.06'; // very subtle; change as needed
+        }
+      }, 4000);
+    }, 500);
+  } else {
+    // If flagContainer missing, don't crash — optionally log
+    console.warn('flag-container not found — skipping flag animation.');
+  }
+
+  // --- About-image (rising) animation via IntersectionObserver ---
+  const image = document.getElementById('rising-image');
+  const aboutSection = document.getElementById('about');
+
+  if (image && aboutSection) {
+    // Initial state
+    image.style.transform = 'translateY(100px) scale(0.95)';
+    image.style.opacity = '0';
+    image.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
+
+    const animateImage = () => {
+      // rise to normal
+      image.style.transform = 'translateY(0) scale(1)';
+      image.style.opacity = '1';
+
+      setTimeout(() => {
+        // float slightly into background
+        image.style.transition = 'transform 1.5s ease-in-out, opacity 1.5s ease-in-out';
+        image.style.transform = 'translateY(-50px) scale(0.92)';
+        image.style.opacity = '0.8';
+        image.style.zIndex = '0';
+      }, 1500);
+    };
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      if (entries[0].isIntersecting) {
+        animateImage();
+        obs.unobserve(aboutSection);
+      }
+    }, { threshold: 0.12 });
+
+    observer.observe(aboutSection);
+  } else {
+    if (!image) console.warn('rising-image not found — skipping image animation.');
+    if (!aboutSection) console.warn('about section not found — cannot observe.');
+  }
+});
+</script>
+
+
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col">
+    <script src="components/navbar.js"></script>
+    <custom-navbar></custom-navbar>
+<main class="flex-grow">
+        <!-- Hero Section with Flag Animation -->
+        <header class="relative h-screen overflow-hidden">
+            <!-- Background elements -->
+            <div class="absolute inset-0 bg-gradient-to-b from-black to-gray-900 z-0">
+                <div id="flag-bg" class="absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-1000 ease-in-out"></div>
+            </div>
+            
+            <div class="absolute inset-0 flex items-center justify-center z-10">
+  <div class="text-center px-4 relative">
+    <div class="relative h-48 mb-8 overflow-visible">
+      
+      <!-- Rising sun (flag) -->
+      <div id="flag-container" class="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full w-64 h-32 opacity-0">
+        <img src="images/nara_flag_white_border.svg" alt="Nara Flag" class="w-full h-full object-contain" id="flag-img">
+      </div>
+
+      <!-- Glow background (starts invisible) -->
+      <div id="sun-glow" class="absolute left-1/2 top-1/2 w-[600px] h-[600px] rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+
+      <!-- Title -->
+      <h1 id="nara-title" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl font-bold text-white opacity-0">
+        NARA
+      </h1>
+    </div>
+
+    <p id="hero-subtitle" class="mt-8 text-xl max-w-2xl mx-auto opacity-0 transition-opacity duration-1000 delay-500">
+      A vibe-based Japanese-themed nation on CivMC
+    </p>
+  </div>
+</div>
+
+
+            </div>
+            <div class="absolute bottom-10 left-0 right-0 flex justify-center z-20">
+                <a href="#about" class="animate-bounce">
+                    <i data-feather="chevron-down" class="text-white w-10 h-10"></i>
+                </a>
+            </div>
+        </header>
+        <!-- About Section -->
+        <section id="about" class="py-20 px-4 max-w-6xl mx-auto relative">
+            <h2 class="text-4xl font-bold mb-10 text-center text-primary">The Nation of Nara</h2>
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="z-20">
+<p class="text-xl mb-6">
+                        Nara is a meritocratic and feudalistic shogunate located in the +,+ on the continent of Alenarith. 
+                        History has redefined Nara into a <span class="text-primary">multicultural empire</span> with regions of different styles and cultures joined under one Shogunate.
+                    </p>
+                    <p class="text-lg mb-6">
+                        Founded on June 2nd, 2022, we've grown from a small settlement to a thriving nation with multiple cities, 
+                        a robust economy, and a rich culture. Our philosophy is to <span class="text-primary">chill</span> and enjoy being part of a large and vibrant community from across the world.
+                    </p>
+                    <div class="flex flex-wrap gap-4 mt-8">
+                        <a href="/government" class="bg-nara-red hover:bg-nara-blue text-white px-6 py-3 rounded-lg transition-colors">
+                            Our Government
+                        </a>
+                        <a href="/joining" class="border-2 border-nara-red hover:bg-nara-red text-white px-6 py-3 rounded-lg transition-colors">
+                            Join Nara
+                        </a>
+                    </div>
+                </div>
+                <div class="relative z-10">
+                    <img id="rising-image" src="images/finn.png" alt="Shiroyama landscape" class="rounded-lg shadow-2xl transform transition-all duration-1000 ease-in-out">
+                    <div class="absolute -bottom-5 -right-5 bg-nara-red p-4 rounded-lg shadow-lg">
+<p class="text-white font-bold">Capital: Shiroyama</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cities Section -->
+        <section class="py-20 bg-gray-900 px-4">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-4xl font-bold mb-10 text-center text-primary">Our Cities</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Shiroyama -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
+                        <img src="images/finn.png" alt="Shiroyama" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2 text-primary">Shiroyama</h3>
+                            <p class="text-gray-300">The capital and largest city of Nara. A world-class city featuring feudal and modern Japanese architecture with high density and environmental integration. Home to extensive security, production, and transport infrastructure.</p>
+                        </div>
+                    </div>
+                    <!-- Ichinokawa -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
+                        <img src="images/finn.png" alt="Ichinokawa" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2 text-primary">Ichinokawa</h3>
+                            <p class="text-gray-300">A serene rural village featuring feudal Japanese architecture. An escape from the hustle and bustle of the big city with realistic farms, a tea shop, and a Shinto shrine dedicated to Tsukuyomi.</p>
+                        </div>
+                    </div>
+                    <!-- Q'Barra -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
+                        <img src="images/finn.png" alt="Q'Barra" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2 text-primary">Q'Barra</h3>
+                            <p class="text-gray-300">An overseas exclave blending Aztec and Argonian fantasy themes. A magical place lost in the jungle with low density, high environmentalism, deep lore, and step pyramid temples.</p>
+                        </div>
+                    </div>
+                    <!-- Tronjheim -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
+                        <img src="images/finn.png" alt="Tronjheim" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2 text-primary">Tronjheim</h3>
+                            <p class="text-gray-300">An independent province and breathtaking dwarven-themed underground city. Once a separate nation closely allied to Nara, Dalgon formally joined as an independent province. A huge underground haven for all dwarves.</p>
+                        </div>
+                    </div>
+                    <!-- Orakuru -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
+                        <img src="images/finn.png" alt="Orakuru" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2 text-primary">Orakuru</h3>
+                            <p class="text-gray-300">A vibrant 1800s European industrial era city. Originally developed as an industrial area, now blending its origins with urban design, artistic and cultural expression with high density in mind.</p>
+                        </div>
+                    </div>
+                    <!-- Karasu -->
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
+                        <img src="images/finn.png" alt="Karasu" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold mb-2 text-primary">Karasu</h3>
+                            <p class="text-gray-300">A welcoming settlement founded west of Ichinokawa. Originally settled by refugees from the Papal States, it has grown with a significant number of newfriends joining the community.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Culture Section -->
+        <section class="py-20 px-4 max-w-6xl mx-auto">
+            <h2 class="text-4xl font-bold mb-10 text-center text-primary">Our Culture</h2>
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="order-2 md:order-1">
+                    <p class="text-xl mb-6">
+                        Nara was born as a nation inspired by East Asian styles, particularly Japanese. As we grew, we developed new styles inspired by different cultures, molding regions into different themes—from traditional feudal Japan to Aztec-Argonian fantasy, to dwarven underground cities.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i data-feather="heart" class="text-primary mr-4 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-lg">Chill Philosophy</h4>
+                                <p class="text-gray-300">We aim for low drama and minding our own business, while still being a player on the international stage. We don't seek war but rather harmony.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i data-feather="sun" class="text-primary mr-4 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-lg">Environmentalism</h4>
+                                <p class="text-gray-300">We carefully consider terrain in all construction, avoiding unnecessary destruction of natural features. Our builds integrate with the environment.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i data-feather="users" class="text-primary mr-4 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-lg">Multicultural Community</h4>
+                                <p class="text-gray-300">A vibrant community from across the world, with diverse architectural styles and cultures united under one Shogunate.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2">
+                    <img src="images/finn.png" alt="Nara culture" class="rounded-lg shadow-xl">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <custom-footer></custom-footer>
+    <!-- Discord Floating Button -->
+   
+    <div class="fixed bottom-10 left-6 z-50 group">
+    <a href="https://discord.gg/M8etHAEyBB" target="_blank" rel="noopener noreferrer" class="bg-[#5865F2] hover:bg-[#4752C4] text-white p-3 rounded-full shadow-lg transition-all duration-300 flex items-center overflow-hidden w-[3.5rem] hover:w-[10.5rem]">
+        <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" fill="currentColor">
+            <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+        </svg>
+        <span class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-2">Join Naracord</span>
+    </a>
+</div>
+
+    <script src="components/footer.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Netlify/GitHub Pages redirects
+# Clean URLs - serve index.html from directories
+/government           /government/index.html           200
+/properties           /properties/index.html           200
+/shops                /shops/index.html                200
+/joining              /joining/index.html              200
+
+# Redirect old .html URLs to clean URLs
+/government.html      /government                      301!
+/properties.html      /properties                      301!
+/shops.html           /shops                           301!
+/joining.html         /joining                         301!
