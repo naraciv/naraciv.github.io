@@ -31,25 +31,25 @@ body {
     filter: blur(60px);
     opacity: 0;
     mix-blend-mode: screen;
-    animation: sunGlowPulse 6s ease-in-out infinite;
+    animation: sunGlowPulse 8s ease-in-out infinite;
 }
 
 /* --- Smooth glow pulsing effect --- */
 @keyframes sunGlowPulse {
     0% {
-        opacity: 0.05;
-        transform: translate(-50%, -50%) scale(1);
-        filter: blur(50px);
-    }
-    50% {
-        opacity: 0.15;
-        transform: translate(-50%, -50%) scale(1.05);
-        filter: blur(70px);
-    }
-    100% {
         opacity: 0.1;
         transform: translate(-50%, -50%) scale(1);
-        filter: blur(60px);
+        /* filter: blur(.5rem); */
+    }
+    50% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1.2);
+        /* filter: blur(2rem); */
+    }
+    100% {
+        opacity: 0.15;
+        transform: translate(-50%, -50%) scale(1);
+        /* filter: blur(.75rem); */
     }
 }
 

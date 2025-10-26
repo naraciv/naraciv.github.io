@@ -5,151 +5,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shops | Nara</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <link rel="stylesheet" href="../style.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2596be',
-                        secondary: '#2596be',
-                        nara: {
-                            red: '#2596be',
-                            blue: '#2596be'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col">
     <script src="../components/navbar.js"></script>
     <custom-navbar></custom-navbar>
 
-    <!-- Page Header -->
-    <header class="relative h-96 flex items-center justify-center bg-gradient-to-b from-black to-gray-900 overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <img src="http://static.photos/japan/1200x630/2" alt="Header background" class="w-full h-full object-cover opacity-30">
-        </div>
-        <div class="relative z-10 text-center px-4">
-            <h1 class="text-6xl font-bold mb-4 text-primary">Shops</h1>
-            <p class="text-xl max-w-2xl mx-auto">Businesses and commerce in Nara</p>
-        </div>
-    </header>
+    <div class="h-[100px]"></div>
 
     <main class="flex-grow py-20 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="mb-16 text-center">
-                <h2 class="text-4xl font-bold mb-6 text-primary">Naran Commerce</h2>
-                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-                    Nara hosts a thriving economy with various shops, cafes, and businesses serving both citizens and international visitors.
-                </p>
-            </div>
-
-            <!-- Featured Shops Section -->
-            <div class="mb-20">
-                <h3 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">Featured Shops</h3>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Shop Card Template -->
-                    <div class="bg-gray-900 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:transform hover:scale-105">
-                        <div class="h-48 bg-gradient-to-br from-nara-red to-gray-800 flex items-center justify-center">
-                            <i data-feather="shopping-bag" class="text-white w-16 h-16"></i>
-                        </div>
-                        <div class="p-6">
-                            <h4 class="text-2xl font-bold mb-2 text-primary">Zeal Corp Mob Drops</h4>
-                            <p class="text-gray-300 mb-4">
-                                All the drops you could need straight from Zeal Farms. Locally sourced and ethically harvested right here in Nara!
-                            </p>
-                            <div class="flex items-center text-sm text-gray-400">
-                                <i data-feather="map-pin" class="w-4 h-4 mr-2"></i>
-                                <span>Shiroyama</span>
-                            </div>
-                        </div>
+        <div class="max-w-6xl mx-auto w-5/6">
+            <h1 class="text-5xl font-bold mb-16 text-center text-primary">Shops</h1>
+            
+            <!-- Search and Filter Controls -->
+            <div class="mb-8">
+                <!-- City Filter Buttons and Search Bar -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex gap-2">
+                        <button id="all-btn" class="city-filter-btn active px-4 py-2 rounded-full border border-nara-red bg-nara-red text-white transition-colors font-bold">
+                            All
+                        </button>
+                        <button id="shiroyama-btn" class="city-filter-btn active px-4 py-2 rounded-full border border-nara-red bg-nara-red text-white transition-colors font-bold">
+                            Shiroyama
+                        </button>
+                        <button id="orakuru-btn" class="city-filter-btn active px-4 py-2 rounded-full border border-nara-red bg-nara-red text-white transition-colors font-bold">
+                            Orakuru
+                        </button>
                     </div>
 
-                    <div class="bg-gray-900 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:transform hover:scale-105">
-                        <div class="h-48 bg-gradient-to-br from-nara-red to-gray-800 flex items-center justify-center">
-                            <i data-feather="shield" class="text-white w-16 h-16"></i>
-                        </div>
-                        <div class="p-6">
-                            <h4 class="text-2xl font-bold mb-2 text-primary">Takumi</h4>
-                            <p class="text-gray-300 mb-4">
-                               Every armament you could need from diamond to netherite, from pickaxe to swords. Every premium item you could need is here.
-                            </p>
-                            <div class="flex items-center text-sm text-gray-400">
-                                <i data-feather="map-pin" class="w-4 h-4 mr-2"></i>
-                                <span>Shiroyama</span>
+                    <!-- Search Bar with Field Selector -->
+                    <div class="w-1/2 relative bg-gray-900 border border-gray-700 rounded-full focus-within:border-nara-red transition-colors h-12">
+                        <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                        <input type="text" id="search-input" placeholder="Search shops..." 
+                               class="w-full h-full pl-10 pr-32 bg-transparent text-white placeholder-gray-400 focus:outline-none rounded-full">
+                        <details class="absolute right-0 top-0 h-full group" id="field-selector-dropdown">
+                            <summary class="h-full px-3 py-1 bg-gray-900 border-0 rounded-full text-white text-sm cursor-pointer hover:text-nara-red transition-colors flex items-center justify-center">
+                                <i data-feather="chevron-down" class="chevron-icon w-7 h-4 ml-1 transition-transform" id="field-selector-chevron"></i>
+                                <span id="selected-field"> All Fields</span>
+                            </summary>
+                            <div class="absolute right-0 top-full mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-10 min-w-full">
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="all">All Fields</button>
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="input">Input</button>
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="output">Output</button>
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="tags">Tags</button>
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="shop">Shop Name</button>
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="coords">Coords</button>
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="contact">Contact (IGN)</button>
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="city">City</button>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-900 rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all hover:transform hover:scale-105">
-                        <div class="h-48 bg-gradient-to-br from-nara-red to-gray-800 flex items-center justify-center">
-                            <i data-feather="dollar-sign" class="text-white w-16 h-16"></i>
-                        </div>
-                        <div class="p-6">
-                            <h4 class="text-2xl font-bold mb-2 text-primary">Exchanges</h4>
-                            <p class="text-gray-300 mb-4">
-                                Floating exchange shops where you can trade in your items for diamonds. Shiroyama features both the Naran Free Exchange and the Griff Exchange I forgot the name of.
-                            </p>
-                            <div class="flex items-center text-sm text-gray-400">
-                                <i data-feather="map-pin" class="w-4 h-4 mr-2"></i>
-                                <span>Shiroyama</span>
-                            </div>
-                        </div>
+                        </details>
                     </div>
                 </div>
+
+              <!-- Advanced Options -->
+<div class="mb-6">
+    <details class="group" id="advanced-options-dropdown">
+      <summary class="flex items-center gap-2 cursor-pointer text-primary hover:text-white transition-colors">
+        <i data-feather="chevron-down" class="w-6 h-6 transition-transform" id="advanced-chevron"></i>
+        <span class="text-lg font-semibold">Advanced Options</span>
+      </summary>
+      <div class="mt-4 space-y-4">
+        <!-- Tags Dropdown -->
+        <div>
+          <details class="group" id="tags-dropdown">
+            <summary
+              class="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white transition-colors bg-gray-800 border border-gray-700 rounded-full px-4 py-2 min-h-12 w-full max-w-md">
+              <i data-feather="chevron-down"
+                 class="chevron-icon w-4 h-4 transition-transform duration-200 flex items-center"
+                 id="tags-selector-chevron"></i>
+              <div id="selected-tags-container" class="flex flex-wrap gap-1 items-center">
+                <span class="text-gray-400 text-sm">Select Tags</span>
+              </div>
+            </summary>
+            <div class="mt-2 p-2 w-full max-w-md rounded-lg">
+              <div id="tags-filter" class="grid grid-cols-3 gap-2">
+                <!-- Tags will be populated by JavaScript -->
+              </div>
             </div>
+          </details>
+        </div>
+  
+        <!-- Exclude Out-of-Stock Toggle -->
+        <div>
+          <label class="flex items-center gap-3 cursor-pointer select-none">
+            <input type="checkbox" id="exclude-out-of-stock"
+                   class="w-5 h-5 rounded-full bg-gray-700 border-gray-600 checked:bg-nara-red focus:ring-nara-red focus:ring-2 transition duration-200">
+            <span class="text-gray-300">Exclude out of stock shops</span>
+          </label>
+        </div>
+      </div>
+    </details>
+  </div>
+  
 
-            <!-- Shopping Districts -->
-            <div class="mb-20">
-                <h3 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">Shopping Districts</h3>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-gray-900 p-8 rounded-lg">
-                        <div class="flex items-center mb-4">
-                            <i data-feather="home" class="text-primary mr-3 w-8 h-8"></i>
-                            <h4 class="text-2xl font-bold">Old Shiroyama District</h4>
-                        </div>
-                        <p class="text-gray-300 mb-4">
-                            The capital's bustling commercial center features the largest concentration of shops, restaurants, and services. Connected to international rail via old_shiro and RyanICE/NordStream for easy access.
-                        </p>
-                    </div>
-
-                    <div class="bg-gray-900 p-8 rounded-lg">
-                        <div class="flex items-center mb-4">
-                            <i data-feather="columns" class="text-primary mr-3 w-8 h-8"></i>
-                            <h4 class="text-2xl font-bold">Modern Shiro Markets</h4>
-                        </div>
-                        <p class="text-gray-300 mb-4">
-                            A lively modern market district featuring large builds and even larger shops. Connected to international rail networks for easy access.
-                        </p>
-                    </div>
-
-                    <div class="bg-gray-900 p-8 rounded-lg">
-                        <div class="flex items-center mb-4">
-                            <i data-feather="trending-up" class="text-primary mr-3 w-8 h-8"></i>
-                            <h4 class="text-2xl font-bold">Orakuru</h4>
-                        </div>
-                        <p class="text-gray-300 mb-4">
-                            A bustling industrial zone in the center of Nara. Connected to international rail networks for easy access. Rapidly growing and vibrant with new shops and services opening frequently.
-                        </p>
-                    </div>
+            <!-- Data Table -->
+            <div class="w-[80%] bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-800">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(0)">
+                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1" style="transition: transform 0.2s, opacity 0.2s;"></i> Input
+                                </th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(1)">
+                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1 transition-all duration-200"></i> Output
+                                </th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(3)">
+                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1 transition-all duration-200"></i> Shop Name
+                                </th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(4)">
+                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1 transition-all duration-200"></i> Coords
+                                </th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(5)">
+                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1 transition-all duration-200"></i> Contact (IGN)
+                                </th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(6)">
+                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1 transition-all duration-200"></i> City
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="shop-table-body" class="divide-y divide-gray-700">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-
-            <!-- Call to Action -->
-            <div class="bg-gradient-to-r from-nara-red to-gray-800 p-12 rounded-lg text-center">
-                <h3 class="text-3xl font-bold mb-4">Want to Open a Shop?</h3>
-                <p class="text-xl mb-6 max-w-2xl mx-auto">
-                    Nara welcomes entrepreneurs and merchants. Contact the Daimyo for the city where you'd like to open a shop to discuss opening your business in Nara.
-                </p>
-                <a href="https://discord.gg/M8etHAEyBB" target="_blank" class="inline-block bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition-colors">
-                    Join Naracord
-                </a>
             </div>
         </div>
     </main>
@@ -158,6 +141,289 @@
     <script src="../components/footer.js"></script>
     <script>
         feather.replace();
-    </script>
+        
+        let shopData = [];
+        let filteredData = [];
+        let currentSortColumn = null;
+        let sortDirection = 'asc';
+        let selectedCities = { all: true, shiroyama: true, orakuru: true };
+        let selectedTags = new Set();
+        let availableTags = new Set();
+        
+        // Load CSV and initialize
+        fetch('../data/shop_data.csv')
+            .then(response => response.text())
+            .then(csvText => {
+                const results = Papa.parse(csvText, { header: false, skipEmptyLines: true });
+                shopData = results.data.slice(1); // skip header row
+                filteredData = [...shopData];
+                init();
+            })
+            .catch(err => console.error('Error loading CSV:', err));
+        
+        // Initialize everything
+        function init() {
+            extractTags();
+            renderTagsFilter();
+            updateSelectedTagsDisplay();
+            renderTable();
+            setupEventListeners();
+            setupDropdownAnimations();
+            updateSortIndicators();
+        }
+        
+        // Extract unique tags from CSV
+        function extractTags() {
+            shopData.forEach(row => {
+                const tagsString = row[2];
+                if (tagsString && tagsString.trim()) {
+                    tagsString.split(',').map(t => t.trim()).forEach(tag => availableTags.add(tag));
+                }
+            });
+        }
+        
+        // Render tag filter buttons
+        function renderTagsFilter() {
+            const tagsContainer = document.getElementById('tags-filter');
+            tagsContainer.innerHTML = '';
+            Array.from(availableTags).sort().forEach(tag => {
+                const btn = document.createElement('button');
+                btn.className = 'tag-filter-btn px-3 py-2 rounded-full border border-gray-600 bg-gray-900 text-gray-300 hover:border-nara-red hover:text-white transition-colors text-xs';
+                btn.textContent = tag;
+                btn.dataset.tag = tag;
+                btn.addEventListener('click', () => toggleTagFilter(tag));
+                tagsContainer.appendChild(btn);
+            });
+        }
+        
+        // Toggle tag selection
+        function toggleTagFilter(tag) {
+            const btn = document.querySelector(`[data-tag="${tag}"]`);
+            if (selectedTags.has(tag)) {
+                selectedTags.delete(tag);
+                btn.classList.remove('active', 'bg-nara-red', 'border-nara-red', 'text-white');
+                btn.classList.add('border-gray-600', 'text-gray-300');
+            } else {
+                selectedTags.add(tag);
+                btn.classList.add('active', 'bg-nara-red', 'border-nara-red', 'text-white');
+                btn.classList.remove('border-gray-600', 'text-gray-300');
+            }
+            updateSelectedTagsDisplay();
+            filterData();
+        }
+        
+        // Update the selected tags display
+        function updateSelectedTagsDisplay() {
+            const container = document.getElementById('selected-tags-container');
+            container.innerHTML = '';
+            if (selectedTags.size === 0) {
+                container.innerHTML = '<span class="text-gray-400 text-sm">Select Tags</span>';
+                return;
+            }
+            selectedTags.forEach(tag => {
+                const el = document.createElement('div');
+                el.className = 'flex items-center gap-1 bg-nara-red text-white px-2 py-1 rounded-full border border-white text-xs';
+                const removeBtn = document.createElement('button');
+                removeBtn.onclick = () => removeTag(tag);
+                removeBtn.innerHTML = '<i data-feather="x" class="w-3 h-3"></i>';
+                const tagSpan = document.createElement('span');
+                tagSpan.textContent = tag;
+                el.appendChild(removeBtn);
+                el.appendChild(tagSpan);
+                container.appendChild(el);
+            });
+            feather.replace();
+        }
+        
+        // Remove tag from selection
+        function removeTag(tag) {
+            selectedTags.delete(tag);
+            const btn = document.querySelector(`[data-tag="${tag}"]`);
+            if (btn) btn.classList.remove('active', 'bg-nara-red', 'border-nara-red', 'text-white');
+            filterData();
+            updateSelectedTagsDisplay();
+        }
+        
+        // Setup button event listeners
+        function setupEventListeners() {
+            document.getElementById('all-btn').addEventListener('click', () => toggleCityFilter('all'));
+            document.getElementById('shiroyama-btn').addEventListener('click', () => toggleCityFilter('shiroyama'));
+            document.getElementById('orakuru-btn').addEventListener('click', () => toggleCityFilter('orakuru'));
+        
+            document.getElementById('search-input').addEventListener('input', filterData);
+            document.getElementById('exclude-out-of-stock').addEventListener('change', filterData);
+        
+            document.querySelectorAll('.field-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    window.selectedSearchField = option.dataset.value;
+                    document.getElementById('selected-field').textContent = ' ' + option.textContent;
+                    filterData();
+                });
+            });
+        }
+        
+        // Toggle city filters
+        function toggleCityFilter(city) {
+            if (city === 'all') {
+                const newState = !selectedCities.all;
+                selectedCities.all = newState;
+                selectedCities.shiroyama = newState;
+                selectedCities.orakuru = newState;
+            } else {
+                selectedCities[city] = !selectedCities[city];
+                selectedCities.all = selectedCities.shiroyama && selectedCities.orakuru;
+            }
+            updateCityFilterButtons();
+            filterData();
+        }
+        
+        // Update city filter button styles
+        function updateCityFilterButtons() {
+            const allBtn = document.getElementById('all-btn');
+            const shiroyamaBtn = document.getElementById('shiroyama-btn');
+            const orakuruBtn = document.getElementById('orakuru-btn');
+        
+            // Helper
+            const updateButton = (btn, active) => {
+                if (active) {
+                    btn.classList.add('active', 'bg-nara-red', 'border-nara-red', 'text-white');
+                    btn.classList.remove('border-gray-600', 'text-gray-300');
+                } else {
+                    btn.classList.remove('active', 'bg-nara-red', 'border-nara-red', 'text-white');
+                    btn.classList.add('border-gray-600', 'text-gray-300');
+                }
+            };
+        
+            updateButton(allBtn, selectedCities.all);
+            updateButton(shiroyamaBtn, selectedCities.shiroyama);
+            updateButton(orakuruBtn, selectedCities.orakuru);
+        }
+        
+        // Filter data based on city, tags, search, out-of-stock
+        function filterData() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const searchField = window.selectedSearchField || 'all';
+            const excludeOutOfStock = document.getElementById('exclude-out-of-stock').checked;
+        
+            filteredData = shopData.filter(row => {
+                const city = (row[6] || '').toLowerCase();
+                if (!selectedCities.all) {
+                    if (!(selectedCities.shiroyama && city === 'shiroyama') &&
+                        !(selectedCities.orakuru && city === 'orakuru')) return false;
+                }
+        
+                if (selectedTags.size > 0) {
+                    const rowTags = (row[2] || '').split(',').map(t => t.trim());
+                    if (![...selectedTags].some(tag => rowTags.includes(tag))) return false;
+                }
+        
+                if (searchTerm) {
+                    if (searchField === 'all') {
+                        if (!row.some(cell => cell.toLowerCase().includes(searchTerm))) return false;
+                    } else {
+                        const fieldIndex = { 'input': 0, 'output': 1, 'tags': 2, 'shop': 3, 'coords': 4, 'contact': 5, 'city': 6 };
+                        if (!row[fieldIndex[searchField]].toLowerCase().includes(searchTerm)) return false;
+                    }
+                }
+                
+
+                // cute way to eliminate broken entries for now. TODO FIX WHEN STOCK FLAG IS INTRODUCED
+                if (excludeOutOfStock && row.some(cell => cell.includes('#REF!'))) return false;
+        
+                return true;
+            });
+        
+            renderTable();
+        }
+        
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('shop-table-body');
+            tbody.innerHTML = '';
+            filteredData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-800 transition-colors';
+                row.forEach((cell, i) => {
+                    if (i === 2) return; // skip tags column
+                    const td = document.createElement('td');
+                    td.className = 'px-6 py-4 text-sm text-gray-300';
+                    td.textContent = cell;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // Modified sortTable function
+        function sortTable(columnIndex) {
+            // If clicking a different column, just select it (don't sort yet)
+            if (currentSortColumn !== columnIndex) {
+                currentSortColumn = columnIndex;
+                sortDirection = 'asc'; // Reset to ascending for new column
+                updateSortIndicators(); // Update visual indicators only
+                return; // Don't sort yet
+            }
+            
+            // If clicking the same column, toggle sort direction and perform sort
+            sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            
+            filteredData.sort((a, b) => {
+                const aVal = (a[columnIndex] || '').toLowerCase();
+                const bVal = (b[columnIndex] || '').toLowerCase();
+                return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            });
+            
+            renderTable();
+            updateSortIndicators();
+        }
+        
+        // Updated updateSortIndicators function
+        function updateSortIndicators() {
+            requestAnimationFrame(() => {
+                document.querySelectorAll('th').forEach((th, i) => {
+                    const icon = th.querySelector('.sort-arrow');
+                    if (!icon) return;
+                    
+                    // Show full opacity and white color only for selected column
+                    if (i === currentSortColumn) {
+                        icon.style.opacity = '1';
+                        th.classList.add('text-white'); // Make text white
+                        th.classList.remove('text-primary'); // Remove red color
+                        // Rotate chevron based on sort direction
+                        icon.style.transform = sortDirection === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)';
+                    } else {
+                        icon.style.opacity = '0.3';
+                        th.classList.remove('text-white'); // Remove white
+                        th.classList.add('text-primary'); // Keep red for unselected
+                        icon.style.transform = 'rotate(0deg)'; // Reset rotation
+                    }
+                });
+            });
+        }
+        
+        // Dropdown animations
+        function setupDropdownAnimations() {
+            const dropdowns = [
+                { id: 'field-selector-dropdown', chevronId: 'field-selector-chevron' },
+                { id: 'tags-dropdown', chevronId: 'tags-selector-chevron' },
+                { id: 'advanced-options-dropdown', chevronId: 'advanced-chevron' }
+            ];
+        
+            dropdowns.forEach(({ id, chevronId }) => {
+                const dropdown = document.getElementById(id);
+                if (!dropdown) return;
+                dropdown.addEventListener('toggle', () => {
+                    const chevron = document.getElementById(chevronId);
+                    if (chevron) chevron.style.transform = dropdown.open ? 'rotate(180deg)' : 'rotate(0deg)';
+        
+                    if (id === 'advanced-options-dropdown' && !dropdown.open) {
+                        const tagsDropdown = document.getElementById('tags-dropdown');
+                        if (tagsDropdown && tagsDropdown.open) tagsDropdown.open = false;
+                    }
+                });
+            });
+        }
+        </script>
+        
 </body>
 </html>

@@ -27,11 +27,14 @@ class CustomFooter extends HTMLElement {
                     color: #aaa;
                     line-height: 1.6;
                 }
+
+                /* Quick Links Grid */
                 .footer-links {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 0.5rem 1.5rem;
                 }
+
                 .footer-links a {
                     color: #aaa;
                     text-decoration: none;
@@ -40,6 +43,7 @@ class CustomFooter extends HTMLElement {
                 .footer-links a:hover {
                     color: #2596be;
                 }
+
                 .social-links {
                     display: flex;
                     gap: 1rem;
@@ -60,16 +64,22 @@ class CustomFooter extends HTMLElement {
                     background: #2596be;
                     transform: translateY(-3px);
                 }
+
                 .copyright {
                     margin-top: 2rem;
                     padding-top: 1rem;
                     border-top: 1px solid #333;
                     color: #666;
                     font-size: 0.9rem;
+                    text-align: center;
                 }
+
                 @media (max-width: 768px) {
                     .footer-content {
                         grid-template-columns: 1fr;
+                    }
+                    .footer-links {
+                        grid-template-columns: 1fr; /* Stack links on small screens */
                     }
                 }
             </style>
@@ -79,6 +89,7 @@ class CustomFooter extends HTMLElement {
                         <h3>About Nara</h3>
                         <p>A Japanese-themed nation on CivMC, located in the +,+ on the continent of Alenarith. Founded on vibes and environmentalism.</p>
                     </div>
+
                     <div class="footer-section">
                         <h3>Quick Links</h3>
                         <div class="footer-links">
@@ -86,9 +97,12 @@ class CustomFooter extends HTMLElement {
                             <a href="/properties">Properties</a>
                             <a href="/shops">Shops</a>
                             <a href="/joining">Joining Nara</a>
+                            <a href="/privacy">Privacy Policy</a>
+                            <a href="/map">Map</a>
                         </div>
                     </div>
                 </div>
+
                 <div class="copyright">
                     &copy; ${new Date().getFullYear()} Nara. All rights reserved.
                 </div>
@@ -97,4 +111,5 @@ class CustomFooter extends HTMLElement {
         `;
     }
 }
+
 customElements.define('custom-footer', CustomFooter);
