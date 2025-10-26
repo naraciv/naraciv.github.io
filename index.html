@@ -72,7 +72,16 @@
     }
     
     .city-image:hover {
-      
+        opacity: 0.8;
+        
+    }
+
+    .big-city-image {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .big-city-image:hover {
+        
         transform: scale(1.05) translateY(-10px);
         box-shadow: 0 20px 50px rgba(220, 38, 38, 0.3);
     }
@@ -310,7 +319,7 @@ A vibe-based Japanese-themed nation on CivMC
   </div>
   </div>
   <div class="about-image-container relative z-10">
-  <img id="rising-image" src="images/nara_above.png" alt="Shiroyama landscape" class="city-image rounded-lg shadow-2xl transform transition-all duration-1000 ease-in-out">
+  <img id="rising-image" src="images/nara_above.png" alt="Shiroyama landscape" class="big-city-image city-image rounded-lg shadow-2xl transform transition-all duration-1000 ease-in-out">
   <div class="absolute -bottom-5 -right-5 bg-nara-red p-4 rounded-lg shadow-lg pointer-events-none">
   <p class="text-white font-bold">Capital: Shiroyama</p>
   </div>
