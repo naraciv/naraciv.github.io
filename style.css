@@ -5,6 +5,71 @@ body {
     scroll-behavior: smooth;
 }
 
+/* Mobile Responsive Utilities */
+@media (max-width: 768px) {
+    /* Padding adjustments for mobile */
+    .py-20 {
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+    
+    /* Font size adjustments */
+    .text-6xl {
+        font-size: 2.5rem !important;
+    }
+    
+    .text-5xl {
+        font-size: 2rem !important;
+    }
+    
+    .text-4xl {
+        font-size: 1.75rem !important;
+    }
+    
+    .text-3xl {
+        font-size: 1.5rem !important;
+    }
+    
+    .text-2xl {
+        font-size: 1.25rem !important;
+    }
+    
+    .text-xl {
+        font-size: 1.125rem !important;
+    }
+    
+    /* Container width adjustments */
+    .max-w-6xl {
+        max-width: 100% !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    /* Grid adjustments */
+    .grid {
+        gap: 1rem !important;
+    }
+    
+    /* Button adjustments */
+    .px-6 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    .py-3 {
+        padding-top: 0.625rem !important;
+        padding-bottom: 0.625rem !important;
+    }
+    
+    /* Improve touch targets */
+    button, a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
 /* --- Remove the line-art stroke --- */
 #flag-container svg path {
     fill: #2596be; /* Use your Nara blue instead of stroke */
@@ -72,4 +137,192 @@ body {
 @keyframes flagRise {
     from { transform: translateY(0); }
     to { transform: translateY(-100%); }
+}
+
+/* Mobile-Specific Improvements */
+@media (max-width: 768px) {
+    /* City cards for mobile */
+    .city-card {
+        margin-bottom: 1rem;
+    }
+    
+    /* Images responsive */
+    .city-image, .big-city-image {
+        width: 100%;
+        height: auto;
+    }
+    
+    /* Modal improvements for mobile */
+    .fullscreen-modal .close-button {
+        width: 40px;
+        height: 40px;
+        top: 10px;
+        right: 10px;
+    }
+    
+    /* Hero section adjustments */
+    #flag-container {
+        width: 200px !important;
+        height: 100px !important;
+    }
+    
+    #sun-glow {
+        width: 400px !important;
+        height: 400px !important;
+    }
+    
+    /* Discord button mobile positioning and sizing */
+    .fixed.bottom-10.left-6 {
+        bottom: 1rem !important;
+        left: 1rem !important;
+    }
+    
+    .fixed.bottom-10.left-6 a {
+        width: 3.5rem !important;
+        min-width: 3.5rem !important;
+        height: 3.5rem !important;
+        padding: 0.5rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .fixed.bottom-10.left-6 a svg {
+        width: 2rem !important;
+        height: 2rem !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .fixed.bottom-10.left-6 a:hover {
+        width: 10.5rem !important;
+        justify-content: flex-start !important;
+        padding-left: 0.5rem !important;
+    }
+    
+    /* Improve spacing on mobile */
+    section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    /* Better flex wrapping */
+    .flex.flex-wrap.gap-4 {
+        gap: 0.75rem !important;
+    }
+    
+    /* Adjust about section layout */
+    .about-image-container .absolute {
+        position: static !important;
+        margin-top: 1rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small devices */
+    #flag-container {
+        width: 150px !important;
+        height: 75px !important;
+    }
+    
+    /* Further reduce padding */
+    .px-4 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+    
+    /* Discord button sizing on very small screens */
+    .fixed.bottom-10.left-6 {
+        bottom: 0.75rem !important;
+        left: 0.75rem !important;
+    }
+    
+    .fixed.bottom-10.left-6 a {
+        width: 3rem !important;
+        min-width: 3rem !important;
+        height: 3rem !important;
+        padding: 0.625rem !important;
+    }
+    
+    .fixed.bottom-10.left-6 a:hover {
+        width: 9rem !important;
+    }
+    
+    .fixed.bottom-10.left-6 svg {
+        width: 1.75rem !important;
+        height: 1.75rem !important;
+    }
+}
+
+/* Improve table responsiveness for shops page */
+@media (max-width: 1024px) {
+    .overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+        min-width: 800px;
+    }
+}
+
+/* Mobile improvements for shop filters */
+@media (max-width: 768px) {
+    /* Stack filter controls vertically */
+    .flex.items-center.justify-between {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 1rem;
+    }
+    
+    /* Full width search on mobile */
+    .w-1\/2 {
+        width: 100% !important;
+    }
+    
+    /* Adjust city filter buttons */
+    .flex.gap-2 {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .city-filter-btn {
+        flex: 1;
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem !important;
+    }
+    
+    /* Table wrapper adjustments */
+    .w-\[80\%\] {
+        width: 100% !important;
+    }
+    
+    /* Smaller table text on mobile */
+    table th,
+    table td {
+        padding: 0.5rem !important;
+        font-size: 0.75rem !important;
+    }
+    
+    /* Tags grid adjustments */
+    #tags-filter {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    /* Increase touch targets */
+    button, a, .nav-link, .city-filter-btn, .field-option {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Remove hover effects on touch devices */
+    .city-card:hover,
+    .big-city-image:hover,
+    .city-image:hover {
+        transform: none !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+    }
 }

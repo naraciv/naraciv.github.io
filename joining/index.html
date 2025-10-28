@@ -25,6 +25,89 @@
             }
         }
     </script>
+    <style>
+        /* Mobile Responsive Improvements for Joining Page */
+        @media (max-width: 768px) {
+            .h-\[100px\] {
+                height: 80px !important;
+            }
+            
+            main {
+                padding-top: 2rem !important;
+                padding-bottom: 2rem !important;
+            }
+            
+            h2, h3 {
+                font-size: 1.5rem !important;
+            }
+            
+            h4 {
+                font-size: 1.125rem !important;
+            }
+            
+            .text-xl {
+                font-size: 1rem !important;
+            }
+            
+            .text-3xl {
+                font-size: 1.5rem !important;
+            }
+            
+            /* Card adjustments */
+            .bg-gray-900.p-6,
+            .bg-gray-900.p-8 {
+                padding: 1rem !important;
+            }
+            
+            .grid.gap-6 {
+                gap: 1rem !important;
+            }
+            
+            /* Icon layouts */
+            .flex.items-start {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .flex.items-start i {
+                margin-bottom: 0.5rem;
+            }
+            
+            /* Step numbers */
+            ol.space-y-6 {
+                gap: 1.5rem !important;
+            }
+            
+            .flex.items-start .bg-nara-red {
+                margin-right: 1rem !important;
+                margin-top: 0 !important;
+            }
+            
+            /* CTA section */
+            .bg-gradient-to-r {
+                padding: 2rem 1rem !important;
+            }
+            
+            .mb-16 {
+                margin-bottom: 2rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h2, h3 {
+                font-size: 1.25rem !important;
+            }
+            
+            .text-4xl {
+                font-size: 1.5rem !important;
+            }
+            
+            .max-w-4xl {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+        }
+    </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col">
     <script src="../components/navbar.js"></script>

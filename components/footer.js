@@ -39,6 +39,7 @@ class CustomFooter extends HTMLElement {
                     color: #aaa;
                     text-decoration: none;
                     transition: color 0.3s;
+                    padding: 0.25rem 0;
                 }
                 .footer-links a:hover {
                     color: #2596be;
@@ -74,12 +75,53 @@ class CustomFooter extends HTMLElement {
                     text-align: center;
                 }
 
+                /* Mobile Responsive */
                 @media (max-width: 768px) {
+                    footer {
+                        padding: 2rem 1rem;
+                    }
+                    
                     .footer-content {
                         grid-template-columns: 1fr;
+                        gap: 1.5rem;
+                        text-align: center;
                     }
+                    
+                    .footer-section h3 {
+                        font-size: 1.125rem;
+                    }
+                    
+                    .footer-section p {
+                        font-size: 0.9rem;
+                    }
+                    
                     .footer-links {
-                        grid-template-columns: 1fr; /* Stack links on small screens */
+                        grid-template-columns: 1fr;
+                        gap: 0.75rem;
+                        text-align: center;
+                    }
+                    
+                    .footer-links a {
+                        display: block;
+                        padding: 0.5rem;
+                    }
+                    
+                    .social-links {
+                        justify-content: center;
+                    }
+                    
+                    .copyright {
+                        font-size: 0.8rem;
+                    }
+                }
+                
+                @media (max-width: 480px) {
+                    .footer-section h3 {
+                        font-size: 1rem;
+                    }
+                    
+                    .footer-section p {
+                        font-size: 0.85rem;
                     }
                 }
             </style>

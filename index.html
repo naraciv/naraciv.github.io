@@ -85,6 +85,73 @@
         transform: scale(1.05) translateY(-10px);
         box-shadow: 0 20px 50px rgba(220, 38, 38, 0.3);
     }
+    
+    /* Mobile Responsive Improvements */
+    @media (max-width: 768px) {
+        /* Reduce hero height on mobile */
+        header {
+            height: 80vh !important;
+        }
+        
+        /* Adjust hero text positioning */
+        #nara-title {
+            font-size: 3rem !important;
+        }
+        
+        #hero-subtitle {
+            font-size: 1rem !important;
+            padding: 0 1rem;
+        }
+        
+        /* Better spacing for city cards */
+        .city-card {
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Disable hover effects on mobile */
+        .city-card:hover,
+        .big-city-image:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        .city-image:hover {
+            opacity: 1 !important;
+        }
+        
+        /* Button group stacking */
+        .flex.flex-wrap.gap-4 {
+            flex-direction: column;
+            gap: 0.75rem !important;
+        }
+        
+        .flex.flex-wrap.gap-4 a {
+            width: 100%;
+            text-align: center;
+            justify-content: center;
+        }
+        
+        /* Culture section icons - keep horizontal on mobile */
+        .space-y-4 .flex.items-start {
+            align-items: flex-start !important;
+            text-align: left;
+        }
+        
+        .space-y-4 .flex.items-start i {
+            flex-shrink: 0;
+            margin-right: 1rem !important;
+            margin-top: 0.25rem;
+        }
+        
+        /* About section button overlap fix */
+        .about-image-container {
+            margin-top: 2rem;
+        }
+        
+        .flex.flex-wrap.gap-4 {
+            margin-bottom: 2rem;
+        }
+    }
 </style>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -431,7 +498,7 @@ Nara was born as a nation inspired by East Asian styles, particularly Japanese. 
 <img id="modal-image" src="" alt="">
 </div>
 
-ustomom-footer></custom-footer>
+<custom-footer></custom-footer>
 <!-- Discord Floating Button -->
 
 <div class="fixed bottom-10 left-6 z-50 group">

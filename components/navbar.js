@@ -26,6 +26,7 @@ class CustomNavbar extends HTMLElement {
           font-weight: bold;
           color: #2596be;
           text-decoration: none;
+          z-index: 1001;
         }
         .nav-links {
           display: flex;
@@ -60,10 +61,91 @@ class CustomNavbar extends HTMLElement {
         .active::after {
           width: 100%;
         }
+        
+        /* Hamburger Menu */
+        .menu-toggle {
+          display: none;
+          flex-direction: column;
+          cursor: pointer;
+          z-index: 1001;
+          background: none;
+          border: none;
+          padding: 0.5rem;
+        }
+        .menu-toggle span {
+          width: 25px;
+          height: 3px;
+          background: white;
+          margin: 3px 0;
+          transition: all 0.3s ease;
+          border-radius: 3px;
+        }
+        .menu-toggle.active span:nth-child(1) {
+          transform: rotate(45deg) translate(8px, 8px);
+          background: #2596be;
+        }
+        .menu-toggle.active span:nth-child(2) {
+          opacity: 0;
+        }
+        .menu-toggle.active span:nth-child(3) {
+          transform: rotate(-45deg) translate(7px, -7px);
+          background: #2596be;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+          nav {
+            padding: 1rem;
+          }
+          
+          .nav-logo {
+            font-size: 1.25rem;
+          }
+          
+          .menu-toggle {
+            display: flex;
+          }
+          
+          .nav-links {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            height: 100vh;
+            width: 70%;
+            max-width: 300px;
+            background: rgba(0, 0, 0, 0.98);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+          }
+          
+          .nav-links.active {
+            right: 0;
+          }
+          
+          .nav-link {
+            font-size: 1.25rem;
+            padding: 0.5rem 1rem;
+          }
+          
+          .nav-link::after {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+          }
+        }
       </style>
       <nav>
         <div class="nav-container">
           <a href="/" class="nav-logo">NARA</a>
+          <button class="menu-toggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
           <div class="nav-links">
             <a href="/" class="nav-link">Home</a>
             <a href="/government" class="nav-link">Government</a>
@@ -74,6 +156,32 @@ class CustomNavbar extends HTMLElement {
         </div>
       </nav>
     `;
+    
+    // Add event listener for mobile menu
+    const menuToggle = this.shadowRoot.querySelector('.menu-toggle');
+    const navLinks = this.shadowRoot.querySelector('.nav-links');
+    
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
+    
+    // Close menu when clicking a link
+    const links = this.shadowRoot.querySelectorAll('.nav-link');
+    links.forEach(link => {
+      link.addEventListener('click', () => {
+        menuToggle.classList.remove('active');
+        navLinks.classList.remove('active');
+      });
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!this.contains(e.target)) {
+        menuToggle.classList.remove('active');
+        navLinks.classList.remove('active');
+      }
+    });
   }
 }
 customElements.define('custom-navbar', CustomNavbar);

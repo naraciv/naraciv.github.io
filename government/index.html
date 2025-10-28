@@ -8,6 +8,82 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Mobile Responsive Improvements for Government Page */
+        @media (max-width: 768px) {
+            .h-\[100px\] {
+                height: 80px !important;
+            }
+            
+            main {
+                padding-top: 2rem !important;
+                padding-bottom: 2rem !important;
+            }
+            
+            h1 {
+                font-size: 2rem !important;
+                margin-bottom: 2rem !important;
+            }
+            
+            h2 {
+                font-size: 1.5rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            h3 {
+                font-size: 1.25rem !important;
+            }
+            
+            .text-xl {
+                font-size: 1rem !important;
+            }
+            
+            /* Card adjustments */
+            .bg-gray-900.p-6 {
+                padding: 1rem !important;
+            }
+            
+            .grid.gap-8,
+            .grid.gap-6 {
+                gap: 1rem !important;
+            }
+            
+            /* Icon positioning */
+            .flex.items-center.mb-4 {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .flex.items-center.mb-4 > div:first-child {
+                margin-right: 0 !important;
+                margin-bottom: 0.5rem;
+            }
+            
+            /* Stack sections better */
+            .mb-20 {
+                margin-bottom: 2rem !important;
+            }
+            
+            .mb-12 {
+                margin-bottom: 1.5rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .max-w-6xl {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+            
+            h1 {
+                font-size: 1.75rem !important;
+            }
+            
+            h2 {
+                font-size: 1.25rem !important;
+            }
+        }
+    </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col">
     <script src="../components/navbar.js"></script>
