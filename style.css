@@ -181,7 +181,7 @@ body {
         width: 3.5rem !important;
         min-width: 3.5rem !important;
         height: 3.5rem !important;
-        padding: 0.5rem !important;
+        padding: 0.625rem !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -191,12 +191,19 @@ body {
         width: 2rem !important;
         height: 2rem !important;
         flex-shrink: 0 !important;
+        display: block !important;
     }
     
     .fixed.bottom-10.left-6 a:hover {
         width: 10.5rem !important;
         justify-content: flex-start !important;
-        padding-left: 0.5rem !important;
+        padding-left: 0.625rem !important;
+        padding-right: 0.625rem !important;
+    }
+    
+    /* Hide Discord text on mobile */
+    .fixed.bottom-10.left-6 a span {
+        display: none !important;
     }
     
     /* Improve spacing on mobile */
@@ -238,19 +245,19 @@ body {
     }
     
     .fixed.bottom-10.left-6 a {
-        width: 3rem !important;
-        min-width: 3rem !important;
-        height: 3rem !important;
+        width: 3.5rem !important;
+        min-width: 3.5rem !important;
+        height: 3.5rem !important;
         padding: 0.625rem !important;
+    }
+    
+    .fixed.bottom-10.left-6 a svg {
+        width: 2rem !important;
+        height: 2rem !important;
     }
     
     .fixed.bottom-10.left-6 a:hover {
         width: 9rem !important;
-    }
-    
-    .fixed.bottom-10.left-6 svg {
-        width: 1.75rem !important;
-        height: 1.75rem !important;
     }
 }
 
