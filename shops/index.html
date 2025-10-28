@@ -191,28 +191,46 @@
   
 
             <!-- Data Table -->
-            <div class="w-[80%] bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
+            <div class="w-[100%] bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="w-full table-fixed">
                         <thead class="bg-gray-800">
                             <tr>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(0)">
-                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1" style="transition: transform 0.2s, opacity 0.2s;"></i> Input
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(0)">
+                                    <div class="flex items-center">
+                                        <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1" style="transition: transform 0.2s, opacity 0.2s;"></i>
+                                        <span>Input</span>
+                                    </div>
                                 </th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(1)">
-                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1 transition-all duration-200"></i> Output
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(1)">
+                                    <div class="flex items-center">
+                                        <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
+                                        <span>Output</span>
+                                    </div>
                                 </th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(3)">
-                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1 transition-all duration-200"></i> Shop Name
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(2)">
+                                    <div class="flex items-center">
+                                        <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
+                                        <span>Shop Name</span>
+                                    </div>
                                 </th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(4)">
-                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1 transition-all duration-200"></i> Coords
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(3)">
+                                    <div class="flex items-center">
+                                        <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
+                                        <span>Coords</span>
+                                    </div>
                                 </th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(5)">
-                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1 transition-all duration-200"></i> Contact (IGN)
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(4)">
+                                    <div class="flex items-center">
+                                        <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
+                                        <span>Contact</span>
+                                    </div>
                                 </th>
-                                <th class="px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors" onclick="sortTable(6)">
-                                    <i data-feather="chevron-up" class="sort-arrow w-4 h-4 inline mr-1 transition-all duration-200"></i> City
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(5)">
+                                    <div class="flex items-center">
+                                        <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
+                                        <span>City</span>
+                                    </div>
                                 </th>
                             </tr>
                         </thead>
@@ -434,7 +452,8 @@
                 row.forEach((cell, i) => {
                     if (i === 2) return; // skip tags column
                     const td = document.createElement('td');
-                    td.className = 'px-6 py-4 text-sm text-gray-300';
+                    td.className = 'px-6 py-4 text-sm text-gray-300 truncate';
+                    td.title = cell; // Add tooltip for truncated text
                     td.textContent = cell;
                     tr.appendChild(td);
                 });
