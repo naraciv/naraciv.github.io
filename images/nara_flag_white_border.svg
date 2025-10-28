@@ -14,7 +14,7 @@
   <style>
     path {
       stroke: white;         /* outline color */
-      stroke-width: .5px;     /* thickness */
+      stroke-width: 1px;     /* thickness */
       stroke-linejoin: round;/* smoother corners */
       stroke-linecap: round; /* smoother ends */
     }
