@@ -106,7 +106,7 @@
     <div class="h-[100px]"></div>
 
     <main class="flex-grow py-20 px-4">
-        <div class="max-w-6xl mx-auto w-5/6">
+        <div class="max-w-[90%] mx-auto w-[90%]">
             <h1 class="text-5xl font-bold mb-16 text-center text-primary">Shops</h1>
             
             <!-- Search and Filter Controls -->
@@ -139,7 +139,6 @@
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="all">All Fields</button>
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="input">Input</button>
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="output">Output</button>
-                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="tags">Tags</button>
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="shop">Shop Name</button>
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="coords">Coords</button>
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="contact">Contact (IGN)</button>
@@ -196,40 +195,47 @@
                     <table class="w-full table-fixed">
                         <thead class="bg-gray-800">
                             <tr>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(0)">
+                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(0)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1" style="transition: transform 0.2s, opacity 0.2s;"></i>
                                         <span>Input</span>
                                     </div>
                                 </th>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(1)">
+                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(1)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
-                                        <span>Output</span>
+                                        <span>Output (mouse over)</span>
                                     </div>
                                 </th>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(2)">
+                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(2)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
-                                        <span>Shop Name</span>
+                                        <span>Lore (mouse over)</span>
                                     </div>
                                 </th>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(3)">
+                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(3)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>Coords</span>
                                     </div>
                                 </th>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(4)">
+                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(4)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
-                                        <span>Contact</span>
+                                        <span>In stock</span>
                                     </div>
                                 </th>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(5)">
+                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(5)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>City</span>
+                                    </div>
+                                </th>
+
+                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(7)">
+                                    <div class="flex items-center">
+                                        <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
+                                        <span>Contact</span>
                                     </div>
                                 </th>
                             </tr>
@@ -281,7 +287,7 @@
         // Extract unique tags from CSV
         function extractTags() {
             shopData.forEach(row => {
-                const tagsString = row[2];
+                const tagsString = row[7];
                 if (tagsString && tagsString.trim()) {
                     tagsString.split(',').map(t => t.trim()).forEach(tag => availableTags.add(tag));
                 }
@@ -427,7 +433,7 @@
                     if (searchField === 'all') {
                         if (!row.some(cell => cell.toLowerCase().includes(searchTerm))) return false;
                     } else {
-                        const fieldIndex = { 'input': 0, 'output': 1, 'tags': 2, 'shop': 3, 'coords': 4, 'contact': 5, 'city': 6 };
+                        const fieldIndex = { 'input': 0, 'output': 1, 'shop': 3, 'coords': 4, 'contact': 5, 'city': 6 };
                         if (!row[fieldIndex[searchField]].toLowerCase().includes(searchTerm)) return false;
                     }
                 }
@@ -450,7 +456,7 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-800 transition-colors';
                 row.forEach((cell, i) => {
-                    if (i === 2) return; // skip tags column
+                    if (i === 0 || i === 7) return; // skip tags column
                     const td = document.createElement('td');
                     td.className = 'px-6 py-4 text-sm text-gray-300 truncate';
                     td.title = cell; // Add tooltip for truncated text
@@ -521,16 +527,19 @@
                 if (!dropdown) return;
                 dropdown.addEventListener('toggle', () => {
                     const chevron = document.getElementById(chevronId);
-                    if (chevron) chevron.style.transform = dropdown.open ? 'rotate(180deg)' : 'rotate(0deg)';
-        
-                    if (id === 'advanced-options-dropdown' && !dropdown.open) {
-                        const tagsDropdown = document.getElementById('tags-dropdown');
-                        if (tagsDropdown && tagsDropdown.open) tagsDropdown.open = false;
+                   if (chevron) {
+                        chevron.style.transform = dropdown.open ? 'rotate(180deg)' : 'rotate(0deg)';
                     }
                 });
             });
         }
-        </script>
-        
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+            window.selectedSearchField = 'all';
+        });
+
+    </script>
 </body>
 </html>
