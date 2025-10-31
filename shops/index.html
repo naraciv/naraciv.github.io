@@ -97,6 +97,30 @@
                 display: none;
             }
         }
+
+        table th,
+        table td {
+            word-wrap: break-word;
+            min-width: 100px;
+            max-width: 200px;
+        }
+
+        /* Update mobile styles */
+        @media (max-width: 768px) {
+            table th,
+            table td {
+                min-width: 80px;
+                max-width: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            table th,
+            table td {
+                min-width: 60px;
+                max-width: 120px;
+            }
+        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col">
@@ -204,13 +228,13 @@
                                 <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(1)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
-                                        <span>Output (mouse over)</span>
+                                        <span>Output</span>
                                     </div>
                                 </th>
                                 <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(2)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
-                                        <span>Lore (mouse over)</span>
+                                        <span>Output Item Lore</span>
                                     </div>
                                 </th>
                                 <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(3)">
@@ -458,8 +482,9 @@
                 row.forEach((cell, i) => {
                     if (i === 0 || i === 7) return; // skip tags column
                     const td = document.createElement('td');
-                    td.className = 'px-6 py-4 text-sm text-gray-300 truncate';
-                    td.title = cell; // Add tooltip for truncated text
+                    td.className = 'px-6 py-4 text-sm text-gray-300 break-words whitespace-normal';
+                    td.style.maxWidth = '200px'; // Set maximum width before wrapping
+                    td.title = cell; // Keep tooltip for full text
                     td.textContent = cell;
                     tr.appendChild(td);
                 });

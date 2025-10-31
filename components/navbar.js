@@ -39,7 +39,7 @@ class CustomNavbar extends HTMLElement {
           transition: color 0.3s;
           position: relative;
         }
-        .nav-link:hover {
+        .nav-link:hover:not(.active) {
           color: #2596be;
         }
         .nav-link::after {
@@ -52,7 +52,7 @@ class CustomNavbar extends HTMLElement {
           background: #2596be;
           transition: width 0.3s;
         }
-        .nav-link:hover::after {
+        .nav-link:hover:not(.active)::after {
           width: 100%;
         }
         .active {
@@ -60,6 +60,12 @@ class CustomNavbar extends HTMLElement {
         }
         .active::after {
           width: 100%;
+          content: '';
+          position: absolute;
+          bottom: -5px;
+          left: 0;
+          height: 2px;
+          background: #2596be;
         }
         
         /* Hamburger Menu */
@@ -157,17 +163,30 @@ class CustomNavbar extends HTMLElement {
       </nav>
     `;
     
-    // Add event listener for mobile menu
+    // Add event listeners after creating shadow DOM
     const menuToggle = this.shadowRoot.querySelector('.menu-toggle');
     const navLinks = this.shadowRoot.querySelector('.nav-links');
+    const links = this.shadowRoot.querySelectorAll('.nav-link');
     
+    // Add active class to current page link
+    const currentPath = window.location.pathname;
+    const cleanCurrentPath = currentPath.replace('index.html', '').replace(/\/$/, '');
+
+links.forEach(link => {
+  const href = link.getAttribute('href');
+  const cleanHref = href.replace(/\/$/, '');
+  
+  if (cleanCurrentPath === cleanHref) {
+    link.classList.add('active');
+  }
+});
+
     menuToggle.addEventListener('click', () => {
       menuToggle.classList.toggle('active');
       navLinks.classList.toggle('active');
     });
     
     // Close menu when clicking a link
-    const links = this.shadowRoot.querySelectorAll('.nav-link');
     links.forEach(link => {
       link.addEventListener('click', () => {
         menuToggle.classList.remove('active');
@@ -184,4 +203,5 @@ class CustomNavbar extends HTMLElement {
     });
   }
 }
+
 customElements.define('custom-navbar', CustomNavbar);

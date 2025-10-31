@@ -1,4 +1,4 @@
-Timestamp,Input,Output,Lore,Coords,Stock,City,Tags,Contact
+Timestamp,Input,Output,Lore,Coords,In Stock,City,Tags,Contact
 2025-10-29T18:15:13.160183,5 Diamond,"1 Barrel ""Copper Workshop Repair Kit""",One kit will repair a Copper Workshop to full health.,"3736,81,7001",TRUE,Orakuru,Infra,
 2025-10-29T18:15:18.926341,4 Diamond,"1 Barrel ""Grill Factory Repair Kit""",One kit will repair a Grill Factory to full health.,"3736,81,7003",TRUE,Orakuru,Infra,
 2025-10-29T18:15:21.422335,5 Diamond,"1 Barrel ""Iron Forge Repair Kit""",One kit will repair an Iron Forge to full health.,"3736,81,7004",TRUE,Orakuru,Infra,
@@ -16,18 +16,18 @@ Timestamp,Input,Output,Lore,Coords,Stock,City,Tags,Contact
 2025-10-29T18:16:12.577007,128 Diamond,"1 Barrel ""Bastion Factory Repair Kit""",One kit will repair a Bastion Factory to full health.,"3727,81,6995",TRUE,Orakuru,Infra,
 2025-10-29T18:16:13.831926,2 Diamond,"1 Barrel ""Bio Factory Repair Kit""",One kit will repair a Bio Factory to full health.,"3728,81,6995",TRUE,Orakuru,Infra,
 2025-10-29T18:16:15.139472,2 Diamond,"1 Barrel ""Concrete Mixer Repair Kit""",One kit will repair a Concrete Mixer to full health.,"3729,81,6995",TRUE,Orakuru,Infra,
-2025-10-29T18:16:25.025298,4 Diamond,1 Block of Emerald,No lore,"3728,88,7014",TRUE,Orakuru,Raw Materials,
+2025-10-29T18:16:25.025298,4 Diamond,1 Block of Emerald, ,"3728,88,7014",TRUE,Orakuru,Raw Materials,
 2025-10-29T18:16:29.504185,2 Diamond,1 Amethyst Shard,Compacted Item,"3724,89,7014",TRUE,Orakuru,Raw Materials,
 2025-10-29T18:16:32.221006,3 Diamond,16 Charcoal,Compacted Item,"3716,90,7005",TRUE,Orakuru,Raw Materials,
 2025-10-29T18:16:33.965376,1 Diamond,8 Bone Meal,Compacted Item,"3716,88,7004",TRUE,Orakuru,Raw Materials,
-2025-10-29T18:16:45.141452,5 Diamond,1 Anvil,No lore,"3716,95,7003",FALSE,Orakuru,"Blocks, Infra",
-2025-10-29T18:16:47.102216,1 Diamond,64 Lapis Lazuli,No lore,"3716,95,7002",TRUE,Orakuru,Raw Materials,
-2025-10-29T18:16:48.367422,2 Diamond,1 Crafter,No lore,"3716,95,7001",TRUE,Orakuru,Blocks,
-2025-10-29T18:16:50.544829,1 Diamond,64 Cooked Porkchop,No lore,"3716,95,7000",TRUE,Orakuru,Food/Pots,
-2025-10-29T18:16:52.549081,"3 Eye of Ender ""Player Essence""",1 Minecart,No lore,"3716,95,6999",TRUE,Orakuru,Other,
-2025-10-29T18:16:54.317310,"3 Eye of Ender ""Player Essence""",1 Oak Boat,No lore,"3716,95,6998",TRUE,Orakuru,Other,
-2025-10-29T18:16:56.124129,1 Diamond,1 Bundle,No lore,"3716,95,6997",TRUE,Orakuru,Tools,
-2025-10-29T18:17:12.072645,8 Iron Ingot,1 Bundle,No lore,"3716,95,6997",TRUE,Orakuru,Tools,
+2025-10-29T18:16:45.141452,5 Diamond,1 Anvil, ,"3716,95,7003",FALSE,Orakuru,"Blocks, Infra",
+2025-10-29T18:16:47.102216,1 Diamond,64 Lapis Lazuli, ,"3716,95,7002",TRUE,Orakuru,Raw Materials,
+2025-10-29T18:16:48.367422,2 Diamond,1 Crafter, ,"3716,95,7001",TRUE,Orakuru,Blocks,
+2025-10-29T18:16:50.544829,1 Diamond,64 Cooked Porkchop, ,"3716,95,7000",TRUE,Orakuru,Food/Pots,
+2025-10-29T18:16:52.549081,"3 Eye of Ender ""Player Essence""",1 Minecart, ,"3716,95,6999",TRUE,Orakuru,Other,
+2025-10-29T18:16:54.317310,"3 Eye of Ender ""Player Essence""",1 Oak Boat, ,"3716,95,6998",TRUE,Orakuru,Other,
+2025-10-29T18:16:56.124129,1 Diamond,1 Bundle, ,"3716,95,6997",TRUE,Orakuru,Tools,
+2025-10-29T18:17:12.072645,8 Iron Ingot,1 Bundle, ,"3716,95,6997",TRUE,Orakuru,Tools,
 2025-10-29T18:18:08.679059,16 Iron Ingot,1 Black Dye,Compacted Item,"3649,77,6918",TRUE,Orakuru,Other,
 2025-10-29T18:18:10.014987,12 Iron Ingot,1 Black Glazed Terracotta,Compacted Item,"3650,77,6916",TRUE,Orakuru,Blocks,
 2025-10-29T18:18:12.245028,2 Iron Ingot,1 Black Wool,Compacted Item,"3649,77,6913",TRUE,Orakuru,Blocks,
@@ -53,7 +53,7 @@ Timestamp,Input,Output,Lore,Coords,Stock,City,Tags,Contact
 2025-10-29T18:40:15.664765,5 Iron Ingot,1 Red Concrete,Compacted Item,"3681,92,6953",TRUE,Orakuru,Blocks,
 2025-10-29T18:40:16.953872,8 Iron Ingot,1 Red Terracotta,Compacted Item,"3682,92,6953",TRUE,Orakuru,Blocks,
 2025-10-29T18:40:18.051043,2 Iron Ingot,1 Red Dye,Compacted Item,"3683,92,6953",TRUE,Orakuru,Other,
-2025-10-29T18:47:58.825173,9 Diamond,1 Beacon,No lore,"3202,69,4822",TRUE,Shiroyama,"Defense, Infra",HPLaptop
+2025-10-29T18:47:58.825173,9 Diamond,1 Beacon, ,"3202,69,4822",TRUE,Shiroyama,"Defense, Infra",HPLaptop
 2025-10-29T18:48:00.831780,3 Diamond,1 Diamond Helmet,Condition: Undamaged|Never repaired,"3203,69,4820",TRUE,Shiroyama,"Defense, Tools/Armor",HPLaptop
 2025-10-29T18:48:01.931769,6 Diamond,1 Diamond Chestplate,Condition: Undamaged|Never repaired,"3204,69,4820",TRUE,Shiroyama,"Defense, Tools/Armor",HPLaptop
 2025-10-29T18:48:03.175419,4 Diamond,1 Diamond Leggings,Condition: Undamaged|Never repaired,"3205,69,4820",FALSE,Shiroyama,"Defense, Tools/Armor",HPLaptop
