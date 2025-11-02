@@ -449,7 +449,7 @@
                 }
         
                 if (selectedTags.size > 0) {
-                    const rowTags = (row[2] || '').split(',').map(t => t.trim());
+                    const rowTags = (row[7] || '').split(',').map(t => t.trim());
                     if (![...selectedTags].some(tag => rowTags.includes(tag))) return false;
                 }
         
