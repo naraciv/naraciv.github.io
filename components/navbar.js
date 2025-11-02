@@ -27,6 +27,52 @@ class CustomNavbar extends HTMLElement {
           color: #2596be;
           text-decoration: none;
           z-index: 1001;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          display: inline-block;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+        }
+        .nav-logo::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(circle, rgba(37, 150, 190, 0) 0%, rgba(37, 150, 190, 0) 100%);
+          border-radius: 8px;
+          z-index: 0;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          opacity: 0;
+        }
+        .nav-logo:hover {
+          color: #4dc4e8;
+          transform: scale(1.1) translateY(-2px);
+          text-shadow: 0 0 30px rgba(77, 196, 232, 1),
+                       0 0 60px rgba(37, 150, 190, 0.8);
+          filter: brightness(1.5);
+        }
+        .nav-logo:hover::before {
+          background: radial-gradient(circle, rgba(37, 150, 190, 0.4) 0%, rgba(37, 150, 190, 0) 70%);
+          opacity: 1;
+          box-shadow: 0 0 40px rgba(37, 150, 190, 0.6),
+                      0 0 80px rgba(37, 150, 190, 0.4),
+                      inset 0 0 30px rgba(37, 150, 190, 0.2);
+        }
+        .nav-logo::after {
+          content: '';
+          position: absolute;
+          bottom: -5px;
+          left: 0;
+          width: 0;
+          height: 3px;
+          background: linear-gradient(90deg, #2596be, #4dc4e8);
+          transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 0 10px rgba(37, 150, 190, 0.8);
+        }
+        .nav-logo:hover::after {
+          width: 100%;
         }
         .nav-links {
           display: flex;

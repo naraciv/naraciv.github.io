@@ -121,6 +121,25 @@
                 max-width: 120px;
             }
         }
+
+        .coord-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #2596be;
+            transition: width 0.3s;
+        }
+
+        .coord-link:hover::after {
+            width: 100%;
+        }
+
+        .coord-link:hover {
+            color: #2596be;
+        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col">
@@ -480,12 +499,43 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-800 transition-colors';
                 row.forEach((cell, i) => {
-                    if (i === 0 || i === 7) return; // skip tags column
+                    if (i === 0 || i === 7) return; // skip timestamp and tags column
                     const td = document.createElement('td');
                     td.className = 'px-6 py-4 text-sm text-gray-300 break-words whitespace-normal';
-                    td.style.maxWidth = '200px'; // Set maximum width before wrapping
-                    td.title = cell; // Keep tooltip for full text
-                    td.textContent = cell;
+                    td.style.maxWidth = '200px';
+                    
+                    // Special handling for coordinates column (index 4)
+                    if (i === 4 && cell) {
+                        // Ensure coordinates have spaces after commas
+                        const formattedCoords = cell.split(',').map(c => c.trim()).join(', ');
+                        const coords = formattedCoords.split(',').map(c => c.trim());
+                        
+                        if (coords.length >= 3) {
+                            const x = coords[0];
+                            const z = coords[2];
+                            const mapUrl = `https://map.civinfo.net/#c=${x},${z}`;
+                            
+                            const link = document.createElement('a');
+                            link.href = mapUrl;
+                            link.target = '_blank';
+                            link.rel = 'noopener noreferrer';
+                            link.textContent = formattedCoords;
+                            link.className = 'coord-link transition-colors';
+                            link.style.color = '#2596be';
+                            link.style.textDecoration = 'none';
+                            link.style.position = 'relative';
+                            link.style.display = 'inline-block';
+                            link.title = 'Open in CivInfo map';
+                            
+                            td.appendChild(link);
+                        } else {
+                            td.textContent = formattedCoords;
+                        }
+                    } else {
+                        td.title = cell;
+                        td.textContent = cell;
+                    }
+                    
                     tr.appendChild(td);
                 });
                 tbody.appendChild(tr);
