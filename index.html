@@ -10,6 +10,16 @@
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 <link rel="stylesheet" href="style.css">
 <style>
+    @font-face {
+    font-family: 'HIROMISAKE';
+    src: url('/static/HIROMISAKE.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    }
+
+    #nara-title {
+    font-family: 'HIROMISAKE', sans-serif;
+    }
     /* City card hover effect */
     .city-card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -165,63 +175,64 @@
   const flagImg = document.getElementById('flag-img');
   const flagBg = document.getElementById('flag-bg');
   const sunGlow = document.getElementById('sun-glow');
-  const title = document.getElementById('nara-title');
-  const subtitle = document.getElementById('hero-subtitle');
-  
   // Safe initialisation (only if flagContainer exists)
   if (flagContainer) {
-  // If you still want flagBg to use the image, set it — guarded by flagImg existence
-  if (flagBg && flagImg && flagImg.src) {
-  flagBg.style.backgroundImage = `url(${flagImg.src})`;
-  flagBg.style.backgroundSize = 'contain';
-  flagBg.style.backgroundPosition = 'center';
-  flagBg.style.backgroundRepeat = 'no-repeat';
-  flagBg.style.opacity = '0';
-  }
+  // Create a clone for the background transition
+  const flagClone = flagContainer.cloneNode(true);
+  flagClone.id = 'flag-clone';
+  flagClone.style.zIndex = '-1'; // Behind the original initially
+  flagClone.style.pointerEvents = 'none';
+  flagContainer.parentElement.insertBefore(flagClone, flagContainer);
   
   // initial states
   flagContainer.style.transform = 'translate(-50%, 80%) scale(0.8)';
   flagContainer.style.opacity = '0';
+  flagClone.style.opacity = '0';
   if (sunGlow) sunGlow.style.opacity = '0';
-  if (title) { title.style.opacity = '0'; title.style.transition = 'opacity 1.2s ease-in'; }
-  if (subtitle) { subtitle.style.opacity = '0'; subtitle.style.transition = 'opacity 1.2s ease-in'; }
   
   // sequence
   setTimeout(() => {
-  // rise up
+  // rise up to peak (10% above text)
   flagContainer.style.transition = 'transform 2.5s cubic-bezier(0.45, 0, 0.25, 1), opacity 2s ease-out';
-  flagContainer.style.transform = 'translate(-50%, -20%) scale(1)';
+  flagContainer.style.transform = 'translate(-50%, -40%) scale(1)';
   flagContainer.style.opacity = '1';
   
-  // title
+
+  
+  // At peak, wait 0.5s then transition to background
   setTimeout(() => {
-  if (title) title.style.opacity = '1';
-  }, 1000);
+  // Position clone at the same spot
+  flagClone.style.transform = flagContainer.style.transform;
+  flagClone.style.opacity = '0';
   
-  // subtitle
+  // Wait 0.5s before starting transition
   setTimeout(() => {
-  if (subtitle) subtitle.style.opacity = '1';
-  }, 2000);
-  
-  // settle into background glow
-  setTimeout(() => {
-  // fade the visible flag out (we keep the single SVG element)
-  flagContainer.style.transition = 'transform 3s ease-in-out, opacity 3s ease-in-out, filter 3s ease-in-out';
-  // place it behind the title (translate to center-ish and fade)
-  flagContainer.style.transform = 'translate(-50%, -50%) scale(1.2)';
-  flagContainer.style.opacity = '0';
-  
-  // show the CSS radial glow instead of a small leftover svg
-  if (sunGlow) {
-  sunGlow.style.transition = 'opacity 3s ease-in-out';
-  sunGlow.style.opacity = '1';
-  }
-  
-  // subtle background flag (if desired)
-  if (flagBg) {
-  flagBg.style.transition = 'opacity 3s ease-in-out';
-  flagBg.style.opacity = '0.06'; // very subtle; change as needed
-  }
+    // Fade out original
+    flagContainer.style.transition = 'opacity 0.5s ease-out';
+    flagContainer.style.opacity = '0';
+    
+    // Show clone at same position
+    flagClone.style.transition = 'opacity 0.3s ease-in';
+    flagClone.style.opacity = '1';
+    
+    // After original fades, start expanding clone slowly
+    setTimeout(() => {
+      
+      // Slow expansion to background (5 seconds)
+      flagClone.style.transition = 'transform 5s cubic-bezier(0.19, 1, 0.22, 1), opacity 5s cubic-bezier(0.19, 1, 0.22, 1)';
+      flagClone.style.transform = 'translate(-50%, -15%) scale(8)';
+      flagClone.style.opacity = '0.10'; // Keep it visible when done
+      
+      setTimeout(() => {
+        // Show the CSS radial glow
+        if (sunGlow) {
+            sunGlow.style.background = 'radial-gradient(circle, rgba(37,150,190,0.25) 0%, rgba(37,150,190,0.05) 70%, transparent 100%)';
+            sunGlow.style.transition = 'opacity 5s ease-in-out';
+            sunGlow.style.opacity = '1';
+        }
+      }, 3000);
+    }, 500);
+  }, 500);
   }, 4000);
   }, 500);
   } else {
@@ -249,7 +260,7 @@
   image.style.transition = 'transform 1.5s ease-in-out, opacity 1.5s ease-in-out';
   image.style.transform = 'translateY(-50px) scale(0.92)';
   image.style.opacity = '0.8';
-  image.style.zIndex = '0';
+  image.style.zIndex = '-1';
   }, 1500);
   };
   
@@ -342,12 +353,12 @@
 <div id="sun-glow" class="absolute left-1/2 top-1/2 w-[600px] h-[600px] rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
 
 <!-- Title -->
-<h1 id="nara-title" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl font-bold text-white opacity-0">
+<h1 id="nara-title" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-8xl font-bold text-white">
 NARA
 </h1>
 </div>
 
-<p id="hero-subtitle" class="mt-8 text-xl max-w-2xl mx-auto opacity-0 transition-opacity duration-1000 delay-500">
+<p id="hero-subtitle" class="mt-8 text-xl max-w-2xl mx-auto transition-opacity duration-1000 delay-500">
 A vibe-based Japanese-themed nation on CivMC
 </p>
 </div>

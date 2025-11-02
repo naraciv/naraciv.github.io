@@ -265,17 +265,11 @@
                                 <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(4)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
-                                        <span>In stock</span>
-                                    </div>
-                                </th>
-                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(5)">
-                                    <div class="flex items-center">
-                                        <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>City</span>
                                     </div>
                                 </th>
 
-                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(7)">
+                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(5)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>Contact</span>
@@ -499,7 +493,7 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-800 transition-colors';
                 row.forEach((cell, i) => {
-                    if (i === 0 || i === 7) return; // skip timestamp and tags column
+                    if (i === 0 || i === 7 || i === 5) return; // skip timestamp and tags column
                     const td = document.createElement('td');
                     td.className = 'px-6 py-4 text-sm text-gray-300 break-words whitespace-normal';
                     td.style.maxWidth = '200px';
