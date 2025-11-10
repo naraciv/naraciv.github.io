@@ -140,6 +140,54 @@
         .coord-link:hover {
             color: #2596be;
         }
+
+        /* Lore tooltip styles */
+         .lore-icon {
+            cursor: help;
+            margin-left: 4px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+        }
+
+        .lore-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            z-index: 1000;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: left;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #4b5563;
+            font-size: 0.875rem;
+            white-space: pre-wrap;
+            width: 15vw;
+            min-width: 200px;
+            max-width: 400px;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .lore-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+
+        .lore-icon:hover .lore-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col">
@@ -182,7 +230,6 @@
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="all">All Fields</button>
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="input">Input</button>
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="output">Output</button>
-                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="shop">Shop Name</button>
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="coords">Coords</button>
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="contact">Contact (IGN)</button>
                                 <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="city">City</button>
@@ -238,38 +285,31 @@
                     <table class="w-full table-fixed">
                         <thead class="bg-gray-800">
                             <tr>
-                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(0)">
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(1)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1" style="transition: transform 0.2s, opacity 0.2s;"></i>
                                         <span>Input</span>
                                     </div>
                                 </th>
-                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(1)">
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(3)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>Output</span>
                                     </div>
                                 </th>
-                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(2)">
-                                    <div class="flex items-center">
-                                        <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
-                                        <span>Output Item Lore</span>
-                                    </div>
-                                </th>
-                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(3)">
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(5)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>Coords</span>
                                     </div>
                                 </th>
-                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(4)">
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(7)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>City</span>
                                     </div>
                                 </th>
-
-                                <th class="w-1/8 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(5)">
+                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(9)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>Contact</span>
@@ -293,6 +333,7 @@
         
         let shopData = [];
         let filteredData = [];
+        let processedData = []; // Add this to store processed versions
         let currentSortColumn = null;
         let sortDirection = 'asc';
         let selectedCities = { all: true, shiroyama: true, orakuru: true };
@@ -305,10 +346,30 @@
             .then(csvText => {
                 const results = Papa.parse(csvText, { header: false, skipEmptyLines: true });
                 shopData = results.data.slice(1); // skip header row
-                filteredData = [...shopData];
+                processAllData(); // Process data on load
+                filteredData = [...processedData];
                 init();
             })
             .catch(err => console.error('Error loading CSV:', err));
+        
+        // Process all data upfront
+        function processAllData() {
+            processedData = shopData.map(row => {
+                const newRow = [...row];
+                
+                // Process Input (index 1) with Input_Lore (index 2)
+                const inputLore = row[2] || '';
+                const { displayName: processedInput } = processItemWithLore(row[1], inputLore);
+                newRow[1] = processedInput;
+                
+                // Process Output (index 3) with Output_Lore (index 4)
+                const outputLore = row[4] || '';
+                const { displayName: processedOutput } = processItemWithLore(row[3], outputLore);
+                newRow[3] = processedOutput;
+                
+                return newRow;
+            });
+        }
         
         // Initialize everything
         function init() {
@@ -324,7 +385,7 @@
         // Extract unique tags from CSV
         function extractTags() {
             shopData.forEach(row => {
-                const tagsString = row[7];
+                const tagsString = row[8]; // Tags column is now at index 8
                 if (tagsString && tagsString.trim()) {
                     tagsString.split(',').map(t => t.trim()).forEach(tag => availableTags.add(tag));
                 }
@@ -454,28 +515,30 @@
             const searchField = window.selectedSearchField || 'all';
             const excludeOutOfStock = document.getElementById('exclude-out-of-stock').checked;
         
-            filteredData = shopData.filter(row => {
-                const city = (row[6] || '').toLowerCase();
+            filteredData = processedData.filter((row, index) => {
+                const originalRow = shopData[index]; // Get original row for tags
+                const city = (row[7] || '').toLowerCase(); // City is now at index 7
                 if (!selectedCities.all) {
                     if (!(selectedCities.shiroyama && city === 'shiroyama') &&
                         !(selectedCities.orakuru && city === 'orakuru')) return false;
                 }
         
                 if (selectedTags.size > 0) {
-                    const rowTags = (row[7] || '').split(',').map(t => t.trim());
+                    const rowTags = (originalRow[8] || '').split(',').map(t => t.trim()); // Tags at index 8
                     if (![...selectedTags].some(tag => rowTags.includes(tag))) return false;
                 }
         
                 if (searchTerm) {
                     if (searchField === 'all') {
+                        // Search through processed data
                         if (!row.some(cell => cell.toLowerCase().includes(searchTerm))) return false;
                     } else {
-                        const fieldIndex = { 'input': 0, 'output': 1, 'shop': 3, 'coords': 4, 'contact': 5, 'city': 6 };
+                        const fieldIndex = { 'input': 1, 'output': 3, 'coords': 5, 'contact': 9, 'city': 7 };
+                        // Search using processed data
                         if (!row[fieldIndex[searchField]].toLowerCase().includes(searchTerm)) return false;
                     }
                 }
                 
-
                 // cute way to eliminate broken entries for now. TODO FIX WHEN STOCK FLAG IS INTRODUCED
                 if (excludeOutOfStock && row.some(cell => cell.includes('#REF!'))) return false;
         
@@ -485,22 +548,103 @@
             renderTable();
         }
         
+        // Process item name and lore
+ function processItemWithLore(itemName, loreText) {
+            let displayName = itemName;
+            let loreContent = loreText;
+            
+            // Check if lore contains "Compacted Item"
+            if (loreContent && loreContent.includes('Compacted Item')) {
+                displayName += ' (CI)';
+                loreContent = loreContent.replace(/Compacted Item,?\s*/gi, '').trim();
+            }
+            
+            // Check if lore contains "Crate"
+            if (loreContent && loreContent.includes('Crate')) {
+                displayName += ' (Crate)';
+                loreContent = loreContent.replace(/Crate,?\s*/gi, '').trim();
+            }
+            
+            // Process lore content for display
+            if (loreContent) {
+                // Remove leading | if it's the first non-whitespace character
+                loreContent = loreContent.replace(/^\s*\|/, '');
+                // Replace remaining | with newlines
+                loreContent = loreContent.replace(/\|/g, '\n');
+                // Strip out § followed by any letter (Minecraft formatting codes)
+                loreContent = loreContent.replace(/§[a-zA-Z]/g, '');
+            }
+            
+            return { displayName, loreContent };
+        }
+        
         // Render table
         function renderTable() {
             const tbody = document.getElementById('shop-table-body');
             tbody.innerHTML = '';
-            filteredData.forEach(row => {
+            filteredData.forEach((row, rowIndex) => {
+                const originalIndex = processedData.indexOf(row);
+                const originalRow = shopData[originalIndex];
+                
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-800 transition-colors';
-                row.forEach((cell, i) => {
-                    if (i === 0 || i === 7 || i === 5) return; // skip timestamp and tags column
+                
+                // Column indices: 0=Timestamp, 1=Input, 2=Input_Lore, 3=Output, 4=Output_Lore, 5=Coordinates, 6=Exchanges_Available, 7=City, 8=Tags, 9=Contact
+                const displayColumns = [1, 3, 5, 7, 9]; // Input, Output, Coordinates, City, Contact
+                
+                displayColumns.forEach(i => {
                     const td = document.createElement('td');
                     td.className = 'px-6 py-4 text-sm text-gray-300 break-words whitespace-normal';
                     td.style.maxWidth = '200px';
                     
-                    // Special handling for coordinates column (index 4)
-                    if (i === 4 && cell) {
-                        // Ensure coordinates have spaces after commas
+                    let cell = row[i] || '';
+                    
+                    // Handle Input column (index 1) with Input_Lore (index 2)
+                    if (i === 1) {
+                        const inputLore = originalRow[2] || '';
+                        const { loreContent } = processItemWithLore(originalRow[1], inputLore);
+                        
+                        const span = document.createElement('span');
+                        span.textContent = cell; // Use processed name from row
+                        td.appendChild(span);
+                        
+                        if (loreContent && loreContent.trim()) {
+                            const icon = document.createElement('span');
+                            icon.className = 'lore-icon';
+                            icon.innerHTML = '<i data-feather="book-open" class="w-4 h-4 text-gray-400"></i>';
+                            
+                            const tooltip = document.createElement('span');
+                            tooltip.className = 'lore-tooltip';
+                            tooltip.textContent = loreContent;
+                            
+                            icon.appendChild(tooltip);
+                            td.appendChild(icon);
+                        }
+                    }
+                    // Handle Output column (index 3) with Output_Lore (index 4)
+                    else if (i === 3) {
+                        const outputLore = originalRow[4] || '';
+                        const { loreContent } = processItemWithLore(originalRow[3], outputLore);
+                        
+                        const span = document.createElement('span');
+                        span.textContent = cell; // Use processed name from row
+                        td.appendChild(span);
+                        
+                        if (loreContent && loreContent.trim()) {
+                            const icon = document.createElement('span');
+                            icon.className = 'lore-icon';
+                            icon.innerHTML = '<i data-feather="book-open" class="w-4 h-4 text-gray-400"></i>';
+                            
+                            const tooltip = document.createElement('span');
+                            tooltip.className = 'lore-tooltip';
+                            tooltip.textContent = loreContent;
+                            
+                            icon.appendChild(tooltip);
+                            td.appendChild(icon);
+                        }
+                    }
+                    // Handle Coordinates column (index 5)
+                    else if (i === 5 && cell) {
                         const formattedCoords = cell.split(',').map(c => c.trim()).join(', ');
                         const coords = formattedCoords.split(',').map(c => c.trim());
                         
@@ -525,7 +669,9 @@
                         } else {
                             td.textContent = formattedCoords;
                         }
-                    } else {
+                    }
+                    // Handle other columns normally
+                    else {
                         td.title = cell;
                         td.textContent = cell;
                     }
@@ -534,6 +680,9 @@
                 });
                 tbody.appendChild(tr);
             });
+            
+            // Replace feather icons after rendering
+            feather.replace();
         }
         
         // Modified sortTable function
@@ -566,18 +715,21 @@
                     const icon = th.querySelector('.sort-arrow');
                     if (!icon) return;
                     
+                    // Map display column index to actual data column index
+                    const displayToDataMap = [1, 3, 5, 7, 9]; // Input, Output, Coords, City, Contact
+                    const dataColumnIndex = displayToDataMap[i];
+                    
                     // Show full opacity and white color only for selected column
-                    if (i === currentSortColumn) {
+                    if (dataColumnIndex === currentSortColumn) {
                         icon.style.opacity = '1';
-                        th.classList.add('text-white'); // Make text white
-                        th.classList.remove('text-primary'); // Remove red color
-                        // Rotate chevron based on sort direction
+                        th.classList.add('text-white');
+                        th.classList.remove('text-primary');
                         icon.style.transform = sortDirection === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)';
                     } else {
                         icon.style.opacity = '0.3';
-                        th.classList.remove('text-white'); // Remove white
-                        th.classList.add('text-primary'); // Keep red for unselected
-                        icon.style.transform = 'rotate(0deg)'; // Reset rotation
+                        th.classList.remove('text-white');
+                        th.classList.add('text-primary');
+                        icon.style.transform = 'rotate(0deg)';
                     }
                 });
             });
