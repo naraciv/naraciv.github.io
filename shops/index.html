@@ -352,6 +352,109 @@
             })
             .catch(err => console.error('Error loading CSV:', err));
         
+        // Load filters from URL on page load
+        function loadFiltersFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            
+            // Load search query
+            const searchQuery = params.get('search');
+            if (searchQuery) {
+                document.getElementById('search-input').value = searchQuery;
+            }
+            
+            // Load search field
+            const searchField = params.get('field');
+            if (searchField) {
+                window.selectedSearchField = searchField;
+                const fieldText = {
+                    'all': 'All Fields',
+                    'input': 'Input',
+                    'output': 'Output',
+                    'coords': 'Coords',
+                    'contact': 'Contact (IGN)',
+                    'city': 'City'
+                };
+                document.getElementById('selected-field').textContent = ' ' + (fieldText[searchField] || 'All Fields');
+            }
+            
+            // Load tags
+            const tagsParam = params.get('tags');
+            if (tagsParam) {
+                const tags = tagsParam.split(',');
+                tags.forEach(tag => selectedTags.add(tag));
+            }
+            
+            // Load cities
+            const citiesParam = params.get('cities');
+            if (citiesParam) {
+                const cities = citiesParam.split(',');
+                selectedCities.all = cities.includes('all');
+                selectedCities.shiroyama = cities.includes('shiroyama');
+                selectedCities.orakuru = cities.includes('orakuru');
+            }
+            
+            // Load exclude out of stock
+            const excludeOutOfStock = params.get('exclude_oos');
+            if (excludeOutOfStock === 'true') {
+                document.getElementById('exclude-out-of-stock').checked = true;
+            }
+            
+            // Load sort column and direction
+            const sortCol = params.get('sort_col');
+            const sortDir = params.get('sort_dir');
+            if (sortCol) {
+                currentSortColumn = parseInt(sortCol);
+                sortDirection = sortDir || 'asc';
+            }
+        }
+        
+        // Update URL with current filters
+        function updateURL() {
+            const params = new URLSearchParams();
+            
+            // Add search query
+            const searchQuery = document.getElementById('search-input').value;
+            if (searchQuery) {
+                params.set('search', searchQuery);
+            }
+            
+            // Add search field
+            const searchField = window.selectedSearchField;
+            if (searchField && searchField !== 'all') {
+                params.set('field', searchField);
+            }
+            
+            // Add tags
+            if (selectedTags.size > 0) {
+                params.set('tags', Array.from(selectedTags).join(','));
+            }
+            
+            // Add cities if not all selected
+            if (!selectedCities.all) {
+                const activeCities = [];
+                if (selectedCities.shiroyama) activeCities.push('shiroyama');
+                if (selectedCities.orakuru) activeCities.push('orakuru');
+                if (activeCities.length > 0) {
+                    params.set('cities', activeCities.join(','));
+                }
+            }
+            
+            // Add exclude out of stock
+            if (document.getElementById('exclude-out-of-stock').checked) {
+                params.set('exclude_oos', 'true');
+            }
+            
+            // Add sort column and direction
+            if (currentSortColumn !== null) {
+                params.set('sort_col', currentSortColumn);
+                params.set('sort_dir', sortDirection);
+            }
+            
+            // Update URL without reloading
+            const newURL = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+            window.history.pushState({}, '', newURL);
+        }
+        
         // Process all data upfront
         function processAllData() {
             processedData = shopData.map(row => {
@@ -374,9 +477,21 @@
         // Initialize everything
         function init() {
             extractTags();
+            loadFiltersFromURL(); // Load filters from URL before rendering
             renderTagsFilter();
+            updateCityFilterButtons(); // Update city button styles based on loaded filters
             updateSelectedTagsDisplay();
-            renderTable();
+            
+            // Apply sort if loaded from URL
+            if (currentSortColumn !== null) {
+                filteredData.sort((a, b) => {
+                    const aVal = (a[currentSortColumn] || '').toLowerCase();
+                    const bVal = (b[currentSortColumn] || '').toLowerCase();
+                    return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                });
+            }
+            
+            filterData(); // This will render the table with filters applied
             setupEventListeners();
             setupDropdownAnimations();
             updateSortIndicators();
@@ -398,7 +513,13 @@
             tagsContainer.innerHTML = '';
             Array.from(availableTags).sort().forEach(tag => {
                 const btn = document.createElement('button');
-                btn.className = 'tag-filter-btn px-3 py-2 rounded-full border border-gray-600 bg-gray-900 text-gray-300 hover:border-nara-red hover:text-white transition-colors text-xs';
+                const isActive = selectedTags.has(tag);
+                btn.className = `tag-filter-btn px-3 py-2 rounded-full border transition-colors text-xs ${
+                    isActive 
+                        ? 'bg-nara-red border-nara-red text-white' 
+                        : 'border-gray-600 bg-gray-900 text-gray-300 hover:border-nara-red hover:text-white'
+                }`;
+                if (isActive) btn.classList.add('active');
                 btn.textContent = tag;
                 btn.dataset.tag = tag;
                 btn.addEventListener('click', () => toggleTagFilter(tag));
@@ -420,6 +541,7 @@
             }
             updateSelectedTagsDisplay();
             filterData();
+            updateURL();
         }
         
         // Update the selected tags display
@@ -449,9 +571,13 @@
         function removeTag(tag) {
             selectedTags.delete(tag);
             const btn = document.querySelector(`[data-tag="${tag}"]`);
-            if (btn) btn.classList.remove('active', 'bg-nara-red', 'border-nara-red', 'text-white');
+            if (btn) {
+                btn.classList.remove('active', 'bg-nara-red', 'border-nara-red', 'text-white');
+                btn.classList.add('border-gray-600', 'text-gray-300');
+            }
             filterData();
             updateSelectedTagsDisplay();
+            updateURL();
         }
         
         // Setup button event listeners
@@ -460,14 +586,21 @@
             document.getElementById('shiroyama-btn').addEventListener('click', () => toggleCityFilter('shiroyama'));
             document.getElementById('orakuru-btn').addEventListener('click', () => toggleCityFilter('orakuru'));
         
-            document.getElementById('search-input').addEventListener('input', filterData);
-            document.getElementById('exclude-out-of-stock').addEventListener('change', filterData);
+            document.getElementById('search-input').addEventListener('input', () => {
+                filterData();
+                updateURL();
+            });
+            document.getElementById('exclude-out-of-stock').addEventListener('change', () => {
+                filterData();
+                updateURL();
+            });
         
             document.querySelectorAll('.field-option').forEach(option => {
                 option.addEventListener('click', () => {
                     window.selectedSearchField = option.dataset.value;
                     document.getElementById('selected-field').textContent = ' ' + option.textContent;
                     filterData();
+                    updateURL();
                 });
             });
         }
@@ -485,6 +618,7 @@
             }
             updateCityFilterButtons();
             filterData();
+            updateURL();
         }
         
         // Update city filter button styles
@@ -692,6 +826,7 @@
                 currentSortColumn = columnIndex;
                 sortDirection = 'asc'; // Reset to ascending for new column
                 updateSortIndicators(); // Update visual indicators only
+                updateURL();
                 return; // Don't sort yet
             }
             
@@ -706,6 +841,7 @@
             
             renderTable();
             updateSortIndicators();
+            updateURL();
         }
         
         // Updated updateSortIndicators function
