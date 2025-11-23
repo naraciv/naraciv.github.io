@@ -31,3 +31,9 @@ jobs:
           git add data/leaderboard.csv
           # Only commit if there are changes
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update leaderboard" && git push)
+
+      - name: Trigger Deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run deploy.yml --ref main
