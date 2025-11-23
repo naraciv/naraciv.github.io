@@ -674,7 +674,7 @@
                 }
                 
                 // cute way to eliminate broken entries for now. TODO FIX WHEN STOCK FLAG IS INTRODUCED
-                if (excludeOutOfStock && row.some(cell => cell.includes('#REF!'))) return false;
+                if (excludeOutOfStock && row[6]=='F') return false;
         
                 return true;
             });
