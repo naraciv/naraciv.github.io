@@ -1,0 +1,33 @@
+name: Update Leaderboard
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Daily at 12am UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install axios papaparse
+        
+      - name: Run update script
+        run: node scripts/update-leaderboard.js
+        
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add data/leaderboard.csv
+          # Only commit if there are changes
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update leaderboard" && git push)
