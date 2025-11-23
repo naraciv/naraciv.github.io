@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <script>
+        (function() {
+            var path = window.location.pathname;
+            var segments = path.split('/').filter(p => p);
+            
+            // Check if we are in /stats/username
+            var statsIndex = segments.indexOf('stats');
+            
+            if (statsIndex !== -1 && segments.length > statsIndex + 1) {
+                var username = segments[segments.length - 1];
+                // Reconstruct the base path to /stats/
+                // e.g. /repo/stats/
+                var basePath = '/' + segments.slice(0, statsIndex + 1).join('/') + '/';
+                basePath = basePath.replace('//', '/'); // Cleanup
+                
+                // Redirect to query param version
+                window.location.replace(basePath + '?player=' + username);
+            } else {
+                // Fallback to home if not a stats route
+                window.location.replace('/');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>
