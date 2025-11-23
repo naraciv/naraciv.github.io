@@ -72,28 +72,34 @@ async function main() {
                         logout = login + oneDayMs;
                     }
 
-                    // Optimization: Skip sessions completely older than 1 year
-                    if (logout < oneYearAgo) continue;
 
-                    // Calculate overlaps
                     
-                    // All Time (Yearly)
-                    if (logout > oneYearAgo) {
-                        const start = Math.max(login, oneYearAgo);
-                        if (logout > start) allTime += (logout - start);
-                    }
+                   
 
+                    const start = login
                     // Monthly
-                    if (logout > oneMonthAgo) {
-                        const start = Math.max(login, oneMonthAgo);
-                        if (logout > start) monthly += (logout - start);
+
+                    if (logout > oneWeekAgo) {
+                        if (logout > start) { 
+                            weekly += (logout - start)
+                            monthly += (logout - start)
+                            allTime += (logout - start)
+                        }
+                    }
+                    else if (logout > oneMonthAgo) {
+                        if (logout > start) { 
+                            monthly += (logout - start)
+                            allTime += (logout - start)
+                        }
+                    }
+                    else {
+                        if (logout > start) { 
+                            allTime += (logout - start)
+                        }
                     }
 
                     // Weekly
-                    if (logout > oneWeekAgo) {
-                        const start = Math.max(login, oneWeekAgo);
-                        if (logout > start) weekly += (logout - start);
-                    }
+                    
                 }
 
                 if (allTime > 0) {
