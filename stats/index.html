@@ -4,15 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stats | Nara</title>
+    <!-- DNS prefetch for faster resolution -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://civapi.duckdns.org">
+    <link rel="dns-prefetch" href="https://mc-heads.net">
+    <link rel="dns-prefetch" href="https://minotar.net">
+    <link rel="dns-prefetch" href="https://d3js.org">
+    <!-- Preconnect for critical domains -->
+    <link rel="preconnect" href="https://civapi.duckdns.org" crossorigin>
+    <link rel="preconnect" href="https://mc-heads.net" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    <!-- D3.js -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- SkinView3D -->
-    <script src="https://bs-community.github.io/skinview3d/js/skinview3d.bundle.js"></script>
-    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" defer></script>
+    <link rel="stylesheet" href="../style.css" fetchpriority="high">
     <style>
         /* Custom scrollbar for leaderboard */
         .leaderboard-scroll::-webkit-scrollbar { width: 6px; }
@@ -20,7 +25,9 @@
         .leaderboard-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
         .leaderboard-scroll::-webkit-scrollbar-thumb:hover { background: #6b7280; }
 
-        .player-card { transition: transform 0.2s, background-color 0.2s; }
+        .player-card { 
+            transition: transform 0.2s, background-color 0.2s;
+        }
         .player-card:hover { transform: translateY(-2px); background-color: #1f2937; }
         
         .status-indicator {
@@ -51,7 +58,7 @@
 
         /* D3 Chart Styles */
         .chart-container text { fill: #9ca3af; font-size: 12px; font-family: sans-serif; }
-        .chart-container path, .chart-container line { stroke: #374151; }
+        .chart-container path, .chart-container line { stroke: #ef4444; }
         .line-path { fill: none; stroke: #ef4444; stroke-width: 2px; }
         .bar-rect { fill: #ef4444; }
         .brush .selection { fill: #ef4444; fill-opacity: 0.3; stroke: #ef4444; stroke-width: 1px; }
@@ -68,10 +75,10 @@
         }
     </style>
     
-<script src="../components/posthog.js"></script>
+<script src="../components/analytics.js" defer></script>
+<script src="../components/navbar.js" defer></script>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col">
-    <script src="../components/navbar.js"></script>
     <custom-navbar></custom-navbar>
 
     <div id="calendar-tooltip"></div>
@@ -85,8 +92,8 @@
         <div id="view-list" class="max-w-[95%] mx-auto w-full flex flex-col lg:flex-row gap-8">
             
             <!-- Left Sidebar: Leaderboard (20%) -->
-            <div class="w-full lg:w-1/5 flex flex-col gap-6">
-                <div class="bg-gray-900 rounded-lg border border-gray-800 p-4 h-fit sticky top-24">
+            <div class="w-full lg:w-1/5 flex flex-col gap-6 lg:sticky lg:top-24">
+                <div class="bg-gray-900 rounded-lg border border-gray-800 p-4 h-fit">
                     <h2 class="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
                         <i data-feather="bar-chart-2"></i> Leaderboard
                     </h2>
@@ -258,20 +265,320 @@
         let skinViewer = null;
         let currentChartType = 'calendar';
         let currentGranularity = 'weekly'; 
+        let durationIntervalId = null;
+        const INITIAL_OFFLINE_LIMIT = 50; // Only render what fits on screen initially
+        const OFFLINE_BATCH_SIZE = 30;
+        const PREFETCH_AHEAD = 100;
+        
+        // Cache DOM elements
+        let cachedElements = {
+            playerGrid: null,
+            playerSearch: null,
+            headerCount: null,
+            viewList: null,
+            viewProfile: null
+        };
+
+        let filteredPlayers = [];
+        let onlinePlayers = [];
+        let offlinePlayers = [];
+        let offlineIndex = 0;
+        let loadMoreObserver = null;
+        const loadMoreSentinel = document.createElement('div');
+        loadMoreSentinel.id = 'player-grid-sentinel';
+        loadMoreSentinel.className = 'h-8 col-span-full';
+        const prefetchedAvatars = new Set();
+
+        const pathSegments = window.location.pathname.split('/').filter(p => p);
+        const statsIndex = pathSegments.indexOf('stats');
+        const baseStatsPath = statsIndex === -1
+            ? window.location.pathname
+            : '/' + pathSegments.slice(0, statsIndex + 1).join('/') + '/';
+
+        const ICON_CLOCK = '<svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+        const ICON_LOGOUT = '<svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>';
+
+        let avatarObserver = null;
         
         const SERVER_START_DATE = 1654041600000; 
         const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
         const MAX_SESSION_MS = 23.8 * 60 * 60 * 1000; 
         const MAX_DATALABELS_RANGE = 14 * 24 * 60 * 60 * 1000;
 
-        // Image Hashing
-        const badHashes = new Set();
-        const hashCanvas = document.createElement('canvas');
-        hashCanvas.width = 32; hashCanvas.height = 32;
-        const hashCtx = hashCanvas.getContext('2d', { willReadFrequently: true });
+        // Avatar hash checking
+        let badAvatarHashes = new Set();
+        let hashCheckInitialized = false;
+
+        // Calculate image hash
+        async function getImageHash(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        
+                        // Simple hash: sum of all pixel values
+                        let hash = 0;
+                        for (let i = 0; i < imageData.data.length; i++) {
+                            hash = ((hash << 5) - hash) + imageData.data[i];
+                            hash = hash & hash; // Convert to 32bit integer
+                        }
+                        resolve(hash.toString());
+                    } catch (e) {
+                        reject(e);
+                    }
+                };
+                img.onerror = () => reject(new Error('Failed to load image'));
+                img.src = url;
+            });
+        }
+
+        // Initialize bad avatar hashes
+        async function initializeBadHashes() {
+            if (hashCheckInitialized) return;
+            try {
+                const blackHash = await getImageHash('../static/black.png');
+                const steveHash = await getImageHash('../static/steve.png');
+                badAvatarHashes.add(blackHash);
+                badAvatarHashes.add(steveHash);
+                console.log('Bad avatar hashes initialized:', Array.from(badAvatarHashes));
+                hashCheckInitialized = true;
+            } catch (e) {
+                console.error('Failed to initialize bad hashes:', e);
+            }
+        }
+
+        // Check if an avatar URL returns a bad hash
+        async function isAvatarBad(url) {
+            if (!hashCheckInitialized) await initializeBadHashes();
+            try {
+                const hash = await getImageHash(url);
+                const isBad = badAvatarHashes.has(hash);
+                return isBad;
+            } catch (e) {
+                return false; // If we can't check, assume it's okay
+            }
+        }
+
+        // --- External Script Loading ---
+        const scriptCache = {};
+
+        function loadExternalScript(src) {
+            if (!scriptCache[src]) {
+                scriptCache[src] = new Promise((resolve, reject) => {
+                    const existing = document.querySelector(`script[src="${src}"]`);
+                    if (existing) {
+                        if (existing.dataset.loaded === 'true') {
+                            resolve();
+                            return;
+                        }
+                        existing.addEventListener('load', () => resolve());
+                        existing.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)));
+                        return;
+                    }
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.async = true;
+                    script.dataset.loading = 'true';
+                    script.onload = () => {
+                        script.dataset.loaded = 'true';
+                        delete script.dataset.loading;
+                        resolve();
+                    };
+                    script.onerror = () => {
+                        script.remove();
+                        delete scriptCache[src];
+                        reject(new Error(`Failed to load ${src}`));
+                    };
+                    document.head.appendChild(script);
+                });
+            }
+            return scriptCache[src];
+        }
+
+        async function ensureD3() {
+            if (!window.d3) {
+                await loadExternalScript('https://d3js.org/d3.v7.min.js');
+            }
+        }
+
+        async function ensureSkinview() {
+            if (!window.skinview3d) {
+                await loadExternalScript('https://bs-community.github.io/skinview3d/js/skinview3d.bundle.js');
+            }
+        }
+
+        function refreshIcons() {
+            if (window.feather) {
+                feather.replace();
+            }
+        }
+
+        function ensureAvatarObserver() {
+            if (!('IntersectionObserver' in window)) {
+                return null;
+            }
+            if (!avatarObserver) {
+                avatarObserver = new IntersectionObserver((entries) => {
+                    for (let i = 0; i < entries.length; i++) {
+                        const entry = entries[i];
+                        if (!entry.isIntersecting) continue;
+                        const img = entry.target;
+                        avatarObserver.unobserve(img);
+                        const username = img.dataset.username;
+                        if (username) resolveAvatarUrl(username, img);
+                    }
+                }, { rootMargin: '500px' }); // Load avatars 500px before they enter viewport
+            }
+            return avatarObserver;
+        }
+
+        function ensureLoadMoreObserver() {
+            if (!('IntersectionObserver' in window)) {
+                return null;
+            }
+            if (!loadMoreObserver) {
+                loadMoreObserver = new IntersectionObserver((entries) => {
+                    if (entries.some(entry => entry.isIntersecting)) {
+                        loadMoreOfflinePlayers();
+                    }
+                }, { rootMargin: '200px' });
+            }
+            return loadMoreObserver;
+        }
+
+        function setupInfiniteScroll(grid) {
+            const observer = ensureLoadMoreObserver();
+            if (!observer) return;
+            if (!grid.contains(loadMoreSentinel)) {
+                grid.appendChild(loadMoreSentinel);
+            }
+            observer.observe(loadMoreSentinel);
+        }
+
+        function teardownInfiniteScroll() {
+            if (loadMoreObserver) {
+                loadMoreObserver.disconnect();
+            }
+            if (loadMoreSentinel.parentElement) {
+                loadMoreSentinel.parentElement.removeChild(loadMoreSentinel);
+            }
+        }
+
+        function appendPlayerCards(grid, players, isEager = false) {
+            if (!players.length) return;
+            const now = Date.now();
+            const fragment = document.createDocumentFragment();
+            const observer = isEager ? null : ensureAvatarObserver();
+            const imagesToLoad = [];
+            
+            for (let i = 0; i < players.length; i++) {
+                const player = players[i];
+                const statusClass = player.isOnline ? 'status-online' : 'status-offline';
+                const referenceTime = player.isOnline ? player.loginTime : player.logoutTime;
+                const tooltipTime = referenceTime ? new Date(referenceTime).toLocaleString() : 'Unknown';
+
+                let statusContent;
+                if (player.isOnline) {
+                    statusContent = `${ICON_CLOCK}<span>Online for <span class="duration-text" data-login="${player.loginTime}">${player.durationHours}h ${player.durationMinutes}m</span></span>`;
+                } else {
+                    const diffMs = referenceTime ? now - referenceTime : 0;
+                    const diffDays = Math.floor(diffMs / 86400000);
+                    statusContent = `${ICON_LOGOUT}<span>${diffDays < 1 ? 'Offline < 1 day' : `Offline for ${diffDays} days`}</span>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'player-card bg-gray-900 border border-gray-800 rounded-lg p-4 flex flex-col items-center gap-3 relative cursor-pointer';
+                card.dataset.username = player.username;
+                
+                card.innerHTML = `<div class="relative"><img class="w-20 h-20 rounded-md shadow-lg bg-gray-800" alt="" data-username="${player.username}"><div class="${statusClass} status-indicator"></div></div><div class="font-bold text-white text-lg truncate w-full text-center mt-2">${player.username}</div><div class="text-center w-full mt-1"><div class="relative group cursor-help flex items-center justify-center gap-2 text-sm text-gray-400 font-medium">${statusContent}<div class="time-tooltip">${tooltipTime}</div></div></div>`;
+                
+                // Collect image reference directly
+                const img = card.querySelector('img');
+                if (img) imagesToLoad.push({ img, username: player.username });
+                
+                fragment.appendChild(card);
+            }
+
+            // Insert all cards at once
+            const insertionPoint = loadMoreSentinel.parentElement === grid ? loadMoreSentinel : null;
+            if (insertionPoint) {
+                grid.insertBefore(fragment, insertionPoint);
+            } else {
+                grid.appendChild(fragment);
+            }
+
+            // Load avatars from collected references (no DOM query needed)
+            for (let i = 0; i < imagesToLoad.length; i++) {
+                const { img, username } = imagesToLoad[i];
+                if (isEager) {
+                    resolveAvatarUrl(username, img, true);
+                } else if (observer) {
+                    observer.observe(img);
+                } else {
+                    resolveAvatarUrl(username, img);
+                }
+            }
+        }
+
+        function cacheAvatar(username) {
+            if (!username || prefetchedAvatars.has(username)) return;
+            prefetchedAvatars.add(username);
+            const img = new Image();
+            img.src = `https://mc-heads.net/avatar/${username}/32`;
+        }
+
+        function cacheUpcomingAvatars(startIndex) {
+            const endIndex = Math.min(startIndex + PREFETCH_AHEAD, offlinePlayers.length);
+            for (let i = startIndex; i < endIndex; i++) {
+                cacheAvatar(offlinePlayers[i].username);
+            }
+        }
+
+        function loadMoreOfflinePlayers() {
+            if (offlineIndex >= offlinePlayers.length) {
+                teardownInfiniteScroll();
+                return;
+            }
+            const grid = document.getElementById('player-grid');
+            if (!grid) return;
+            const nextCount = Math.min(OFFLINE_BATCH_SIZE, offlinePlayers.length - offlineIndex);
+            const nextBatch = offlinePlayers.slice(offlineIndex, offlineIndex + nextCount);
+            offlineIndex += nextCount;
+            appendPlayerCards(grid, nextBatch);
+            cacheUpcomingAvatars(offlineIndex);
+
+            if (offlineIndex >= offlinePlayers.length) {
+                teardownInfiniteScroll();
+            }
+        }
+
+        // Debounce function for search
+        let searchTimeout = null;
+        function debouncedRenderPlayers(searchValue) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                renderPlayers();
+                updateURL(searchValue, null);
+                // Check avatars after search filter
+                scheduleAvatarCheck();
+            }, 200);
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
-            initBadHashes();
+            // Cache DOM elements on load
+            cachedElements.playerGrid = document.getElementById('player-grid');
+            cachedElements.playerSearch = document.getElementById('player-search');
+            cachedElements.headerCount = document.getElementById('header-count');
+            cachedElements.viewList = document.getElementById('view-list');
+            cachedElements.viewProfile = document.getElementById('view-profile');
+            
             handleRouting();
             // write a check to only check settings menu if on profile view (/stats/username)
             if (window.location.pathname.split('/').filter(p => p).length === 2) {
@@ -287,18 +594,37 @@
 
             }
             
-            document.getElementById('player-search').addEventListener('input', (e) => {
-                renderPlayers();
-                updateURL(e.target.value, null);
+            cachedElements.playerSearch.addEventListener('input', (e) => {
+                debouncedRenderPlayers(e.target.value);
             });
+
+            // Use event delegation on grid
+            cachedElements.playerGrid.addEventListener('click', (event) => {
+                const card = event.target.closest('.player-card');
+                if (!card) return;
+                const username = card.dataset.username;
+                if (username) {
+                    updateURL(null, username);
+                    showProfileView(username);
+                }
+            });
+            
+            // Prerender initial view immediately
+            if (allPlayers.length === 0) {
+                loadLeaderboard();
+                fetchPlayers();
+            }
         });
 
         window.addEventListener('popstate', handleRouting);
-        window.addEventListener('resize', () => {
+        window.addEventListener('resize', async () => {
             if (currentChartType !== 'calendar' && profileData) {
+                await ensureD3();
                 renderD3Chart(currentChartType);
             }
         });
+
+        let wasOnProfileView = false;
 
         function handleRouting() {
             const params = new URLSearchParams(window.location.search);
@@ -306,43 +632,59 @@
             const search = params.get('search');
             const pathParts = window.location.pathname.split('/').filter(p => p);
             const lastSegment = pathParts[pathParts.length - 1];
-            if (lastSegment && lastSegment !== 'stats' && lastSegment !== 'index.html') player = lastSegment;
+            if (lastSegment && lastSegment !== 'stats' && lastSegment !== 'index.html') player = decodeURIComponent(lastSegment);
 
-            if (player) showProfileView(player);
-            else showListView(search);
+            if (player) {
+                wasOnProfileView = true;
+                showProfileView(player);
+            } else {
+                const shouldScroll = wasOnProfileView;
+                wasOnProfileView = false;
+                showListView(search, shouldScroll);
+            }
         }
 
         function goBackToList() {
             const url = new URL(window.location);
             url.searchParams.delete('player');
-            if (window.location.pathname.split('/').length > 2) window.history.pushState({}, '', '../stats/');
-            else window.history.pushState({}, '', url.pathname + url.search);
-            showListView();
+            url.pathname = baseStatsPath;
+            window.history.pushState({}, '', url);
+            showListView(null, true);
         }
 
-        function showListView(searchTerm) {
-            document.getElementById('view-list').classList.remove('hidden');
-            document.getElementById('view-profile').classList.add('hidden');
-            if (searchTerm) document.getElementById('player-search').value = searchTerm;
+        function showListView(searchTerm, scrollToTop = false) {
+            cachedElements.viewList.classList.remove('hidden');
+            cachedElements.viewProfile.classList.add('hidden');
+            if (searchTerm) cachedElements.playerSearch.value = searchTerm;
             if (allPlayers.length === 0) { loadLeaderboard(); fetchPlayers(); }
             else renderPlayers();
-            feather.replace();
+            refreshIcons();
             if (skinViewer) { skinViewer.dispose(); skinViewer = null; }
+            if (scrollToTop) window.scrollTo(0, 0);
         }
 
         async function showProfileView(username) {
-            document.getElementById('view-list').classList.add('hidden');
-            document.getElementById('view-profile').classList.remove('hidden');
+            cachedElements.viewList.classList.add('hidden');
+            cachedElements.viewProfile.classList.remove('hidden');
             document.getElementById('profile-username').textContent = username;
             document.getElementById('profile-playtime').textContent = 'Loading...';
             document.getElementById('chart-calendar').innerHTML = '<div class="text-center py-20 text-gray-500">Loading history...</div>';
             document.getElementById('monthly-data-container').innerHTML = '';
             
-            if (skinViewer) skinViewer.dispose();
+            let viewerAvailable = true;
+            try {
+                await ensureSkinview();
+            } catch (error) {
+                console.error(error);
+                viewerAvailable = false;
+            }
+            if (skinViewer) { skinViewer.dispose(); skinViewer = null; }
             const canvas = document.getElementById("skin-canvas");
-            skinViewer = new skinview3d.SkinViewer({ canvas: canvas, width: 250, height: 350, skin: `https://mc-heads.net/skin/${username}` });
-            skinViewer.controls.enableZoom = true; skinViewer.controls.enableRotate = true;
-            skinViewer.animation = new skinview3d.WalkingAnimation(); skinViewer.animation.speed = 0.5;
+            if (viewerAvailable && window.skinview3d) {
+                skinViewer = new skinview3d.SkinViewer({ canvas: canvas, width: 250, height: 350, skin: `https://mc-heads.net/skin/${username}` });
+                skinViewer.controls.enableZoom = true; skinViewer.controls.enableRotate = true;
+                skinViewer.animation = new skinview3d.WalkingAnimation(); skinViewer.animation.speed = 0.5;
+            }
             document.getElementById('profile-namemc').href = `https://namemc.com/profile/${username}`;
 
             try {
@@ -354,33 +696,79 @@
                 console.error(error);
                 document.getElementById('chart-calendar').innerHTML = '<div class="text-center py-20 text-red-500">Failed to load player history.</div>';
             }
-            feather.replace();
+            refreshIcons();
         }
 
         // --- Image Handling ---
-        async function computeImageHash(src) {
-            return new Promise((resolve) => {
-                const img = new Image(); img.crossOrigin = "Anonymous";
-                img.onload = () => { hashCtx.clearRect(0, 0, 32, 32); hashCtx.drawImage(img, 0, 0, 32, 32); resolve(hashCanvas.toDataURL()); };
-                img.onerror = () => resolve(null); img.src = src;
-            });
-        }
-        async function initBadHashes() {
-            const sources = ['../static/black.png', '../static/steve.png']; 
-            for (const src of sources) { const hash = await computeImageHash(src); if (hash) badHashes.add(hash); }
-        }
-        function resolveAvatarUrl(username, imgElement) {
-            const primaryUrl = `https://mc-heads.net/avatar/${username}/100`;
-            const fallbackUrl = `https://minotar.net/avatar/${username}/100`;
-            imgElement.src = primaryUrl; imgElement.crossOrigin = "Anonymous";
-            imgElement.onload = function() {
-                if (badHashes.size > 0) {
-                    try {
-                        hashCtx.clearRect(0, 0, 32, 32); hashCtx.drawImage(imgElement, 0, 0, 32, 32);
-                        if (badHashes.has(hashCanvas.toDataURL())) { imgElement.onload = null; imgElement.src = fallbackUrl; }
-                    } catch (e) {}
+        function resolveAvatarUrl(username, imgElement, isEager = false) {
+            const primaryUrl = `https://mc-heads.net/avatar/${username}/32`;
+            const fallbackUrl = `https://minotar.net/avatar/${username}/32`;
+            
+            imgElement.loading = isEager ? 'eager' : 'lazy';
+            imgElement.decoding = 'async';
+            imgElement.src = primaryUrl;
+            
+            imgElement.onerror = () => {
+                if (imgElement.src !== fallbackUrl) {
+                    imgElement.onerror = null;
+                    imgElement.src = fallbackUrl;
                 }
             };
+        }
+
+        // Schedule avatar check with delay to let images load first
+        let avatarCheckTimeout = null;
+        function scheduleAvatarCheck() {
+            clearTimeout(avatarCheckTimeout);
+            avatarCheckTimeout = setTimeout(() => {
+                checkAndFixBadAvatars();
+            }, 800); // Wait for images to load
+        }
+
+        // Check visible avatars for bad hashes and switch to fallback if needed
+        async function checkAndFixBadAvatars() {
+            if (!hashCheckInitialized) {
+                await initializeBadHashes();
+            }
+            if (!hashCheckInitialized) return; // Failed to initialize
+
+            const images = document.querySelectorAll('img[data-username][src*="mc-heads.net"]');
+            if (images.length === 0) return;
+
+            // Process in small batches to avoid blocking
+            const BATCH_SIZE = 10;
+            let index = 0;
+
+            async function processBatch() {
+                const endIndex = Math.min(index + BATCH_SIZE, images.length);
+                
+                for (let i = index; i < endIndex; i++) {
+                    const img = images[i];
+                    const username = img.dataset.username;
+                    if (!username || !img.complete) continue;
+                    
+                    try {
+                        const isBad = await isAvatarBad(img.src);
+                        if (isBad) {
+                            img.src = `https://minotar.net/avatar/${username}/32`;
+                        }
+                    } catch (e) {
+                        // Skip if we can't check
+                    }
+                }
+                
+                index = endIndex;
+                if (index < images.length) {
+                    // Process next batch on next idle or with timeout
+                    if ('requestIdleCallback' in window) {
+                        requestIdleCallback(processBatch, { timeout: 500 });
+                    } else {
+                        setTimeout(processBatch, 50);
+                    }
+                }
+            }
+
+            processBatch();
         }
 
         // --- Profile Logic ---
@@ -488,7 +876,7 @@
         }
 
         // --- D3 Charting Logic ---
-        function switchChart(type) {
+        async function switchChart(type) {
             currentChartType = type;
             ['calendar', 'line', 'bar'].forEach(t => {
                 const btn = document.getElementById(`chart-tab-${t}`);
@@ -504,6 +892,7 @@
                 calDiv.classList.remove('hidden'); mainDiv.classList.add('hidden'); brushDiv.classList.add('hidden'); hint.classList.add('hidden');
                 renderCalendarChart();
             } else {
+                await ensureD3();
                 calDiv.classList.add('hidden'); mainDiv.classList.remove('hidden'); brushDiv.classList.remove('hidden'); hint.classList.remove('hidden');
                 renderD3Chart(type);
             }
@@ -566,6 +955,10 @@
 
         // --- D3 Main Chart Implementation ---
         function renderD3Chart(type) {
+            if (!window.d3) {
+                console.warn('D3 library unavailable; skipping chart render.');
+                return;
+            }
             const mainContainer = document.getElementById('chart-d3-main');
             const brushContainer = document.getElementById('chart-d3-brush');
             mainContainer.innerHTML = ''; brushContainer.innerHTML = '';
@@ -796,7 +1189,7 @@
         }
         async function fetchPlayers() {
             try {
-                const response = await fetch('https://civapi.drekamor.dev/mc-sessions/last');
+                const response = await fetch('https://civapi.duckdns.org/mc-sessions/last');
                 const data = await response.json();
                 
                 // Handle both {sessions: [...]} and [...] formats
@@ -806,70 +1199,159 @@
                 allPlayers = sessions.map(session => {
                     let isOnline = !session.logoutTs; const loginTime = session.loginTs; const now = Date.now();
                     let durationHours = 0; let durationMinutes = 0;
-                    if (isOnline) {
+                    if (isOnline && loginTime) {
                         const diff = now - loginTime; durationHours = Math.floor(diff / 3600000); durationMinutes = Math.floor((diff % 3600000) / 60000);
                         if (durationHours >= 24) isOnline = false;
                     }
-                    // Ensure username is never null
-                    return { username: session.mcName || 'Unknown', isOnline, loginTime, logoutTime: session.logoutTs || loginTime, durationHours, durationMinutes };
+                    const username = session.mcName || 'Unknown';
+                    return {
+                        username,
+                        lowerName: username.toLowerCase(),
+                        isOnline,
+                        loginTime,
+                        logoutTime: session.logoutTs || loginTime,
+                        durationHours,
+                        durationMinutes
+                    };
                 });
                 allPlayers.sort((a, b) => (a.isOnline === b.isOnline) ? (a.isOnline ? a.loginTime - b.loginTime : b.logoutTime - a.logoutTime) : (a.isOnline ? -1 : 1));
-                document.getElementById('header-count').textContent = allPlayers.filter(p => p.isOnline).length;
-                renderPlayers(); setInterval(updateDurations, 60000);
+                cachedElements.headerCount.textContent = allPlayers.filter(p => p.isOnline).length;
+                
+                // Start prefetching online player avatars immediately
+                for (let i = 0; i < allPlayers.length && allPlayers[i].isOnline; i++) {
+                    cacheAvatar(allPlayers[i].username);
+                }
+                
+                renderPlayers();
+                
+                // Check for bad avatars after initial render completes
+                scheduleAvatarCheck();
+                
+                const hasOnline = allPlayers.some(p => p.isOnline);
+                if (hasOnline && durationIntervalId === null) {
+                    durationIntervalId = setInterval(updateDurations, 60000);
+                } else if (!hasOnline && durationIntervalId !== null) {
+                    clearInterval(durationIntervalId);
+                    durationIntervalId = null;
+                }
             } catch (error) { 
                 console.error(error);
                 document.getElementById('player-grid').innerHTML = '<div class="col-span-full text-center text-red-400">Failed to load player data</div>'; 
             }
         }
         function renderPlayers() {
-            const grid = document.getElementById('player-grid'); 
-            const searchInput = document.getElementById('player-search');
-            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-            
-            grid.innerHTML = '';
-            
-            if (!allPlayers || !Array.isArray(allPlayers)) return;
+            const grid = cachedElements.playerGrid; 
+            const searchTerm = cachedElements.playerSearch ? cachedElements.playerSearch.value.trim().toLowerCase() : '';
 
-            // Added safety check for p.username
-            const filtered = allPlayers.filter(p => p.username && p.username.toLowerCase().includes(searchTerm));
+            if (!allPlayers || !Array.isArray(allPlayers)) {
+                grid.innerHTML = '<div class="col-span-full text-center text-red-400 py-8">Player data unavailable</div>';
+                return;
+            }
+
+            if (allPlayers.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">Loading player data...</div>';
+                return;
+            }
+
+            // Single pass: filter and split online/offline simultaneously
+            onlinePlayers = [];
+            offlinePlayers = [];
             
-            if (filtered.length === 0) { grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">No players found</div>'; return; }
-            
-            filtered.slice(0, 100).forEach(player => {
-                const card = document.createElement('div');
-                card.className = 'player-card bg-gray-900 border border-gray-800 rounded-lg p-4 flex flex-col items-center gap-3 relative cursor-pointer';
-                card.onclick = () => { updateURL(null, player.username); showProfileView(player.username); };
-                const statusClass = player.isOnline ? 'status-online' : 'status-offline';
-                let displayText = ''; let tooltipTime = ''; let iconName = '';
-                if (player.isOnline) {
-                    iconName = 'clock'; displayText = `Online for <span class="duration-text" data-login="${player.loginTime}">${player.durationHours}h ${player.durationMinutes}m</span>`;
-                    tooltipTime = new Date(player.loginTime).toLocaleString();
-                } else {
-                    iconName = 'log-out'; tooltipTime = new Date(player.logoutTime).toLocaleString();
-                    const diffMs = Date.now() - player.logoutTime;
-                    const diffDays = Math.floor(diffMs / 86400000);
-                    displayText = diffDays < 1 ? `Offline < 1 day` : `Offline for ${diffDays} days`;
+            if (searchTerm) {
+                for (let i = 0; i < allPlayers.length; i++) {
+                    const player = allPlayers[i];
+                    if (player.lowerName && player.lowerName.includes(searchTerm)) {
+                        if (player.isOnline) onlinePlayers.push(player);
+                        else offlinePlayers.push(player);
+                    }
                 }
-                const imgContainer = document.createElement('div'); imgContainer.className = 'relative';
-                const img = document.createElement('img'); img.className = 'w-20 h-20 rounded-md shadow-lg bg-gray-800'; resolveAvatarUrl(player.username, img);
-                const statusIndicator = document.createElement('div'); statusIndicator.className = `${statusClass} status-indicator`;
-                imgContainer.appendChild(img); imgContainer.appendChild(statusIndicator);
-                card.innerHTML = `<div class="font-bold text-white text-lg truncate w-full text-center mt-2">${player.username}</div><div class="text-center w-full mt-1"><div class="relative group cursor-help flex items-center justify-center gap-2 text-sm text-gray-400 font-medium"><i data-feather="${iconName}" class="w-4 h-4"></i><span>${displayText}</span><div class="time-tooltip">${tooltipTime}</div></div></div>`;
-                card.prepend(imgContainer); grid.appendChild(card);
-            });
-            feather.replace();
+            } else {
+                for (let i = 0; i < allPlayers.length; i++) {
+                    const player = allPlayers[i];
+                    if (player.isOnline) onlinePlayers.push(player);
+                    else offlinePlayers.push(player);
+                }
+            }
+            
+            offlineIndex = 0;
+
+            if (onlinePlayers.length === 0 && offlinePlayers.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">No players found</div>';
+                teardownInfiniteScroll();
+                return;
+            }
+
+            teardownInfiniteScroll();
+            grid.innerHTML = '';
+
+            // Render online players first (typically small count, render immediately)
+            if (onlinePlayers.length > 0) {
+                appendPlayerCards(grid, onlinePlayers, true);
+            }
+
+            // Render offline players in chunks using requestAnimationFrame
+            const maxInitialCards = searchTerm ? Number.POSITIVE_INFINITY : INITIAL_OFFLINE_LIMIT;
+            const availableOfflineSlots = Math.max(0, maxInitialCards - onlinePlayers.length);
+            const initialOfflineCount = Math.min(availableOfflineSlots, offlinePlayers.length);
+
+            if (initialOfflineCount > 0) {
+                let rendered = 0;
+                const CHUNK_SIZE = 20;
+                
+                function renderOfflineChunk() {
+                    if (rendered >= initialOfflineCount) {
+                        // Done with initial batch, setup infinite scroll
+                        offlineIndex = initialOfflineCount;
+                        if (!searchTerm && offlinePlayers.length > offlineIndex) {
+                            setupInfiniteScroll(grid);
+                            cacheUpcomingAvatars(offlineIndex);
+                        }
+                        return;
+                    }
+                    
+                    const end = Math.min(rendered + CHUNK_SIZE, initialOfflineCount);
+                    const chunk = offlinePlayers.slice(rendered, end);
+                    appendPlayerCards(grid, chunk);
+                    rendered = end;
+                    
+                    requestAnimationFrame(renderOfflineChunk);
+                }
+                
+                requestAnimationFrame(renderOfflineChunk);
+            } else {
+                // No offline players to render, but may need infinite scroll
+                if (!searchTerm && offlinePlayers.length > 0) {
+                    setupInfiniteScroll(grid);
+                    cacheUpcomingAvatars(0);
+                }
+            }
         }
         function updateDurations() {
             const now = Date.now();
             document.querySelectorAll('.duration-text').forEach(el => {
                 const loginTime = parseInt(el.dataset.login);
-                if (loginTime) { const diff = now - loginTime; el.textContent = `Online for ${Math.floor(diff/3600000)}h ${Math.floor((diff%3600000)/60000)}m`; }
+                if (loginTime) {
+                    const diff = now - loginTime;
+                    const hours = Math.floor(diff / 3600000);
+                    const minutes = Math.floor((diff % 3600000) / 60000);
+                    el.textContent = `${hours}h ${minutes}m`;
+                }
             });
         }
         function updateURL(searchTerm, player) {
             const url = new URL(window.location);
-            if (searchTerm !== null) searchTerm ? url.searchParams.set('search', searchTerm) : url.searchParams.delete('search');
-            if (player !== null) player ? window.history.pushState({}, '', player) : url.searchParams.delete('player');
+            if (searchTerm !== null) {
+                if (searchTerm) url.searchParams.set('search', searchTerm);
+                else url.searchParams.delete('search');
+            }
+            if (player !== null) {
+                url.searchParams.delete('player');
+                if (player) {
+                    url.pathname = baseStatsPath + encodeURIComponent(player);
+                } else {
+                    url.pathname = baseStatsPath;
+                }
+            }
             window.history.pushState({}, '', url);
         }
     </script>
