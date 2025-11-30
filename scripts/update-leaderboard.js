@@ -103,6 +103,9 @@ async function main() {
                     
                     const weekStart = Math.max(start, oneWeekAgo);
                     const weekEnd = Math.min(end, now);
+                    if (weekEnd > weekStart) {
+                        weekly += (weekEnd - weekStart);
+                    }
                     
                     const monthStart = Math.max(start, oneMonthAgo);
                     const monthEnd = Math.min(end, now);
