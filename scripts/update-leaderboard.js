@@ -52,56 +52,69 @@ async function main() {
                 const logins = history.loginTimestamps || [];
                 const logouts = history.logoutTimestamps || [];
 
+                // Pair logins with their corresponding logout and sort by login time
+                const sessionsArr = logins.map((login, i) => ({ login, logout: logouts[i] || null }));
+                sessionsArr.sort((a, b) => (a.login || 0) - (b.login || 0));
+                
+                // Normalize sessions (cap per-day), filter invalid and merge overlaps so we don't double-count
+                const normalized = [];
+                for (const s of sessionsArr) {
+                    let login = s.login;
+                    let logout = s.logout;
+                    if (!login) continue;
+                    if (!logout || logout <= login) logout = now;
+                    if (logout - login > oneDayMs) logout = login + oneDayMs;
+                    if (logout <= login) continue;
+                    normalized.push({ start: login, end: logout });
+                }
+                
+                const merged = [];
+                for (const s of normalized) {
+                    if (merged.length === 0) {
+                        merged.push({ ...s });
+                        continue;
+                    }
+                    const last = merged[merged.length - 1];
+                    if (s.start <= last.end) {
+                        // overlapping or adjacent -> extend the last segment
+                        last.end = Math.max(last.end, s.end);
+                    } else {
+                        merged.push({ ...s });
+                    }
+                }
+                
+                // Cap merged sessions to 23.8 hours max each
+                const maxSessionMs = 23.8 * 3600 * 1000;
+                for (const s of merged) {
+                    if (s.end - s.start > maxSessionMs) {
+                        s.end = s.start + maxSessionMs;
+                    }
+                }
+                
                 let weekly = 0;
                 let monthly = 0;
                 let allTime = 0;
-
-                // Iterate through sessions
-                // User confirmed loginTimestamps length equals logoutTimestamps length
-                for (let i = 0; i < logins.length; i++) {
-                    const login = logins[i];
-                    let logout = logouts[i];
-
-                    // Handle active sessions or bad data (logout before login or missing)
-                    if (!logout || logout <= login) {
-                        logout = now;
-                    }
-
-                    // Sanity Check: Cap sessions at 24 hours (server restarts daily)
-                    // This fixes the issue with inflated playtime numbers
-                    if (logout - login > oneDayMs) {
-                        logout = login + oneDayMs;
-                    }
-
-
+                
+                // Accumulate durations from merged sessions (use overlaps with week/month windows)
+                for (const s of merged) {
+                    const start = s.start;
+                    const end = s.end;
+                    const duration = end - start;
+                    allTime += duration;
                     
-                   
-
-                    const start = login
-                    // Monthly
-
-                    if (logout > oneWeekAgo) {
-                        if (logout > start) { 
-                            weekly += (logout - start)
-                            monthly += (logout - start)
-                            allTime += (logout - start)
-                        }
-                    }
-                    else if (logout > oneMonthAgo) {
-                        if (logout > start) { 
-                            monthly += (logout - start)
-                            allTime += (logout - start)
-                        }
-                    }
-                    else {
-                        if (logout > start) { 
-                            allTime += (logout - start)
-                        }
-                    }
-
-                    // Weekly
+                    const weekStart = Math.max(start, oneWeekAgo);
+                    const weekEnd = Math.min(end, now);
                     
+                    const monthStart = Math.max(start, oneMonthAgo);
+                    const monthEnd = Math.min(end, now);
+                    if (monthEnd > monthStart) {
+                        monthly += (monthEnd - monthStart);
+                    }
                 }
+
+                // Clamp weekly to max 23.8 hours/day * 7 days to avoid impossible weekly totals
+                const WEEKLY_MAX_MS = 23.8 * 7 * 3600 * 1000;
+                weekly = Math.min(weekly, WEEKLY_MAX_MS);
 
                 if (allTime > 0) {
                     return { username, weekly, monthly, allTime };
