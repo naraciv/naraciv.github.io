@@ -36,6 +36,7 @@ async function main() {
 
         const stats = {};
         let processedCount = 0;
+        const failedUsers = [];
 
         // Worker function to process a single user
         const processUser = async (username) => {
@@ -43,8 +44,7 @@ async function main() {
                 const historyRes = await fetch(`https://civapi.duckdns.org/mc-sessions/all?mcName=${username}&mcServer=civmc`);
                 
                 if (!historyRes.ok) {
-                    // console.warn(`Failed to fetch history for ${username}: ${historyRes.status}`);
-                    return null;
+                    return { success: false, username };
                 }
 
                 const history = await historyRes.json();
@@ -119,12 +119,13 @@ async function main() {
                 weekly = Math.min(weekly, WEEKLY_MAX_MS);
 
                 if (allTime > 0) {
-                    return { username, weekly, monthly, allTime };
+                    return { success: true, username, weekly, monthly, allTime };
                 }
+                return { success: true, username, noData: true };
             } catch (err) {
                 console.error(`Error processing ${username}:`, err.message);
+                return { success: false, username };
             }
-            return null;
         };
 
         // Process in chunks to control concurrency (approx 10 threads)
@@ -136,14 +137,54 @@ async function main() {
             const results = await Promise.all(promises);
             
             results.forEach(result => {
-                if (result) {
+                if (result.success && !result.noData) {
                     stats[result.username] = result;
+                } else if (!result.success) {
+                    failedUsers.push(result.username);
                 }
                 processedCount++;
             });
             
             if (processedCount % 20 === 0 || processedCount === usersArray.length) {
                 console.log(`[${processedCount}/${usersArray.length}] Processed`);
+            }
+        }
+
+        // Retry failed users
+        if (failedUsers.length > 0) {
+            console.log(`\nRetrying ${failedUsers.length} failed users...`);
+            const maxRetries = 3;
+            let retryQueue = [...failedUsers];
+            
+            for (let attempt = 1; attempt <= maxRetries && retryQueue.length > 0; attempt++) {
+                console.log(`Retry attempt ${attempt}/${maxRetries} for ${retryQueue.length} users...`);
+                const stillFailed = [];
+                
+                // Add a small delay before retrying
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                for (let i = 0; i < retryQueue.length; i += chunkSize) {
+                    const chunk = retryQueue.slice(i, i + chunkSize);
+                    const promises = chunk.map(username => processUser(username));
+                    
+                    const results = await Promise.all(promises);
+                    
+                    results.forEach(result => {
+                        if (result.success && !result.noData) {
+                            stats[result.username] = result;
+                            console.log(`  ✓ Successfully retried: ${result.username}`);
+                        } else if (!result.success) {
+                            stillFailed.push(result.username);
+                        }
+                    });
+                }
+                
+                retryQueue = stillFailed;
+            }
+            
+            if (retryQueue.length > 0) {
+                console.log(`\n⚠ ${retryQueue.length} users still failed after ${maxRetries} retries:`);
+                retryQueue.forEach(u => console.log(`  - ${u}`));
             }
         }
 
