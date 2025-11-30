@@ -13,10 +13,9 @@ async function main() {
         const sessions = data.sessions || data;
         
         const now = Date.now();
-        
-        const twentyFiveHoursAgo = now - (25 * 60 * 60 * 1000);
         const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
         const oneMonthAgo = now - (30 * 24 * 60 * 60 * 1000);
+        const oneYearAgo = now - (365 * 24 * 60 * 60 * 1000);
         const oneDayMs = 24 * 60 * 60 * 1000;
 
         // Extract unique usernames
@@ -25,15 +24,15 @@ async function main() {
             const login = s.loginTs || s.login || 0;
             const logout = s.logoutTs || s.logout || now;
 
-            // Only include players who have been active in the last 25 hours
-            if (logout > twentyFiveHoursAgo) {
+            // Only include players who have been active in the past week
+            if (logout > oneWeekAgo) {
                 if (s.mcName) uniqueUsers.add(s.mcName);
                 if (s.user?.name) uniqueUsers.add(s.user.name);
             }
         });
 
         const usersArray = Array.from(uniqueUsers);
-        console.log(`Found ${usersArray.length} unique players active in the last 25 hours. Fetching details...`);
+        console.log(`Found ${usersArray.length} unique players active in the last week. Fetching details...`);
 
         const stats = {};
         let processedCount = 0;
