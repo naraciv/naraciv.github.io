@@ -779,46 +779,109 @@
             const logins = data.loginTimestamps || [];
             const logouts = data.logoutTimestamps || [];
             const now = Date.now();
-            let totalMs = 0; let firstJoin = now; let lastJoin = 0;
-            const dailyPlaytime = {}; const monthlyPlaytime = {};
-
-            for (let i = 0; i < logins.length; i++) {
-                const login = logins[i];
-                let logout = (i < logouts.length) ? logouts[i] : now;
+            const oneDayMs = 24 * 60 * 60 * 1000;
+            const maxSessionMs = 23.8 * 60 * 60 * 1000;
+            
+            // Pair logins with their corresponding logout and sort by login time
+            const sessionsArr = logins.map((login, i) => ({ login, logout: logouts[i] || null }));
+            sessionsArr.sort((a, b) => (a.login || 0) - (b.login || 0));
+            
+            // Normalize sessions (cap per-day), filter invalid and merge overlaps so we don't double-count
+            const normalized = [];
+            for (const s of sessionsArr) {
+                let login = s.login;
+                let logout = s.logout;
                 
-                // Strict check against server start
-                if (logout < SERVER_START_DATE) continue;
+                // Skip invalid entries
+                if (!login) continue;
+                if (login < SERVER_START_DATE) continue;
+                if (logout && logout < SERVER_START_DATE) continue;
                 
-                if(login<SERVER_START_DATE) continue;
-
-
-                if (logout < login) logout = now;
+                // Handle active sessions or bad data (logout before login or missing)
+                if (!logout || logout <= login) logout = now;
                 
-                // Cap session length to prevent massive outliers
-                if (logout - login > MAX_SESSION_MS) logout = login + MAX_SESSION_MS;
+                // Cap sessions at 24 hours
+                if (logout - login > oneDayMs) logout = login + oneDayMs;
+                
+                if (logout <= login) continue;
+                normalized.push({ start: login, end: logout });
+            }
+            
+            // Merge overlapping sessions
+            const merged = [];
+            for (const s of normalized) {
+                if (merged.length === 0) {
+                    merged.push({ ...s });
+                    continue;
+                }
+                const last = merged[merged.length - 1];
+                if (s.start <= last.end) {
+                    // overlapping or adjacent -> extend the last segment
+                    last.end = Math.max(last.end, s.end);
+                } else {
+                    merged.push({ ...s });
+                }
+            }
+            
+            // Cap merged sessions to 23.8 hours max each
+            for (const s of merged) {
+                if (s.end - s.start > maxSessionMs) {
+                    s.end = s.start + maxSessionMs;
+                }
+            }
+            
+            let totalMs = 0;
+            let firstJoin = now;
+            let lastJoin = 0;
+            const dailyPlaytime = {};
+            const monthlyPlaytime = {};
+
+            // Process merged sessions
+            for (const session of merged) {
+                const login = session.start;
+                const logout = session.end;
                 
                 if (login < firstJoin) firstJoin = login;
                 if (login > lastJoin) lastJoin = login;
-                const duration = logout - login ;
+                
+                const duration = logout - login;
                 totalMs += duration;
                 
-                // Use UTC for bucketing to avoid timezone shifts (e.g. May 31st issue)
-                const d = new Date(login);
-                const dayStart = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-                
-                dailyPlaytime[dayStart] = (dailyPlaytime[dayStart] || 0) + duration;
-                
-                // Monthly bucket (UTC)
-                const monthKey = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
-                monthlyPlaytime[monthKey] = (monthlyPlaytime[monthKey] || 0) + duration;
+                // Split session across day boundaries for accurate daily bucketing
+                let currentTime = login;
+                while (currentTime < logout) {
+                    const d = new Date(currentTime);
+                    const dayStart = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+                    const dayEnd = dayStart + (24 * 60 * 60 * 1000); // Next day start
+                    
+                    // How much of this session falls on this day?
+                    const sessionEndOnThisDay = Math.min(logout, dayEnd);
+                    const durationOnThisDay = sessionEndOnThisDay - currentTime;
+                    
+                    dailyPlaytime[dayStart] = (dailyPlaytime[dayStart] || 0) + durationOnThisDay;
+                    
+                    // Monthly bucket (UTC)
+                    const monthKey = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+                    monthlyPlaytime[monthKey] = (monthlyPlaytime[monthKey] || 0) + durationOnThisDay;
+                    
+                    currentTime = dayEnd;
+                }
             }
+            
+            // Cap daily playtime to 23.8 hours max per day
+            for (const dayKey of Object.keys(dailyPlaytime)) {
+                if (dailyPlaytime[dayKey] > maxSessionMs) {
+                    dailyPlaytime[dayKey] = maxSessionMs;
+                }
+            }
+            
             if (totalMs === 0) { firstJoin = 0; lastJoin = 0; }
 
             // Prepare D3 Data
             const dailyData = [];
             Object.keys(dailyPlaytime).sort((a,b)=>a-b).forEach(ts => {
-                // Cap daily playtime at 24h to prevent graph artifacts
-                const hours = Math.min(24, dailyPlaytime[ts] / 3600000);
+                // Cap daily playtime at 23.8h to prevent graph artifacts
+                const hours = Math.min(23.8, dailyPlaytime[ts] / 3600000);
                 dailyData.push({ date: new Date(parseInt(ts)), value: hours });
             });
 
@@ -832,9 +895,13 @@
                 const validMonday = Math.max(monday.getTime(), SERVER_START_DATE); 
                 weeklyMap[validMonday] = (weeklyMap[validMonday] || 0) + dailyPlaytime[ts];
             });
+            
+            // Cap weekly playtime to 23.8 * 7 hours max
+            const maxWeeklyMs = 23.8 * 7 * 3600 * 1000;
             const weeklyData = [];
             Object.keys(weeklyMap).sort((a,b)=>a-b).forEach(ts => {
-                weeklyData.push({ date: new Date(parseInt(ts)), value: weeklyMap[ts] / 3600000 });
+                const cappedMs = Math.min(weeklyMap[ts], maxWeeklyMs);
+                weeklyData.push({ date: new Date(parseInt(ts)), value: cappedMs / 3600000 });
             });
 
             profileData = { totalMs, firstJoin, lastJoin, dailyPlaytime, monthlyPlaytime, dailyData, weeklyData };
