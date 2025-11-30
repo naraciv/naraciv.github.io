@@ -20,7 +20,7 @@ jobs:
           node-version: '18'
           
       - name: Install dependencies
-        run: npm install axios papaparse
+        run: npm install fs axios papaparse
         
       - name: Run update script
         run: node scripts/update-leaderboard.js
