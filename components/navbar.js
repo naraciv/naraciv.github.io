@@ -73,6 +73,65 @@ class CustomNavbar extends HTMLElement {
           background: #2596be;
         }
         
+        /* Dropdown Menu */
+        .nav-dropdown {
+          position: relative;
+        }
+        .nav-dropdown-trigger {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          cursor: pointer;
+        }
+        .nav-dropdown-trigger svg {
+          width: 16px;
+          height: 16px;
+          transition: transform 0.3s;
+        }
+        .nav-dropdown:hover .nav-dropdown-trigger svg {
+          transform: rotate(180deg);
+        }
+        .nav-dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(0, 0, 0, 0.95);
+          border: 1px solid #333;
+          border-radius: 8px;
+          padding: 0.5rem 0;
+          min-width: 140px;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.3s, visibility 0.3s;
+          margin-top: 10px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        .nav-dropdown-menu::before {
+          content: '';
+          position: absolute;
+          top: -10px;
+          left: 0;
+          right: 0;
+          height: 10px;
+        }
+        .nav-dropdown:hover .nav-dropdown-menu {
+          opacity: 1;
+          visibility: visible;
+        }
+        .nav-dropdown-item {
+          display: block;
+          padding: 0.5rem 1rem;
+          color: white;
+          text-decoration: none;
+          transition: background 0.2s, color 0.2s;
+          white-space: nowrap;
+        }
+        .nav-dropdown-item:hover {
+          background: rgba(37, 150, 190, 0.2);
+          color: #2596be;
+        }
+        
         /* Hamburger Menu */
         .menu-toggle {
           display: none;
@@ -147,6 +206,24 @@ class CustomNavbar extends HTMLElement {
             left: 50%;
             transform: translateX(-50%);
           }
+          
+          /* Mobile dropdown */
+          .nav-dropdown-menu {
+            position: static;
+            transform: none;
+            opacity: 1;
+            visibility: visible;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            margin-top: 0;
+            padding: 0.5rem 0 0 1rem;
+          }
+          .nav-dropdown-item {
+            font-size: 1rem;
+            padding: 0.25rem 0.5rem;
+            color: #aaa;
+          }
         }
       </style>
       <nav>
@@ -161,7 +238,18 @@ class CustomNavbar extends HTMLElement {
             <a href="/" class="nav-link">Home</a>
             <a href="/government" class="nav-link">Government</a>
             <a href="/properties" class="nav-link">Properties</a>
-            <a href="/shops" class="nav-link">Shops</a>
+            <div class="nav-dropdown">
+              <a href="/shops" class="nav-link nav-dropdown-trigger">
+                Shops
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </a>
+              <div class="nav-dropdown-menu">
+                <a href="/shops" class="nav-dropdown-item">All Shops</a>
+                <a href="/heads" class="nav-dropdown-item">Head Shop</a>
+              </div>
+            </div>
             <a href="/joining" class="nav-link">Join Us</a>
           </div>
         </div>
@@ -172,19 +260,38 @@ class CustomNavbar extends HTMLElement {
     const menuToggle = this.shadowRoot.querySelector('.menu-toggle');
     const navLinks = this.shadowRoot.querySelector('.nav-links');
     const links = this.shadowRoot.querySelectorAll('.nav-link');
+    const dropdownItems = this.shadowRoot.querySelectorAll('.nav-dropdown-item');
     
     // Add active class to current page link
     const currentPath = window.location.pathname;
     const cleanCurrentPath = currentPath.replace('index.html', '').replace(/\/$/, '');
 
-links.forEach(link => {
-  const href = link.getAttribute('href');
-  const cleanHref = href.replace(/\/$/, '');
-  
-  if (cleanCurrentPath === cleanHref) {
-    link.classList.add('active');
-  }
-});
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      const cleanHref = href.replace(/\/$/, '');
+      
+      if (cleanCurrentPath === cleanHref) {
+        link.classList.add('active');
+      }
+    });
+
+    // Also check dropdown items for active state
+    dropdownItems.forEach(item => {
+      const href = item.getAttribute('href');
+      const cleanHref = href.replace(/\/$/, '');
+      
+      if (cleanCurrentPath === cleanHref) {
+        item.style.color = '#2596be';
+        // Also highlight the parent dropdown trigger
+        const dropdown = item.closest('.nav-dropdown');
+        if (dropdown) {
+          const trigger = dropdown.querySelector('.nav-dropdown-trigger');
+          if (trigger) {
+            trigger.classList.add('active');
+          }
+        }
+      }
+    });
 
     menuToggle.addEventListener('click', () => {
       menuToggle.classList.toggle('active');
