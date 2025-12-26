@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Head Shop | Nara</title>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://mc-heads.net">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" defer></script>
+    <link rel="stylesheet" href="../style.css" fetchpriority="high">
+    <style>
+        /* Custom scrollbar */
+        .cart-scroll::-webkit-scrollbar { width: 6px; }
+        .cart-scroll::-webkit-scrollbar-track { background: #1f2937; }
+        .cart-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+        .cart-scroll::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        /* Line clamp for 2 lines */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Head card styles - smaller cards */
+        .head-card {
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+            padding: 0.5rem;
+        }
+        .head-card:hover {
+            transform: translateY(-3px);
+            background-color: #1f2937;
+            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Category tag with circular border */
+        .category-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 1px 6px 1px 3px;
+            border: 1px solid #374151;
+            border-radius: 9999px;
+            background-color: rgba(31, 41, 55, 0.5);
+            font-size: 0.6rem;
+        }
+
+        .category-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* Category colors */
+        .category-food { background-color: #f59e0b; }
+        .category-lasers-arrows { background-color: #ef4444; }
+        .category-decoration { background-color: #8b5cf6; }
+        .category-nature { background-color: #10b981; }
+        .category-blocks { background-color: #6b7280; }
+        .category-misc { background-color: #3b82f6; }
+        .category-default { background-color: #9ca3af; }
+
+        /* Canvas container for head viewer - square */
+        .head-canvas-container {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: grab;
+            margin: 0 auto;
+            background-color: transparent;
+        }
+        .head-canvas-container:active {
+            cursor: grabbing;
+        }
+        .head-canvas-container canvas {
+            width: 100px !important;
+            height: 100px !important;
+        }
+        
+        /* Rotate hint overlay */
+        .rotate-hint {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 0.5rem;
+            color: #6b7280;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            user-select: none;
+            z-index: 5;
+            opacity: 0.7;
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background-color: #374151;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .toggle-switch.active {
+            background-color: #2596be;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        /* Enlarge button */
+        .enlarge-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            padding: 3px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 6;
+        }
+        .head-canvas-container:hover .enlarge-btn {
+            opacity: 1;
+        }
+        .enlarge-btn:hover {
+            background: rgba(37, 150, 190, 0.8);
+        }
+        
+        /* Empty cart button */
+        .empty-cart-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0.5rem 0.75rem;
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 0.5rem;
+            color: #9ca3af;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            white-space: nowrap;
+        }
+        .empty-cart-btn:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            color: white;
+        }
+        .empty-cart-btn svg {
+            flex-shrink: 0;
+        }
+        
+        /* Cart footer */
+        .cart-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #374151;
+        }
+        .cart-total {
+            flex: 2;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+        .cart-total-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: #1f2937;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .cart-total-item img {
+            width: 14px;
+            height: 14px;
+        }
+        
+        /* Quantity controls */
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .qty-btn {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #374151;
+            border: none;
+            border-radius: 4px;
+            color: #9ca3af;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .qty-btn:hover {
+            background: #4b5563;
+            color: white;
+        }
+        .qty-btn.minus:hover {
+            background: #dc2626;
+        }
+        .qty-num {
+            min-width: 20px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: white;
+        }
+
+        /* Modal for enlarged head */
+        .head-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+        .head-modal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .head-modal-content {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            max-width: 400px;
+        }
+        .head-modal canvas {
+            width: 250px !important;
+            height: 250px !important;
+            cursor: grab;
+        }
+        .head-modal canvas:active {
+            cursor: grabbing;
+        }
+
+        /* View mode switching - category view shows sections, flat view is handled by JS */
+        .category-view .category-header {
+            display: flex !important;
+        }
+        .category-view .category-section {
+            display: block;
+        }
+        
+        /* Flat grid for when categories are off */
+        .flat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+        @media (min-width: 640px) { .flat-grid { grid-template-columns: repeat(5, 1fr); } }
+        @media (min-width: 768px) { .flat-grid { grid-template-columns: repeat(6, 1fr); } }
+        @media (min-width: 1024px) { .flat-grid { grid-template-columns: repeat(8, 1fr); } }
+        @media (min-width: 1280px) { .flat-grid { grid-template-columns: repeat(10, 1fr); } }
+
+        /* Cart dropdown */
+        .cart-dropdown {
+            position: relative;
+        }
+        .cart-dropdown-content {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 320px;
+            max-height: 400px;
+            background-color: #111827;
+            border: 1px solid #374151;
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
+        }
+        .cart-dropdown-content.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Category accordion */
+        .category-header {
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+        .category-header:hover {
+            background-color: #374151;
+        }
+        .category-section {
+            margin-bottom: 1.5rem;
+        }
+        .category-section:has(.category-content.collapsed) {
+            margin-bottom: 0.5rem;
+        }
+        .category-content {
+            transition: max-height 0.3s ease-out, opacity 0.2s ease-out, padding 0.3s ease-out;
+            overflow: hidden;
+        }
+        .category-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .category-content.expanded {
+            max-height: 5000px;
+            opacity: 1;
+        }
+
+        /* Out of stock styling - just grayed out, no text */
+        .out-of-stock {
+            opacity: 0.4;
+            filter: grayscale(60%);
+        }
+        .out-of-stock .head-canvas-container {
+            filter: grayscale(70%);
+        }
+        .out-of-stock .add-to-cart-btn {
+            pointer-events: none;
+        }
+
+        /* Coord link styling */
+        .coord-link {
+            position: relative;
+        }
+
+        /* Sticky header */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(8px);
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .head-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+            .cart-dropdown-content {
+                width: 280px;
+                right: -50px;
+            }
+        }
+        @media (max-width: 480px) {
+            .head-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .cart-dropdown-content {
+                width: 260px;
+                right: -80px;
+            }
+        }
+    </style>
+    <script src="../components/analytics.js" defer></script>
+    <script src="../components/navbar.js" defer></script>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col">
+    <custom-navbar></custom-navbar>
+
+    <div class="h-[100px]"></div>
+
+    <main class="flex-grow px-4">
+        <div class="max-w-[95%] mx-auto w-full">
+            
+            <!-- Sticky Header: Search Bar + Cart -->
+            <div class="sticky-header">
+                <h1 class="text-4xl font-bold mb-6 text-center text-primary">MitsuHeadCorp</h1>
+                
+                <!-- Search Bar and Cart Row -->
+                <div class="flex items-center justify-center gap-3 max-w-5xl mx-auto">
+                    <!-- Search Bar (same style as shops page) - wider -->
+                    <div class="flex-1 relative bg-gray-900 border border-gray-700 rounded-full focus-within:border-nara-red transition-colors h-11 max-w-2xl">
+                        <i data-feather="search" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                        <input type="text" id="search-input" placeholder="Search heads..." 
+                               class="w-full h-full pl-12 pr-32 bg-transparent text-white placeholder-gray-400 focus:outline-none rounded-full text-sm">
+                        <details class="absolute right-0 top-0 h-full group" id="field-selector-dropdown">
+                            <summary class="h-full px-3 py-1 bg-gray-900 border-0 rounded-full text-white text-sm cursor-pointer hover:text-nara-red transition-colors flex items-center justify-center">
+                                <i data-feather="chevron-down" class="chevron-icon w-4 h-4 mr-1 transition-transform" id="field-selector-chevron"></i>
+                                <span id="selected-field" class="text-xs">All Fields</span>
+                            </summary>
+                            <div class="absolute right-0 top-full mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-20 min-w-[120px]">
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm rounded-t-lg" data-value="all">All Fields</button>
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="name">Name</button>
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="category">Category</button>
+                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm rounded-b-lg" data-value="tags">Tags</button>
+                            </div>
+                        </details>
+                    </div>
+
+                    <!-- Cart Dropdown Button -->
+                    <div class="cart-dropdown">
+                        <button id="cart-toggle" class="flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-700 rounded-full hover:border-nara-red transition-colors h-11">
+                            <i data-feather="shopping-cart" class="w-5 h-5 text-gray-400"></i>
+                            <span id="cart-count" class="text-white font-semibold text-sm">0</span>
+                            <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 transition-transform" id="cart-chevron"></i>
+                        </button>
+                        
+                        <!-- Cart Dropdown Content -->
+                        <div id="cart-dropdown-content" class="cart-dropdown-content">
+                            <div class="p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="text-lg font-bold text-primary flex items-center gap-2">
+                                        <i data-feather="shopping-cart" class="w-5 h-5"></i>
+                                        Cart
+                                    </h3>
+                                    <button id="cart-close" class="p-1 text-gray-400 hover:text-white transition-colors">
+                                        <i data-feather="x" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                                <div id="cart-items" class="cart-scroll max-h-[280px] overflow-y-auto space-y-2">
+                                    <p class="text-gray-500 text-sm text-center py-4" id="cart-empty-msg">Your cart is empty</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sort Toggle -->
+                <div class="mt-4 flex items-center justify-center gap-3">
+                    <label class="flex items-center gap-3 cursor-pointer select-none">
+                        <span class="text-gray-300 text-sm">Sort by Category</span>
+                        <div id="sort-by-category-toggle" class="toggle-switch active"></div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Heads Container (Full Width) -->
+            <div class="mt-6">
+                <div id="heads-container">
+                    <div class="text-center py-12 text-gray-500">
+                        Loading head shop data...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Disclaimer -->
+            <div class="mt-8 mb-4 p-4  text-center">
+                <p class="text-gray-400 text-sm">
+                    <strong class="text-gray-300">Disclaimer:</strong> MitsuHeadCorp is not affiliated with the Naran Government and is a private business.
+                </p>
+                <p class="text-gray-500 text-xs mt-2">
+                    For any inquiries, please reach out to <span class="text-primary">HPLaptop</span> (<span class="text-gray-400">@rm.dv</span>).
+                </p>
+                <p class="text-gray-500 text-xs mt-1">
+                    Online ordering is not available at this time.
+                </p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Head Enlarge Modal -->
+    <div id="head-modal" class="head-modal">
+        <div class="head-modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 id="modal-head-name" class="text-lg font-bold text-white">Head Name</h3>
+                <button id="modal-close" class="p-1 text-gray-400 hover:text-white transition-colors">
+                    <i data-feather="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="flex justify-center">
+                <canvas id="modal-head-canvas"></canvas>
+            </div>
+            <p class="text-gray-400 text-sm mt-3">Drag to rotate</p>
+        </div>
+    </div>
+
+    <custom-footer></custom-footer>
+    <script src="../components/footer.js"></script>
+
+    <script>
+        // --- Global State ---
+        let headData = [];
+        let filteredData = [];
+        let cart = [];
+        let headViewers = {};
+        let selectedSearchField = 'all';
+        let sortByCategory = true;
+        let categoriesExpanded = {};
+
+        // Category color mapping
+        const categoryColors = {
+            'food': 'category-food',
+            'lasers/arrows': 'category-lasers-arrows',
+            'lasers': 'category-lasers-arrows',
+            'arrows': 'category-lasers-arrows',
+            'decoration': 'category-decoration',
+            'nature': 'category-nature',
+            'blocks': 'category-blocks',
+            'misc': 'category-misc'
+        };
+
+        function getCategoryColorClass(category) {
+            if (!category) return 'category-default';
+            const lowerCat = category.toLowerCase().trim();
+            return categoryColors[lowerCat] || 'category-default';
+        }
+        
+        // Floor level mapping based on Y coordinate
+        function getFloorName(y) {
+            // Y levels and their floor names
+            // Adjust these ranges based on your actual building layout
+            if (y >= 62 && y <= 64) return 'Top Floor';
+            if (y >= 65 && y <= 67) return 'Middle Floor';
+            if (y >= 68 && y <= 70) return 'Bottom Floor';
+            if (y >= 71 && y <= 73) return 'Top Floor';
+            if (y < 62) return 'Basement';
+            return `Y${y}`;
+        }
+
+        // --- External Script Loading ---
+        const scriptCache = {};
+
+        function loadExternalScript(src) {
+            if (!scriptCache[src]) {
+                scriptCache[src] = new Promise((resolve, reject) => {
+                    const existing = document.querySelector(`script[src="${src}"]`);
+                    if (existing) {
+                        if (existing.dataset.loaded === 'true') {
+                            resolve();
+                            return;
+                        }
+                        existing.addEventListener('load', () => resolve());
+                        existing.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)));
+                        return;
+                    }
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.async = true;
+                    script.dataset.loading = 'true';
+                    script.onload = () => {
+                        script.dataset.loaded = 'true';
+                        delete script.dataset.loading;
+                        resolve();
+                    };
+                    script.onerror = () => {
+                        script.remove();
+                        delete scriptCache[src];
+                        reject(new Error(`Failed to load ${src}`));
+                    };
+                    document.head.appendChild(script);
+                });
+            }
+            return scriptCache[src];
+        }
+
+        async function ensureHeadview() {
+            if (!window.skinview3d) {
+                // Use headview3d from jsdelivr CDN
+                await loadExternalScript('https://cdn.jsdelivr.net/npm/headview3d@3.0.2/bundles/skinview3d.bundle.js');
+            }
+        }
+
+        function refreshIcons() {
+            if (window.feather) {
+                feather.replace();
+            }
+        }
+
+        // --- Data Loading ---
+        async function loadHeadData() {
+            try {
+                const response = await fetch('../data/head_shop_data.csv');
+                const csvText = await response.text();
+                const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+                headData = parsed.data;
+                
+                // Initialize all categories as expanded
+                const categories = [...new Set(headData.map(h => h.Category || 'Uncategorized'))];
+                categories.forEach(cat => {
+                    categoriesExpanded[cat] = true;
+                });
+                
+                filterAndRender();
+            } catch (err) {
+                console.error('Error loading head data:', err);
+                document.getElementById('heads-container').innerHTML = 
+                    '<div class="text-center py-12 text-red-500">Failed to load head shop data.</div>';
+            }
+        }
+
+        // --- Filtering ---
+        function filterAndRender() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            
+            filteredData = headData.filter(head => {
+                if (!searchTerm) return true;
+                
+                const name = (head.Name || '').toLowerCase();
+                const category = (head.Category || '').toLowerCase();
+                const tags = (head.Tags || '').toLowerCase();
+                
+                switch (selectedSearchField) {
+                    case 'name':
+                        return name.includes(searchTerm);
+                    case 'category':
+                        return category.includes(searchTerm);
+                    case 'tags':
+                        return tags.includes(searchTerm);
+                    default:
+                        return name.includes(searchTerm) || 
+                               category.includes(searchTerm) || 
+                               tags.includes(searchTerm);
+                }
+            });
+            
+            renderHeads();
+        }
+
+        // --- Rendering ---
+        let lastViewMode = null;
+        
+        function renderHeads() {
+            const container = document.getElementById('heads-container');
+            
+            // Check if we need a full re-render
+            const filterKey = JSON.stringify(filteredData.map(h => h.Name + h.Texture));
+            const needsFullRender = container.dataset.lastFilterKey !== filterKey;
+            const viewModeChanged = lastViewMode !== sortByCategory;
+            
+            if (needsFullRender || viewModeChanged) {
+                container.innerHTML = '';
+                
+                // Dispose existing viewers
+                Object.values(headViewers).forEach(viewer => {
+                    if (viewer && viewer.dispose) viewer.dispose();
+                });
+                headViewers = {};
+                
+                if (filteredData.length === 0) {
+                    container.innerHTML = '<div class="text-center py-12 text-gray-500">No heads found matching your search.</div>';
+                    return;
+                }
+                
+                // Render based on current view mode
+                if (sortByCategory) {
+                    renderWithCategories(container);
+                } else {
+                    renderFlat(container);
+                }
+                
+                container.dataset.lastFilterKey = filterKey;
+                lastViewMode = sortByCategory;
+                
+                refreshIcons();
+                initializeHeadViewers();
+            }
+        }
+        
+        function renderFlat(container) {
+            const grid = document.createElement('div');
+            grid.className = 'flat-grid';
+            grid.innerHTML = filteredData.map((head, idx) => renderHeadCard(head, `head-${idx}`)).join('');
+            container.appendChild(grid);
+        }
+
+        function renderWithCategories(container) {
+            const grouped = {};
+            filteredData.forEach(head => {
+                const cat = head.Category || 'Uncategorized';
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(head);
+            });
+            
+            const sortedCategories = Object.keys(grouped).sort();
+            let flatIndex = 0;
+            
+            sortedCategories.forEach(category => {
+                const isExpanded = categoriesExpanded[category] !== false;
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category-section';
+                
+                categoryDiv.innerHTML = `
+                    <div class="category-header flex items-center gap-2 p-2 bg-gray-800 rounded-lg mb-2" data-category="${category}">
+                        <i data-feather="chevron-down" class="w-4 h-4 text-gray-400 transition-transform ${isExpanded ? '' : '-rotate-90'}"></i>
+                        <div class="category-tag">
+                            <span class="category-dot ${getCategoryColorClass(category)}"></span>
+                            <span class="text-xs text-white">${category}</span>
+                        </div>
+                        <span class="text-gray-500 text-xs">(${grouped[category].length})</span>
+                    </div>
+                    <div class="category-content ${isExpanded ? 'expanded' : 'collapsed'}" data-category-content="${category}">
+                        <div class="head-grid grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
+                            ${grouped[category].map((head, idx) => {
+                                const card = renderHeadCard(head, `head-${flatIndex}`);
+                                flatIndex++;
+                                return card;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(categoryDiv);
+            });
+            
+            // Add category toggle listeners
+            container.querySelectorAll('.category-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const category = header.dataset.category;
+                    categoriesExpanded[category] = !categoriesExpanded[category];
+                    const content = container.querySelector(`[data-category-content="${category}"]`);
+                    const chevron = header.querySelector('[data-feather="chevron-down"], svg');
+                    
+                    if (categoriesExpanded[category]) {
+                        content.classList.remove('collapsed');
+                        content.classList.add('expanded');
+                        chevron.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.classList.remove('expanded');
+                        content.classList.add('collapsed');
+                        chevron.style.transform = 'rotate(-90deg)';
+                    }
+                });
+            });
+        }
+
+        function renderHeadCard(head, uniqueId) {
+            const isOutOfStock = head.Exchanges_Available === 'F';
+            const coords = head.Coordinates || '';
+            const name = head.Name || 'Unknown';
+            const input = head.Input || '';
+            const category = head.Category || 'Uncategorized';
+            
+            // Create map link and format coordinates with floor level
+            const coordMatch = coords.match(/(-?\d+),\s*(-?\d+),\s*(-?\d+)/);
+            let coordsDisplay = coords;
+            let coordsLink = '#';
+            if (coordMatch) {
+                const [, x, y, z] = coordMatch;
+                const floorName = getFloorName(parseInt(y, 10));
+                coordsLink = `https://civmc-map.github.io/?x=${x}&z=${z}&zoom=6`;
+                coordsDisplay = `${x}, ${z} (${floorName})`;
+            }
+            
+            // Escape data for JSON attribute
+            const headDataJson = JSON.stringify({ name, coords: coordsDisplay, texture: head.Texture, input, uniqueId })
+                .replace(/"/g, '&quot;');
+            
+            return `
+                <div class="head-card bg-gray-900 border border-gray-800 rounded-lg flex flex-col ${isOutOfStock ? 'out-of-stock' : ''}" data-head-id="${uniqueId}" data-category="${category.toLowerCase().replace(/[^a-z0-9]/g, '-')}">
+                    <!-- Category Tag with circular border -->
+                    <div class="mb-1">
+                        <div class="category-tag">
+                            <span class="category-dot ${getCategoryColorClass(category)}"></span>
+                            <span class="text-gray-300">${category}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 3D Head Viewer -->
+                    <div class="head-canvas-container rounded">
+                        <canvas id="head-canvas-${uniqueId}" class="head-canvas" data-texture="${head.Texture || ''}"></canvas>
+                        <button class="enlarge-btn text-white" data-texture="${head.Texture || ''}" data-name="${name}" title="Enlarge">
+                            <i data-feather="maximize-2" class="w-3 h-3"></i>
+                        </button>
+                        <div class="rotate-hint">
+                            <i data-feather="rotate-cw" class="w-2 h-2"></i>
+                            <span>drag</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Head Info - Two columns layout -->
+                    <div class="flex-1 mt-1">
+                        <div class="flex items-start justify-between gap-1">
+                            <!-- Left column: Name, Input, Coords -->
+                            <div class="flex-1 space-y-0.5 min-w-0">
+                                <h3 class="font-semibold text-white text-xs leading-tight line-clamp-2 min-h-[2rem]">${name}</h3>
+                                <p class="text-[0.6rem] text-gray-400 truncate">${input}</p>
+                                <a target="_blank" class="coord-link text-[0.6rem] text-gray-500 hover:text-nara-red inline-block truncate">${coordsDisplay}</a>
+                            </div>
+                            
+                            <!-- Right column: Add to Cart button -->
+                            <button class="add-to-cart-btn flex-shrink-0 p-1.5 bg-gray-800 hover:bg-nara-red text-gray-400 hover:text-white rounded transition-colors"
+                                    data-head="${headDataJson}"
+                                    title="Add to Cart">
+                                <i data-feather="shopping-cart" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Head Viewer Initialization with Lazy Loading ---
+        let headObserver = null;
+        
+        async function initializeHeadViewers() {
+            try {
+                await ensureHeadview();
+            } catch (error) {
+                console.error('Failed to load headview3d:', error);
+                return;
+            }
+            
+            if (!window.skinview3d) return;
+            
+            // Clean up previous observer
+            if (headObserver) {
+                headObserver.disconnect();
+            }
+            
+            // Create intersection observer for lazy loading
+            headObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const canvas = entry.target;
+                        if (!canvas.dataset.initialized) {
+                            initializeSingleViewer(canvas);
+                            canvas.dataset.initialized = 'true';
+                        }
+                    }
+                });
+            }, {
+                root: null,
+                rootMargin: '100px', // Load slightly before visible
+                threshold: 0
+            });
+            
+            // Observe all canvases
+            const canvases = document.querySelectorAll('.head-canvas');
+            canvases.forEach(canvas => {
+                if (canvas.dataset.texture) {
+                    headObserver.observe(canvas);
+                }
+            });
+        }
+        
+        function initializeSingleViewer(canvas) {
+            const texture = canvas.dataset.texture;
+            if (!texture || !window.skinview3d) return;
+            
+            const id = canvas.id;
+            if (headViewers[id]) return; // Already initialized
+            
+            try {
+                const viewer = new skinview3d.SkinViewer({
+                    canvas: canvas,
+                    width: 100,
+                    height: 100
+                });
+                
+                // Get skin URL from texture
+                const skinUrl = getSkinUrlFromTexture(texture);
+                
+                if (skinUrl) {
+                    viewer.loadSkin(skinUrl).catch(err => {
+                        console.warn('Failed to load skin:', err);
+                    });
+                }
+                
+                // Configure viewer for head-only view
+                viewer.controls.enableZoom = false;
+                viewer.controls.enableRotate = true;
+                viewer.controls.enablePan = false;
+                
+                // Zoom in more to show only the head
+                viewer.zoom = 6;
+                viewer.camera.position.set(0, 26, 16);
+                viewer.camera.lookAt(0, 26, 0);
+                
+                // No animation - static head
+                viewer.animation = null;
+                viewer.autoRotate = false;
+                
+                headViewers[id] = viewer;
+            } catch (e) {
+                console.warn('Failed to create viewer for', id, e);
+            }
+        }
+        
+        // Helper function to get skin URL from texture
+        function getSkinUrlFromTexture(texture) {
+            if (!texture) return null;
+            try {
+                const decoded = atob(texture);
+                const json = JSON.parse(decoded);
+                if (json.textures && json.textures.SKIN && json.textures.SKIN.url) {
+                    return json.textures.SKIN.url;
+                }
+            } catch (e) {
+                // If decoding fails, use mc-heads fallback
+            }
+            return `https://mc-heads.net/skin/${texture}`;
+        }
+
+        // --- Cart Functions ---
+        // Cart is now an array of { ...headData, quantity }
+        
+        // Parse input string to extract resource costs
+        function parseInput(input) {
+            const result = { diamonds: 0, iron: 0 };
+            if (!input) return result;
+            
+            // Match patterns like "1 Diamond", "2 Iron", etc.
+            const diamondMatch = input.match(/(\d+)\s*Diamond/i);
+            const ironMatch = input.match(/(\d+)\s*Iron/i);
+            
+            if (diamondMatch) result.diamonds = parseInt(diamondMatch[1], 10);
+            if (ironMatch) result.iron = parseInt(ironMatch[1], 10);
+            
+            return result;
+        }
+        
+        function calculateCartTotal() {
+            let diamonds = 0;
+            let iron = 0;
+            
+            cart.forEach(item => {
+                const costs = parseInput(item.input);
+                diamonds += costs.diamonds * item.quantity;
+                iron += costs.iron * item.quantity;
+            });
+            
+            return { diamonds, iron };
+        }
+        
+        function updateCartDisplay() {
+            const cartCount = document.getElementById('cart-count');
+            const cartItems = document.getElementById('cart-items');
+            
+            // Calculate total quantity
+            const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalQty;
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-gray-500 text-sm text-center py-4" id="cart-empty-msg">Your cart is empty</p>';
+            } else {
+                const itemsHtml = cart.map((item, index) => {
+                    const headImgUrl = getHeadImageUrl(item.texture);
+                    return `
+                    <div class="cart-item flex items-center gap-2 p-2 bg-gray-800 rounded-lg" data-cart-index="${index}">
+                        <div class="qty-controls flex-shrink-0">
+                            <button class="qty-btn minus" data-index="${index}" data-action="decrease">−</button>
+                            <span class="qty-num">${item.quantity}</span>
+                            <button class="qty-btn plus" data-index="${index}" data-action="increase">+</button>
+                        </div>
+                        <img src="${headImgUrl}" 
+                             alt="${item.name}" 
+                             class="w-7 h-7 rounded flex-shrink-0"
+                             onerror="this.src='https://mc-heads.net/avatar/steve/32'">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs text-white font-medium truncate">${item.name}</p>
+                            <p class="text-[0.65rem] text-gray-400 truncate">${item.coords}</p>
+                        </div>
+                    </div>
+                `}).join('');
+                
+                // Calculate totals
+                const totals = calculateCartTotal();
+                let totalHtml = '';
+                if (totals.diamonds > 0) {
+                    totalHtml += `<div class="cart-total-item"><img src="https://minecraft.wiki/images/Invicon_Diamond.png" alt="Diamond"><span class="text-cyan-400">${totals.diamonds}</span></div>`;
+                }
+                if (totals.iron > 0) {
+                    totalHtml += `<div class="cart-total-item"><img src="https://minecraft.wiki/images/Invicon_Iron_Ingot.png" alt="Iron"><span class="text-gray-300">${totals.iron}</span></div>`;
+                }
+                if (!totalHtml) {
+                    totalHtml = '<span class="text-gray-500 text-xs">No cost data</span>';
+                }
+                
+                cartItems.innerHTML = itemsHtml + `
+                    <div class="cart-footer">
+                        <div class="cart-total">
+                            <span class="text-gray-400 text-xs">Total:</span>
+                            ${totalHtml}
+                        </div>
+                        <button class="empty-cart-btn" id="empty-cart-btn">
+                            <i data-feather="trash-2" class="w-3 h-3"></i>
+                            <span>Empty Cart</span>
+                        </button>
+                    </div>
+                `;
+                
+                refreshIcons();
+            }
+        }
+        
+        // Get head image URL from texture data
+        function getHeadImageUrl(texture) {
+            if (!texture) return 'https://mc-heads.net/avatar/steve/32';
+            try {
+                const decoded = atob(texture);
+                const json = JSON.parse(decoded);
+                if (json.textures && json.textures.SKIN && json.textures.SKIN.url) {
+                    // Extract texture ID from Mojang URL
+                    const url = json.textures.SKIN.url;
+                    const match = url.match(/\/texture\/([a-f0-9]+)/i);
+                    if (match) {
+                        return `https://mc-heads.net/head/${match[1]}/32`;
+                    }
+                }
+            } catch (e) {
+                // Fallback
+            }
+            return `https://mc-heads.net/head/${texture}/32`;
+        }
+
+        function addToCart(headData) {
+            // Check if item already exists in cart (by texture)
+            const existingIndex = cart.findIndex(item => item.texture === headData.texture);
+            
+            if (existingIndex >= 0) {
+                // Increment quantity
+                cart[existingIndex].quantity++;
+            } else {
+                // Add new item with quantity 1
+                cart.push({ ...headData, quantity: 1 });
+            }
+            
+            updateCartDisplay();
+            
+            // Open cart dropdown when item is added
+            const cartDropdown = document.getElementById('cart-dropdown-content');
+            const cartChevron = document.getElementById('cart-chevron');
+            if (cartDropdown) {
+                cartDropdown.classList.add('open');
+                cartChevron.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function updateCartQuantity(index, delta) {
+            if (index >= 0 && index < cart.length) {
+                cart[index].quantity += delta;
+                if (cart[index].quantity <= 0) {
+                    cart.splice(index, 1);
+                }
+                updateCartDisplay();
+            }
+        }
+        
+        function emptyCart() {
+            cart = [];
+            updateCartDisplay();
+        }
+        
+        function toggleCartDropdown() {
+            const cartDropdown = document.getElementById('cart-dropdown-content');
+            const cartChevron = document.getElementById('cart-chevron');
+            if (cartDropdown.classList.contains('open')) {
+                cartDropdown.classList.remove('open');
+                cartChevron.style.transform = 'rotate(0deg)';
+            } else {
+                cartDropdown.classList.add('open');
+                cartChevron.style.transform = 'rotate(180deg)';
+            }
+        }
+        
+        // --- Modal Functions ---
+        let modalViewer = null;
+        
+        function openHeadModal(texture, name) {
+            const modal = document.getElementById('head-modal');
+            const canvas = document.getElementById('modal-head-canvas');
+            const nameEl = document.getElementById('modal-head-name');
+            
+            nameEl.textContent = name || 'Head';
+            
+            // Dispose previous viewer
+            if (modalViewer) {
+                modalViewer.dispose();
+                modalViewer = null;
+            }
+            
+            // Create new viewer
+            try {
+                modalViewer = new skinview3d.SkinViewer({
+                    canvas: canvas,
+                    width: 250,
+                    height: 250
+                });
+                
+                const skinUrl = getSkinUrlFromTexture(texture);
+                if (skinUrl) {
+                    modalViewer.loadSkin(skinUrl).catch(err => {
+                        console.warn('Failed to load skin in modal:', err);
+                    });
+                }
+                
+                modalViewer.controls.enableZoom = false;
+                modalViewer.controls.enableRotate = true;
+                modalViewer.controls.enablePan = false;
+                modalViewer.zoom = 5;
+                modalViewer.camera.position.set(0, 26, 18);
+                modalViewer.camera.lookAt(0, 26, 0);
+                modalViewer.animation = null;
+                modalViewer.autoRotate = false;
+                
+            } catch (e) {
+                console.error('Failed to create modal viewer:', e);
+            }
+            
+            modal.classList.add('open');
+            refreshIcons();
+        }
+        
+        function closeHeadModal() {
+            const modal = document.getElementById('head-modal');
+            modal.classList.remove('open');
+            
+            if (modalViewer) {
+                modalViewer.dispose();
+                modalViewer = null;
+            }
+        }
+
+        // --- Event Listeners ---
+        function setupEventListeners() {
+            // Search input
+            document.getElementById('search-input').addEventListener('input', () => {
+                filterAndRender();
+            });
+            
+            // Field selector
+            document.querySelectorAll('.field-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    selectedSearchField = option.dataset.value;
+                    document.getElementById('selected-field').textContent = option.textContent;
+                    document.getElementById('field-selector-dropdown').removeAttribute('open');
+                    filterAndRender();
+                });
+            });
+            
+            // Field selector dropdown chevron animation
+            const fieldDropdown = document.getElementById('field-selector-dropdown');
+            fieldDropdown.addEventListener('toggle', () => {
+                const chevron = document.getElementById('field-selector-chevron');
+                if (fieldDropdown.open) {
+                    chevron.style.transform = 'rotate(180deg)';
+                } else {
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            // Sort by category toggle switch
+            document.getElementById('sort-by-category-toggle').addEventListener('click', () => {
+                const toggle = document.getElementById('sort-by-category-toggle');
+                sortByCategory = !sortByCategory;
+                if (sortByCategory) {
+                    toggle.classList.add('active');
+                } else {
+                    toggle.classList.remove('active');
+                }
+                renderHeads();
+            });
+            
+            // Add to cart buttons (delegated)
+            document.getElementById('heads-container').addEventListener('click', (e) => {
+                // Handle add to cart
+                const addBtn = e.target.closest('.add-to-cart-btn');
+                if (addBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    try {
+                        const headDataStr = addBtn.dataset.head.replace(/&quot;/g, '"');
+                        const headData = JSON.parse(headDataStr);
+                        addToCart(headData);
+                    } catch (err) {
+                        console.error('Failed to parse head data:', err);
+                    }
+                    return;
+                }
+                
+                // Handle enlarge button
+                const enlargeBtn = e.target.closest('.enlarge-btn');
+                if (enlargeBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const texture = enlargeBtn.dataset.texture;
+                    const name = enlargeBtn.dataset.name;
+                    openHeadModal(texture, name);
+                }
+            });
+            
+            // Cart quantity controls and empty cart (delegated on cart items container)
+            document.getElementById('cart-items').addEventListener('click', (e) => {
+                // Handle quantity buttons
+                const qtyBtn = e.target.closest('.qty-btn');
+                if (qtyBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const index = parseInt(qtyBtn.dataset.index, 10);
+                    const action = qtyBtn.dataset.action;
+                    if (action === 'increase') {
+                        updateCartQuantity(index, 1);
+                    } else if (action === 'decrease') {
+                        updateCartQuantity(index, -1);
+                    }
+                    return;
+                }
+                
+                // Handle empty cart button
+                const emptyBtn = e.target.closest('#empty-cart-btn');
+                if (emptyBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    emptyCart();
+                }
+            });
+            
+            // Cart toggle button
+            document.getElementById('cart-toggle').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleCartDropdown();
+            });
+            
+            // Cart close button
+            document.getElementById('cart-close').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const cartDropdown = document.getElementById('cart-dropdown-content');
+                const cartChevron = document.getElementById('cart-chevron');
+                cartDropdown.classList.remove('open');
+                cartChevron.style.transform = 'rotate(0deg)';
+            });
+            
+            // Close cart dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const cartDropdown = document.getElementById('cart-dropdown-content');
+                const cartToggle = document.getElementById('cart-toggle');
+                if (cartDropdown && cartDropdown.classList.contains('open')) {
+                    if (!cartDropdown.contains(e.target) && !cartToggle.contains(e.target)) {
+                        cartDropdown.classList.remove('open');
+                        document.getElementById('cart-chevron').style.transform = 'rotate(0deg)';
+                    }
+                }
+            });
+            
+            // Modal close button
+            document.getElementById('modal-close').addEventListener('click', (e) => {
+                e.preventDefault();
+                closeHeadModal();
+            });
+            
+            // Close modal when clicking outside content
+            document.getElementById('head-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'head-modal') {
+                    closeHeadModal();
+                }
+            });
+            
+            // Close modal on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('head-modal');
+                    if (modal.classList.contains('open')) {
+                        closeHeadModal();
+                    }
+                }
+            });
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshIcons();
+            setupEventListeners();
+            loadHeadData();
+        });
+    </script>
+</body>
+</html>
