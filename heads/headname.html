@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Head Shop | Nara</title>
+    <title>Head Name Editor | Nara</title>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="https://vzge.me">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -391,6 +391,102 @@
             padding-bottom: 0;
         }
 
+        /* Editable name field */
+        .editable-name {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            width: 100%;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            transition: border-color 0.2s, background-color 0.2s;
+            outline: none;
+            min-height: 2rem;
+            resize: none;
+            overflow: hidden;
+        }
+        .editable-name:hover {
+            border-color: #4b5563;
+            background-color: rgba(55, 65, 81, 0.5);
+        }
+        .editable-name:focus {
+            border-color: #2596be;
+            background-color: rgba(55, 65, 81, 0.8);
+        }
+        .editable-name.modified {
+            border-color: #f59e0b !important;
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+        .editable-name.empty {
+            border-color: #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Save controls bar */
+        .save-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #374151;
+            padding: 1rem;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+        .save-controls.visible {
+            transform: translateY(0);
+        }
+        .save-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .save-btn:hover {
+            transform: scale(1.02);
+        }
+        .save-btn:active {
+            transform: scale(0.98);
+        }
+        .save-btn-primary {
+            background-color: #2596be;
+            color: white;
+        }
+        .save-btn-primary:hover {
+            background-color: #1e7a9a;
+        }
+        .save-btn-secondary {
+            background-color: #374151;
+            color: #d1d5db;
+            border: 1px solid #4b5563;
+        }
+        .save-btn-secondary:hover {
+            background-color: #4b5563;
+        }
+        .changes-count {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+        
+        /* Add bottom padding when save controls visible */
+        body.has-changes {
+            padding-bottom: 80px;
+        }
+
         /* Mobile responsive */
         @media (max-width: 768px) {
             .head-grid {
@@ -429,7 +525,7 @@
         <div class="max-w-[95%] mx-auto w-full">
             
             <!-- Page Title (not sticky) -->
-            <h1 class="text-4xl font-bold mb-6 text-center text-primary">MitsuHeadCorp</h1>
+            <h1 class="text-4xl font-bold mb-6 text-center text-primary">Head Name Editor</h1>
             
             <!-- Sticky Header: Search Bar + Cart -->
             <div class="sticky-header">
@@ -508,15 +604,12 @@
             </div>
             
             <!-- Disclaimer -->
-            <div class="mt-8 mb-4 p-4  text-center">
+            <div class="mt-8 mb-20 p-4 text-center">
                 <p class="text-gray-400 text-sm">
-                    <strong class="text-gray-300">Disclaimer:</strong> MitsuHeadCorp is not affiliated with the Naran Government and is a private business.
+                    <strong class="text-gray-300">Head Name Editor:</strong> Click on any head name to edit it. Changes are tracked and can be downloaded as a CSV.
                 </p>
                 <p class="text-gray-500 text-xs mt-2">
-                    For any inquiries, please reach out to <span class="text-primary">HPLaptop</span> (<span class="text-gray-400">@rm.dv</span>).
-                </p>
-                <p class="text-gray-500 text-xs mt-1">
-                    Online ordering is not available at this time.
+                    Names highlighted in <span class="text-yellow-500">orange</span> have been modified. Empty names are highlighted in <span class="text-red-500">red</span>.
                 </p>
             </div>
         </div>
@@ -541,6 +634,25 @@
             </p>
         </div>
     </div>
+    
+    <!-- Save Controls Bar -->
+    <div id="save-controls" class="save-controls">
+        <span class="text-gray-400 text-sm">
+            <span id="changes-count" class="changes-count">0</span> changes pending
+        </span>
+        <button id="download-csv-btn" class="save-btn save-btn-primary">
+            <i data-feather="download" class="w-4 h-4"></i>
+            Download Updated CSV
+        </button>
+        <button id="copy-changes-btn" class="save-btn save-btn-secondary">
+            <i data-feather="clipboard" class="w-4 h-4"></i>
+            Copy Changes
+        </button>
+        <button id="reset-changes-btn" class="save-btn save-btn-secondary">
+            <i data-feather="x" class="w-4 h-4"></i>
+            Reset All
+        </button>
+    </div>
 
     <custom-footer></custom-footer>
     <script src="../components/footer.js"></script>
@@ -553,6 +665,9 @@
         let selectedSearchField = 'all';
         let sortByCategory = true;
         let categoriesExpanded = {};
+        
+        // Track name changes: Map of texture -> { original, current }
+        let nameChanges = new Map();
         
         // Skin URL cache to avoid repeated base64 decoding
         const skinUrlCache = new Map();
@@ -847,9 +962,16 @@
         function renderHeadCard(head, uniqueId) {
             const isOutOfStock = head.Exchanges_Available === 'F';
             const coords = head.Coordinates || '';
-            const name = head.Name || 'Unknown';
+            const originalName = head.Name || '';
             const input = head.Input || '';
             const category = head.Category || 'Uncategorized';
+            const texture = head.Texture || '';
+            
+            // Check if this head has a modified name
+            const change = nameChanges.get(texture);
+            const displayName = change ? change.current : originalName;
+            const isModified = change && change.current !== change.original;
+            const isEmpty = !displayName.trim();
             
             // Create map link and format coordinates with floor level
             const coordMatch = coords.match(/(-?\d+),\s*(-?\d+),\s*(-?\d+)/);
@@ -863,15 +985,20 @@
             }
             
             // Escape data for JSON attribute
-            const headDataJson = JSON.stringify({ name, coords: coordsDisplay, texture: head.Texture, input, uniqueId })
+            const headDataJson = JSON.stringify({ name: displayName, coords: coordsDisplay, texture, input, uniqueId })
                 .replace(/"/g, '&quot;');
             
             // Get texture ID for vzge.me URL
-            const textureId = getTextureId(head.Texture);
+            const textureId = getTextureId(texture);
             const headImageUrl = textureId ? `https://vzge.me/head/512/${textureId}.png` : 'https://vzge.me/head/512/steve.png';
             
+            // Determine CSS classes for editable name
+            const nameClasses = ['editable-name'];
+            if (isModified) nameClasses.push('modified');
+            if (isEmpty) nameClasses.push('empty');
+            
             return `
-                <div class="head-card bg-gray-900 border border-gray-800 rounded-lg flex flex-col ${isOutOfStock ? 'out-of-stock' : ''}" data-head-id="${uniqueId}" data-category="${category.toLowerCase().replace(/[^a-z0-9]/g, '-')}">
+                <div class="head-card bg-gray-900 border border-gray-800 rounded-lg flex flex-col ${isOutOfStock ? 'out-of-stock' : ''}" data-head-id="${uniqueId}" data-texture="${texture}" data-category="${category.toLowerCase().replace(/[^a-z0-9]/g, '-')}">
                     <!-- Category Tag -->
                     <div class="mb-1">
                         <div class="category-tag">
@@ -882,13 +1009,13 @@
                     
                     <!-- Head Image with overlayed 3D Button -->
                     <div class="head-image-area">
-                        <div class="head-image-container" style="cursor: pointer;" data-texture="${head.Texture || ''}" data-name="${name}">
+                        <div class="head-image-container" style="cursor: pointer;" data-texture="${texture}" data-name="${displayName}">
                             <img src="${headImageUrl}" 
-                                 alt="${name}" 
+                                 alt="${displayName || 'Unknown'}" 
                                  loading="lazy"
                                  onerror="this.src='https://vzge.me/head/512/steve.png'">
                         </div>
-                        <button class="enlarge-btn" data-texture="${head.Texture || ''}" data-name="${name}" title="View 3D Preview">
+                        <button class="enlarge-btn" data-texture="${texture}" data-name="${displayName}" title="View 3D Preview">
                             <i data-feather="rotate-cw"></i>
                             <span>Live Preview</span>
                         </button>
@@ -896,21 +1023,15 @@
                     
                     <!-- Head Info - Two columns layout -->
                     <div class="flex-1 mt-1">
-                        <div class="flex items-end justify-between gap-2 h-full">
-                            <!-- Left column: Name, Input, Coords -->
-                            <div class="flex-1 space-y-0.5 min-w-0">
-                                <h3 class="font-semibold text-white text-xs leading-tight line-clamp-2 min-h-[2rem] mb-1">${name}</h3>
-                                <p class="text-[0.65rem] text-gray-300 truncate">${input}</p>
-                                <a target="_blank" class="coord-link text-[0.65rem] text-gray-400 hover:text-nara-red inline-block">${coordsDisplay}</a>
-                            </div>
-                            
-                            <!-- Right column: Add to Cart button -->
-                            <button class="add-to-cart-btn flex-shrink-0 p-1.5 bg-gray-800 hover:bg-nara-red text-gray-400 hover:text-white rounded transition-colors flex items-center gap-0.5"
-                                    data-head="${headDataJson}"
-                                    title="Add to Cart">
-                                <i data-feather="plus" class="w-2 h-2"></i>
-                                <i data-feather="shopping-cart" class="w-3 h-3"></i>
-                            </button>
+                        <div class="flex flex-col gap-1">
+                            <!-- Editable Name Field -->
+                            <textarea class="${nameClasses.join(' ')}" 
+                                      data-texture="${texture}" 
+                                      data-original="${originalName.replace(/"/g, '&quot;')}"
+                                      rows="2"
+                                      placeholder="Enter head name...">${displayName}</textarea>
+                            <p class="text-[0.65rem] text-gray-300 truncate">${input}</p>
+                            <a target="_blank" class="coord-link text-[0.65rem] text-gray-400 hover:text-nara-red inline-block">${coordsDisplay}</a>
                         </div>
                     </div>
                 </div>
@@ -1200,6 +1321,115 @@
             }
         }
 
+        // --- Name Change Tracking ---
+        function updateNameChange(texture, original, current) {
+            if (!texture) return;
+            
+            if (current === original) {
+                // Name is back to original, remove from changes
+                nameChanges.delete(texture);
+            } else {
+                // Track the change
+                nameChanges.set(texture, { original, current });
+            }
+            
+            // Also update the headData array
+            const headIndex = headData.findIndex(h => h.Texture === texture);
+            if (headIndex >= 0) {
+                headData[headIndex].Name = current;
+            }
+            
+            updateSaveControlsVisibility();
+        }
+        
+        function updateSaveControlsVisibility() {
+            const saveControls = document.getElementById('save-controls');
+            const changesCount = document.getElementById('changes-count');
+            
+            const count = nameChanges.size;
+            changesCount.textContent = count;
+            
+            if (count > 0) {
+                saveControls.classList.add('visible');
+                document.body.classList.add('has-changes');
+            } else {
+                saveControls.classList.remove('visible');
+                document.body.classList.remove('has-changes');
+            }
+        }
+        
+        function generateUpdatedCSV() {
+            // Get original headers from first load
+            const headers = ['Timestamp', 'Input', 'Output', 'Coordinates', 'Exchanges_Available', 'Category', 'Tags', 'Texture', 'Name'];
+            
+            const rows = headData.map(head => {
+                return headers.map(header => {
+                    let value = head[header] || '';
+                    // Escape quotes and wrap in quotes if contains comma, quote, or newline
+                    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+                        value = '"' + value.replace(/"/g, '""') + '"';
+                    }
+                    return value;
+                }).join(',');
+            });
+            
+            return headers.join(',') + '\n' + rows.join('\n');
+        }
+        
+        function downloadCSV() {
+            const csv = generateUpdatedCSV();
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'head_shop_data.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+        
+        function copyChangesToClipboard() {
+            if (nameChanges.size === 0) return;
+            
+            const changesList = [];
+            nameChanges.forEach((change, texture) => {
+                // Get a short texture ID for reference
+                const textureId = getTextureId(texture);
+                const shortId = textureId ? textureId.substring(0, 8) + '...' : 'unknown';
+                changesList.push(`${change.original || '(empty)'} -> ${change.current} [${shortId}]`);
+            });
+            
+            const text = `Name Changes (${nameChanges.size}):\n` + changesList.join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Changes copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                // Fallback: show in prompt
+                prompt('Copy these changes:', text);
+            });
+        }
+        
+        function resetAllChanges() {
+            if (nameChanges.size === 0) return;
+            
+            if (!confirm(`Reset all ${nameChanges.size} changes?`)) return;
+            
+            // Restore original names in headData
+            nameChanges.forEach((change, texture) => {
+                const headIndex = headData.findIndex(h => h.Texture === texture);
+                if (headIndex >= 0) {
+                    headData[headIndex].Name = change.original;
+                }
+            });
+            
+            nameChanges.clear();
+            updateSaveControlsVisibility();
+            
+            // Re-render to show original names
+            filterAndRender();
+        }
+
         // --- Event Listeners ---
         function setupEventListeners() {
             // Search input
@@ -1238,6 +1468,39 @@
                     toggle.classList.remove('active');
                 }
                 renderHeads();
+            });
+            
+            // Name editing (delegated) - handle input and blur events
+            document.getElementById('heads-container').addEventListener('input', (e) => {
+                if (e.target.classList.contains('editable-name')) {
+                    const textarea = e.target;
+                    const texture = textarea.dataset.texture;
+                    const original = textarea.dataset.original;
+                    const current = textarea.value;
+                    
+                    // Update visual state
+                    textarea.classList.toggle('modified', current !== original);
+                    textarea.classList.toggle('empty', !current.trim());
+                    
+                    // Track the change
+                    updateNameChange(texture, original, current);
+                }
+            });
+            
+            // Save controls buttons
+            document.getElementById('download-csv-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                downloadCSV();
+            });
+            
+            document.getElementById('copy-changes-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                copyChangesToClipboard();
+            });
+            
+            document.getElementById('reset-changes-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                resetAllChanges();
             });
             
             // Add to cart buttons (delegated)

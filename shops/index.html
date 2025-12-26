@@ -188,6 +188,27 @@
             visibility: visible;
             opacity: 1;
         }
+
+        /* Item icon styles */
+        .item-icon {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+
+        @media (max-width: 768px) {
+            .item-icon {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .item-icon {
+                width: 16px;
+                height: 16px;
+            }
+        }
     </style>
     
 <script src="../components/analytics.js"></script>
@@ -684,8 +705,98 @@
             renderTable();
         }
         
+        // Extract item name for icon URL
+        function extractItemName(itemString, loreText = '') {
+            if (!itemString) return null;
+            
+            // Remove leading whitespace
+            let cleaned = itemString.trim();
+            
+            // Remove leading numbers and spaces, including ranges like "42-62"
+            cleaned = cleaned.replace(/^\d+(-\d+)?\s*/, '');
+            
+            // Remove anything in quotes (e.g., '1 Barrel "Repair Kit"' -> 'Barrel')
+            cleaned = cleaned.replace(/"[^"]*"/g, '').trim();
+            
+            // If empty after cleaning, return null
+            if (!cleaned) return null;
+            
+            // Convert to lowercase for matching
+            let itemName = cleaned.toLowerCase();
+            
+            // Check if lore contains "Author" - map to written_book
+            if (loreText && loreText.toLowerCase().includes('author')) {
+                return 'written_book';
+            }
+            
+            // Special case mappings
+            const potionWords = ['strength', 'healing', 'regeneration', 'water breathing', 'resistance', 'fire resistance', 'invisibility', 'swiftness', 'night vision', 'leaping', 'slowness', 'poison', 'weakness', 'turtle master', 'slow falling'];
+            for (const word of potionWords) {
+                if (itemName.includes(word)) {
+                    return 'potion';
+                }
+            }
+            
+            // Banner -> white_banner
+            if (itemName.includes('banner')) {
+                return 'white_banner';
+            }
+            
+            // Book and Quill -> writable_book
+            if (itemName === 'book and quill') {
+                return 'writable_book';
+            }
+            
+            // Slimeball -> slime_ball
+            if (itemName === 'slimeball') {
+                return 'slime_ball';
+            }
+            
+            // Netherite Upgrade -> netherite_upgrade_smithing_template
+            if (itemName === 'netherite upgrade') {
+                return 'netherite_upgrade_smithing_template';
+            }
+            
+            // Nether Quartz -> quartz
+            if (itemName === 'nether quartz') {
+                return 'quartz';
+            }
+            
+            // Anything with Shield -> shield
+            if (itemName.includes('shield')) {
+                return 'shield';
+            }
+            
+            // Eye of Ender -> ender_eye
+            if (itemName === 'eye of ender') {
+                return 'ender_eye';
+            }
+            
+            // Bucket of X -> X_bucket (e.g., "bucket of axolotl" -> "axolotl_bucket")
+            const bucketOfMatch = itemName.match(/^bucket of\s+(.+)$/);
+            if (bucketOfMatch) {
+                return bucketOfMatch[1].replace(/\s+/g, '_') + '_bucket';
+            }
+            
+            // Block of X -> X_block (e.g., "block of iron" -> "iron_block")
+            const blockOfMatch = itemName.match(/^block of\s+(.+)$/);
+            if (blockOfMatch) {
+                return blockOfMatch[1].replace(/\s+/g, '_') + '_block';
+            }
+            
+            // Default: replace spaces with underscores
+            return itemName.replace(/\s+/g, '_');
+        }
+        
+        // Get icon URL for an item
+        function getItemIconUrl(itemString, loreText = '') {
+            const itemName = extractItemName(itemString, loreText);
+            if (!itemName) return null;
+            return `https://mc.nerothe.com/img/1.21.8/minecraft_${itemName}.png`;
+        }
+        
         // Process item name and lore
- function processItemWithLore(itemName, loreText) {
+        function processItemWithLore(itemName, loreText) {
             let displayName = itemName;
             let loreContent = loreText;
             
@@ -740,9 +851,25 @@
                         const inputLore = originalRow[2] || '';
                         const { loreContent } = processItemWithLore(originalRow[1], inputLore);
                         
+                        // Create wrapper for icon and text
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'flex items-center gap-2';
+                        
+                        // Add item icon (pass lore for special mappings like written_book)
+                        const iconUrl = getItemIconUrl(originalRow[1], inputLore);
+                        if (iconUrl) {
+                            const img = document.createElement('img');
+                            img.src = iconUrl;
+                            img.alt = '';
+                            img.className = 'item-icon w-6 h-6 flex-shrink-0';
+                            img.style.imageRendering = 'pixelated';
+                            img.onerror = function() { this.style.display = 'none'; };
+                            wrapper.appendChild(img);
+                        }
+                        
                         const span = document.createElement('span');
                         span.textContent = cell; // Use processed name from row
-                        td.appendChild(span);
+                        wrapper.appendChild(span);
                         
                         if (loreContent && loreContent.trim()) {
                             const icon = document.createElement('span');
@@ -754,17 +881,35 @@
                             tooltip.textContent = loreContent;
                             
                             icon.appendChild(tooltip);
-                            td.appendChild(icon);
+                            wrapper.appendChild(icon);
                         }
+                        
+                        td.appendChild(wrapper);
                     }
                     // Handle Output column (index 3) with Output_Lore (index 4)
                     else if (i === 3) {
                         const outputLore = originalRow[4] || '';
                         const { loreContent } = processItemWithLore(originalRow[3], outputLore);
                         
+                        // Create wrapper for icon and text
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'flex items-center gap-2';
+                        
+                        // Add item icon (pass lore for special mappings like written_book)
+                        const iconUrl = getItemIconUrl(originalRow[3], outputLore);
+                        if (iconUrl) {
+                            const img = document.createElement('img');
+                            img.src = iconUrl;
+                            img.alt = '';
+                            img.className = 'item-icon w-6 h-6 flex-shrink-0';
+                            img.style.imageRendering = 'pixelated';
+                            img.onerror = function() { this.style.display = 'none'; };
+                            wrapper.appendChild(img);
+                        }
+                        
                         const span = document.createElement('span');
                         span.textContent = cell; // Use processed name from row
-                        td.appendChild(span);
+                        wrapper.appendChild(span);
                         
                         if (loreContent && loreContent.trim()) {
                             const icon = document.createElement('span');
@@ -776,8 +921,10 @@
                             tooltip.textContent = loreContent;
                             
                             icon.appendChild(tooltip);
-                            td.appendChild(icon);
+                            wrapper.appendChild(icon);
                         }
+                        
+                        td.appendChild(wrapper);
                     }
                     // Handle Coordinates column (index 5)
                     else if (i === 5 && cell) {
