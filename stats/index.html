@@ -183,6 +183,16 @@
                             <div id="profile-last-join" class="text-white">Loading...</div>
                         </div>
 
+                        <div id="profile-status-container" class="bg-gray-800/50 p-3 rounded-lg hidden">
+                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Status</div>
+                            <div id="profile-status" class="text-green-400 font-semibold">Online</div>
+                        </div>
+
+                        <div id="profile-last-logout-container" class="bg-gray-800/50 p-3 rounded-lg hidden">
+                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Last Logout</div>
+                            <div id="profile-last-logout" class="text-white">Loading...</div>
+                        </div>
+
                         <a id="profile-namemc" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-gray-300 hover:text-white">
                             <i data-feather="external-link" class="w-4 h-4"></i> NameMC Profile
                         </a>
@@ -215,22 +225,14 @@
                             <button onclick="switchChart('bar')" id="chart-tab-bar" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Bar</button>
                         </div>
 
-                        <!-- Settings Dropdown (Right) -->
-                        <!-- 
-                        <div class="relative">
-                            <button id="settings-btn" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-                                <i data-feather="settings" class="w-5 h-5"></i> Settings
-                            </button>
-                            <div id="settings-menu" class="hidden absolute top-full right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 p-2">
-                                <div class="text-xs text-gray-500 mb-2 px-2">Font Size</div>
-                                <div class="flex gap-1">
-                                    <button onclick="setFontSize('text-sm')" class="flex-1 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs">Small</button>
-                                    <button onclick="setFontSize('text-base')" class="flex-1 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs">Normal</button>
-                                    <button onclick="setFontSize('text-lg')" class="flex-1 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs">Large</button>
-                                </div>
+                        <!-- Granularity Toggle (Right) - Only shown for line/bar charts -->
+                        <div id="granularity-controls" class="hidden flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Smoothing:</span>
+                            <div class="flex bg-gray-800 rounded-lg p-1">
+                                <button onclick="setGranularity('daily')" id="granularity-daily" class="px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white">Daily</button>
+                                <button onclick="setGranularity('weekly')" id="granularity-weekly" class="px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold">Weekly</button>
                             </div>
-                        </div> 
-                        -->
+                        </div>
                     </div>
 
                     <!-- D3 Chart Wrapper -->
@@ -268,6 +270,7 @@
         let skinViewer = null;
         let currentChartType = 'calendar';
         let currentGranularity = 'weekly'; 
+        let userGranularityPreference = 'weekly'; // User's preferred granularity (daily or weekly)
         let durationIntervalId = null;
         const INITIAL_OFFLINE_LIMIT = 50; // Only render what fits on screen initially
         const OFFLINE_BATCH_SIZE = 30;
@@ -307,6 +310,12 @@
         const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
         const MAX_SESSION_MS = 23.8 * 60 * 60 * 1000; 
         const MAX_DATALABELS_RANGE = 14 * 24 * 60 * 60 * 1000;
+
+        // Custom fetch wrapper to add identifying header
+        const API_HEADERS = { 'X-Client-Source': 'nara.rocks/stats' };
+        function fetchAPI(url) {
+            return fetch(url, { headers: API_HEADERS });
+        }
 
         // Avatar hash checking
         let badAvatarHashes = new Set();
@@ -673,6 +682,22 @@
             document.getElementById('profile-playtime').textContent = 'Loading...';
             document.getElementById('chart-calendar').innerHTML = '<div class="text-center py-20 text-gray-500">Loading history...</div>';
             document.getElementById('monthly-data-container').innerHTML = '';
+            document.getElementById('profile-status-container').classList.add('hidden');
+            document.getElementById('profile-last-logout-container').classList.add('hidden');
+            
+            // Fetch UUID from mc-accounts for skin
+            let playerUuid = null;
+            try {
+                const accountResponse = await fetchAPI(`https://api.civinfo.net/mc-accounts/all?mcName=${username}`);
+                if (accountResponse.ok) {
+                    const accountData = await accountResponse.json();
+                    if (accountData.uuids && accountData.uuids.length > 0) {
+                        playerUuid = accountData.uuids[0];
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to fetch UUID:', e);
+            }
             
             let viewerAvailable = true;
             try {
@@ -684,14 +709,18 @@
             if (skinViewer) { skinViewer.dispose(); skinViewer = null; }
             const canvas = document.getElementById("skin-canvas");
             if (viewerAvailable && window.skinview3d) {
-                skinViewer = new skinview3d.SkinViewer({ canvas: canvas, width: 250, height: 350, skin: `https://mc-heads.net/skin/${username}` });
+                // Use UUID for skin if available, otherwise fall back to username
+                const skinUrl = playerUuid 
+                    ? `https://mc-heads.net/skin/${playerUuid}` 
+                    : `https://mc-heads.net/skin/${username}`;
+                skinViewer = new skinview3d.SkinViewer({ canvas: canvas, width: 250, height: 350, skin: skinUrl });
                 skinViewer.controls.enableZoom = true; skinViewer.controls.enableRotate = true;
                 skinViewer.animation = new skinview3d.WalkingAnimation(); skinViewer.animation.speed = 0.5;
             }
-            document.getElementById('profile-namemc').href = `https://namemc.com/profile/${username}`;
+            document.getElementById('profile-namemc').href = `https://namemc.com/profile/${playerUuid || username}`;
 
             try {
-                const response = await fetch(`https://api.civinfo.net/mc-sessions/all?mcName=${username}`);
+                const response = await fetchAPI(`https://api.civinfo.net/mc-sessions/all?mcName=${username}`);
                 if (!response.ok) throw new Error('Failed to fetch history');
                 const data = await response.json();
                 processProfileData(data);
@@ -781,6 +810,14 @@
             const now = Date.now();
             const oneDayMs = 24 * 60 * 60 * 1000;
             const maxSessionMs = 23.8 * 60 * 60 * 1000;
+            
+            // Track last login and logout for online status
+            let lastLoginTime = 0;
+            let lastLogoutTime = 0;
+            for (let i = 0; i < logins.length; i++) {
+                if (logins[i] && logins[i] > lastLoginTime) lastLoginTime = logins[i];
+                if (logouts[i] && logouts[i] > lastLogoutTime) lastLogoutTime = logouts[i];
+            }
             
             // Pair logins with their corresponding logout and sort by login time
             const sessionsArr = logins.map((login, i) => ({ login, logout: logouts[i] || null }));
@@ -907,13 +944,35 @@
             profileData = { totalMs, firstJoin, lastJoin, dailyPlaytime, monthlyPlaytime, dailyData, weeklyData };
             
             document.getElementById('profile-playtime').textContent = (totalMs / 3600000).toFixed(1) + 'h';
-            const dateOpts = { year: 'numeric', month: 'long', day: 'numeric' };
+            const dateTimeOpts = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' };
+            
+            // Check if player is online (last login > last logout)
+            const isOnline = lastLoginTime > lastLogoutTime;
+            const statusContainer = document.getElementById('profile-status-container');
+            const lastLogoutContainer = document.getElementById('profile-last-logout-container');
+            
             if (firstJoin > 0) {
-                document.getElementById('profile-first-join').textContent = new Date(firstJoin).toLocaleDateString(undefined, dateOpts);
-                document.getElementById('profile-last-join').textContent = new Date(lastJoin).toLocaleDateString(undefined, dateOpts);
+                document.getElementById('profile-first-join').textContent = new Date(firstJoin).toLocaleString(undefined, dateTimeOpts);
+                document.getElementById('profile-last-join').textContent = new Date(lastJoin).toLocaleString(undefined, dateTimeOpts);
+                
+                // Show online status if player is currently online, otherwise show last logout
+                if (isOnline) {
+                    statusContainer.classList.remove('hidden');
+                    lastLogoutContainer.classList.add('hidden');
+                } else {
+                    statusContainer.classList.add('hidden');
+                    if (lastLogoutTime > 0) {
+                        document.getElementById('profile-last-logout').textContent = new Date(lastLogoutTime).toLocaleString(undefined, dateTimeOpts);
+                        lastLogoutContainer.classList.remove('hidden');
+                    } else {
+                        lastLogoutContainer.classList.add('hidden');
+                    }
+                }
             } else {
                 document.getElementById('profile-first-join').textContent = "N/A";
                 document.getElementById('profile-last-join').textContent = "N/A";
+                statusContainer.classList.add('hidden');
+                lastLogoutContainer.classList.add('hidden');
             }
             renderMonthlyList();
             switchChart('calendar');
@@ -957,14 +1016,39 @@
             const mainDiv = document.getElementById('chart-d3-main');
             const brushDiv = document.getElementById('chart-d3-brush');
             const hint = document.getElementById('chart-hint-zoom');
+            const granularityControls = document.getElementById('granularity-controls');
 
             if (type === 'calendar') {
                 calDiv.classList.remove('hidden'); mainDiv.classList.add('hidden'); brushDiv.classList.add('hidden'); hint.classList.add('hidden');
+                granularityControls.classList.add('hidden');
                 renderCalendarChart();
             } else {
                 await ensureD3();
                 calDiv.classList.add('hidden'); mainDiv.classList.remove('hidden'); brushDiv.classList.remove('hidden'); hint.classList.remove('hidden');
+                granularityControls.classList.remove('hidden');
+                granularityControls.classList.add('flex');
+                updateGranularityButtons();
                 renderD3Chart(type);
+            }
+        }
+
+        function updateGranularityButtons() {
+            const dailyBtn = document.getElementById('granularity-daily');
+            const weeklyBtn = document.getElementById('granularity-weekly');
+            if (userGranularityPreference === 'daily') {
+                dailyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
+                weeklyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white';
+            } else {
+                dailyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white';
+                weeklyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
+            }
+        }
+
+        function setGranularity(granularity) {
+            userGranularityPreference = granularity;
+            updateGranularityButtons();
+            if (currentChartType !== 'calendar' && profileData) {
+                renderD3Chart(currentChartType);
             }
         }
 
@@ -974,9 +1058,10 @@
             const months = {};
             Object.entries(profileData.dailyPlaytime).forEach(([ts, ms]) => {
                 const d = new Date(parseInt(ts));
-                const key = `${d.getFullYear()}-${d.getMonth()}`;
-                if (!months[key]) months[key] = { name: d.toLocaleDateString(undefined, {month:'long', year:'numeric'}), days: {}, max: 0 };
-                const day = d.getDate();
+                // Use UTC methods to avoid timezone shifts
+                const key = `${d.getUTCFullYear()}-${d.getUTCMonth()}`;
+                if (!months[key]) months[key] = { name: d.toLocaleDateString(undefined, {month:'long', year:'numeric', timeZone: 'UTC'}), days: {}, max: 0 };
+                const day = d.getUTCDate();
                 months[key].days[day] = ms;
                 if (ms > months[key].max) months[key].max = ms;
             });
@@ -992,8 +1077,9 @@
             sortedKeys.forEach(key => {
                 const mData = months[key];
                 const [y, m] = key.split('-').map(Number);
-                const daysInMonth = new Date(y, m + 1, 0).getDate();
-                const firstDayOffset = new Date(y, m, 1).getDay();
+                // Use UTC for consistent calendar rendering
+                const daysInMonth = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+                const firstDayOffset = new Date(Date.UTC(y, m, 1)).getUTCDay();
                 
                 const monthCard = document.createElement('div');
                 // Reduced padding
@@ -1009,9 +1095,9 @@
                     if (mData.max > 0) opacity = 0.2 + (0.8 * (ms / mData.max));
                     const bg = ms > 0 ? `rgba(16, 185, 129, ${opacity})` : 'rgba(55, 65, 81, 0.3)';
                     
-                    // Fix: Month Day, Year format
-                    const dateObj = new Date(y, m, d);
-                    const dateStr = dateObj.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+                    // Use UTC for consistent date display
+                    const dateObj = new Date(Date.UTC(y, m, d));
+                    const dateStr = dateObj.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
                     const title = `${dateStr}: ${hours}h`;
                     
                     html += `<div class="calendar-day" style="background-color: ${bg}" onmouseenter="showTooltip(event, '${title}')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
@@ -1038,9 +1124,8 @@
             const height = 350 - margin.top - margin.bottom;
             const brushHeight = 60 - 20;
 
-            // Determine initial granularity
-            const totalRange = Date.now() - profileData.firstJoin;
-            currentGranularity = totalRange < ONE_MONTH_MS ? 'daily' : 'weekly';
+            // Use user's granularity preference
+            currentGranularity = userGranularityPreference;
             let data = currentGranularity === 'daily' ? profileData.dailyData : profileData.weeklyData;
 
             // Scales - Use UTC to prevent local timezone shifts
@@ -1158,18 +1243,7 @@
                 const [minX, maxX] = selection.map(xBrush.invert);
                 x.domain([minX, maxX]);
                 
-                // Update Granularity
-                const range = maxX - minX;
-                const newGranularity = range < ONE_MONTH_MS ? 'daily' : 'weekly';
-                
-                if (newGranularity !== currentGranularity) {
-                    currentGranularity = newGranularity;
-                    data = currentGranularity === 'daily' ? profileData.dailyData : profileData.weeklyData;
-                    y.domain([0, d3.max(data, d => d.value) * 1.1]);
-                    yAxis.call(d3.axisLeft(y).ticks(5).tickFormat(d => d + "h"));
-                }
-
-                // Filter data for view
+                // Filter data for view (granularity is controlled by user preference, not zoom level)
                 const viewData = data.filter(d => d.date >= minX && d.date <= maxX);
                 
                 xAxis.call(d3.axisBottom(x));
@@ -1257,52 +1331,125 @@
                 container.appendChild(item);
             });
         }
+        // Helper function to process session data into player map
+        function processSessionData(data, playerMap, now) {
+            const logins = data.loginTimestamps || [];
+            const logouts = data.logoutTimestamps || [];
+            const names = data.mcNames || [];
+            
+            for (let i = 0; i < logins.length; i++) {
+                const username = names[i] || 'Unknown';
+                const loginTime = logins[i];
+                const logoutTime = logouts[i]; // null if still online
+                
+                // Only keep the most recent session per player
+                if (!playerMap.has(username) || loginTime > playerMap.get(username).loginTime) {
+                    let isOnline = logoutTime === null;
+                    let durationHours = 0;
+                    let durationMinutes = 0;
+                    
+                    if (isOnline && loginTime) {
+                        const diff = now - loginTime;
+                        durationHours = Math.floor(diff / 3600000);
+                        durationMinutes = Math.floor((diff % 3600000) / 60000);
+                        if (durationHours >= 24) isOnline = false;
+                    }
+                    
+                    playerMap.set(username, {
+                        username,
+                        lowerName: username.toLowerCase(),
+                        isOnline,
+                        loginTime,
+                        logoutTime: logoutTime || loginTime,
+                        durationHours,
+                        durationMinutes
+                    });
+                }
+            }
+        }
+        
+        // Helper function to process mc-accounts data into player map
+        function processAccountData(data, playerMap, now) {
+            const names = data.mcNames || [];
+            const lastLogins = data.lastLoginTimestamps || [];
+            const lastLogouts = data.lastLogoutTimestamps || [];
+            
+            for (let i = 0; i < names.length; i++) {
+                const username = names[i];
+                if (!username) continue;
+                
+                const lastLogin = lastLogins[i] || 0;
+                const lastLogout = lastLogouts[i] || 0;
+                
+                // Check if player already exists in map (from session data)
+                const existing = playerMap.get(username);
+                
+                if (existing) {
+                    // Player exists from session data - check if account data indicates they're online
+                    // If lastLogin > lastLogout from accounts API, they might be online
+                    if (lastLogin > lastLogout && !existing.isOnline) {
+                        // Account data suggests online, session data didn't catch it
+                        // Check if this login is more recent than what we have
+                        if (lastLogin > existing.loginTime) {
+                            const diff = now - lastLogin;
+                            const durationHours = Math.floor(diff / 3600000);
+                            const durationMinutes = Math.floor((diff % 3600000) / 60000);
+                            
+                            // Only mark as online if the session isn't stale (< 24 hours)
+                            if (durationHours < 24) {
+                                existing.isOnline = true;
+                                existing.loginTime = lastLogin;
+                                existing.durationHours = durationHours;
+                                existing.durationMinutes = durationMinutes;
+                            }
+                        }
+                    }
+                } else {
+                    // New player not in session data - add from accounts
+                    let isOnline = lastLogin > lastLogout;
+                    let durationHours = 0;
+                    let durationMinutes = 0;
+                    
+                    if (isOnline && lastLogin) {
+                        const diff = now - lastLogin;
+                        durationHours = Math.floor(diff / 3600000);
+                        durationMinutes = Math.floor((diff % 3600000) / 60000);
+                        // Don't mark as online if session is stale
+                        if (durationHours >= 24) isOnline = false;
+                    }
+                    
+                    playerMap.set(username, {
+                        username,
+                        lowerName: username.toLowerCase(),
+                        isOnline,
+                        loginTime: lastLogin,
+                        logoutTime: lastLogout || lastLogin,
+                        durationHours,
+                        durationMinutes
+                    });
+                }
+            }
+        }
+
         async function fetchPlayers() {
             try {
-                const response = await fetch('https://api.civinfo.net/mc-sessions/all?limit=1000');
-                const data = await response.json();
-                
-                // New API format: parallel arrays for loginTimestamps, logoutTimestamps, mcNames
-                const logins = data.loginTimestamps || [];
-                const logouts = data.logoutTimestamps || [];
-                const names = data.mcNames || [];
-                
-                if (!Array.isArray(logins)) throw new Error('Invalid API response');
-
-                // Build a map of latest session per player
-                const playerMap = new Map();
                 const now = Date.now();
+                const oneDayAgo = now - (24 * 60 * 60 * 1000);
+                const playerMap = new Map();
                 
-                for (let i = 0; i < logins.length; i++) {
-                    const username = names[i] || 'Unknown';
-                    const loginTime = logins[i];
-                    const logoutTime = logouts[i]; // null if still online
-                    
-                    // Only keep the most recent session per player
-                    if (!playerMap.has(username) || loginTime > playerMap.get(username).loginTime) {
-                        let isOnline = logoutTime === null;
-                        let durationHours = 0;
-                        let durationMinutes = 0;
-                        
-                        if (isOnline && loginTime) {
-                            const diff = now - loginTime;
-                            durationHours = Math.floor(diff / 3600000);
-                            durationMinutes = Math.floor((diff % 3600000) / 60000);
-                            if (durationHours >= 24) isOnline = false;
-                        }
-                        
-                        playerMap.set(username, {
-                            username,
-                            lowerName: username.toLowerCase(),
-                            isOnline,
-                            loginTime,
-                            logoutTime: logoutTime || loginTime,
-                            durationHours,
-                            durationMinutes
-                        });
-                    }
-                }
+                // Step 1: Fetch players active in last 24 hours (includes online players from sessions)
+                console.log('Fetching recent players (last 24h)...');
+                const recentResponse = await fetchAPI(`https://api.civinfo.net/mc-sessions/all?after=${oneDayAgo}`);
+                if (!recentResponse.ok) throw new Error('Failed to fetch recent players');
+                const recentData = await recentResponse.json();
                 
+                if (!Array.isArray(recentData.loginTimestamps)) throw new Error('Invalid API response');
+                
+                console.log(`Recent sessions: ${recentData.loginTimestamps.length}`);
+                processSessionData(recentData, playerMap, now);
+                console.log(`Unique players after recent fetch: ${playerMap.size}`);
+                
+                // Render recent players immediately
                 allPlayers = Array.from(playerMap.values());
                 allPlayers.sort((a, b) => (a.isOnline === b.isOnline) ? (a.isOnline ? a.loginTime - b.loginTime : b.logoutTime - a.logoutTime) : (a.isOnline ? -1 : 1));
                 cachedElements.headerCount.textContent = allPlayers.filter(p => p.isOnline).length;
@@ -1313,9 +1460,30 @@
                 }
                 
                 renderPlayers();
-                
-                // Check for bad avatars after initial render completes
                 scheduleAvatarCheck();
+                
+                // Step 2: Fetch ALL players from mc-accounts endpoint
+                console.log('Fetching all players from mc-accounts...');
+                const allResponse = await fetchAPI('https://api.civinfo.net/mc-accounts/all?limit=50000');
+                if (allResponse.ok) {
+                    const allData = await allResponse.json();
+                    
+                    if (Array.isArray(allData.mcNames)) {
+                        console.log(`Total accounts from API: ${allData.mcNames.length}`);
+                        processAccountData(allData, playerMap, now);
+                        console.log(`Total unique players: ${playerMap.size}`);
+                        
+                        // Re-render with all players
+                        allPlayers = Array.from(playerMap.values());
+                        allPlayers.sort((a, b) => (a.isOnline === b.isOnline) ? (a.isOnline ? a.loginTime - b.loginTime : b.logoutTime - a.logoutTime) : (a.isOnline ? -1 : 1));
+                        cachedElements.headerCount.textContent = allPlayers.filter(p => p.isOnline).length;
+                        
+                        renderPlayers();
+                        scheduleAvatarCheck();
+                    }
+                } else {
+                    console.error('Failed to fetch all players:', allResponse.status);
+                }
                 
                 const hasOnline = allPlayers.some(p => p.isOnline);
                 if (hasOnline && durationIntervalId === null) {

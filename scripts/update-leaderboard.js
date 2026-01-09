@@ -2,34 +2,43 @@ const fs = require('fs');
 const path = require('path');
 const Papa = require('papaparse');
 
+const fetchOptions = {
+    headers: {
+        'User-Agent': 'nara.rocks/stats leaderboard updater'
+    }
+};
+
 async function main() {
     try {
         console.log('Fetching active player list...');
-        // Step 1: Get list of players from the 'last' endpoint to know who to query
-        const response = await fetch('https://civapi.drekamor.dev/mc-sessions/last');
+        // Step 1: Get list of players from the mc-accounts endpoint
+        const response = await fetch('https://api.civinfo.net/mc-accounts/all?limit=50000', fetchOptions);
         if (!response.ok) throw new Error(`Failed to fetch player list: ${response.status}`);
         
         const data = await response.json();
-        const sessions = data.sessions || data;
+        
+        // API format: parallel arrays with account info
+        const names = data.mcNames || [];
+        const lastLogins = data.lastLoginTimestamps || [];
+        const lastLogouts = data.lastLogoutTimestamps || [];
         
         const now = Date.now();
         const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
         const oneMonthAgo = now - (30 * 24 * 60 * 60 * 1000);
-        const oneYearAgo = now - (365 * 24 * 60 * 60 * 1000);
         const oneDayMs = 24 * 60 * 60 * 1000;
 
-        // Extract unique usernames
+        // Extract unique usernames who have been active in the past week
         const uniqueUsers = new Set();
-        sessions.forEach(s => {
-            const login = s.loginTs || s.login || 0;
-            const logout = s.logoutTs || s.logout || now;
+        for (let i = 0; i < names.length; i++) {
+            const lastLogin = lastLogins[i] || 0;
+            const lastLogout = lastLogouts[i] || now;
+            const username = names[i];
 
             // Only include players who have been active in the past week
-            if (logout > oneWeekAgo) {
-                if (s.mcName) uniqueUsers.add(s.mcName);
-                if (s.user?.name) uniqueUsers.add(s.user.name);
+            if (lastLogin > oneWeekAgo || lastLogout > oneWeekAgo) {
+                if (username) uniqueUsers.add(username);
             }
-        });
+        }
 
         const usersArray = Array.from(uniqueUsers);
         console.log(`Found ${usersArray.length} unique players active in the last week. Fetching details...`);
@@ -41,7 +50,7 @@ async function main() {
         // Worker function to process a single user
         const processUser = async (username) => {
             try {
-                const historyRes = await fetch(`https://civapi.duckdns.org/mc-sessions/all?mcName=${username}&mcServer=civmc`);
+                const historyRes = await fetch(`https://api.civinfo.net/mc-sessions/all?mcName=${username}`, fetchOptions);
                 
                 if (!historyRes.ok) {
                     return { success: false, username };
