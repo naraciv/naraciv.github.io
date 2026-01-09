@@ -6,12 +6,12 @@
     <title>Stats | Nara</title>
     <!-- DNS prefetch for faster resolution -->
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://civapi.duckdns.org">
+    <link rel="dns-prefetch" href="https://api.civinfo.net">
     <link rel="dns-prefetch" href="https://mc-heads.net">
     <link rel="dns-prefetch" href="https://minotar.net">
     <link rel="dns-prefetch" href="https://d3js.org">
     <!-- Preconnect for critical domains -->
-    <link rel="preconnect" href="https://civapi.duckdns.org" crossorigin>
+    <link rel="preconnect" href="https://api.civinfo.net" crossorigin>
     <link rel="preconnect" href="https://mc-heads.net" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -118,7 +118,7 @@
 
                 <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300">
                     <p class="font-semibold text-white">Sources</p>
-                    <p class="mt-2 leading-relaxed">Playtime stats are provided by <a href="https://civapi.duckdns.org" target="_blank" class="text-nara-red hover:underline">civapi.duckdns.org</a>. Please contact <span class="font-medium">Gjum</span> if you spot any data errors. Player heads are sourced from <a href="https://mc-heads.net" target="_blank" class="text-nara-red hover:underline">mc-heads.net</a> and <a href="https://minotar.net" target="_blank" class="text-nara-red hover:underline">minotar.net</a>.</p>
+                    <p class="mt-2 leading-relaxed">Playtime stats are provided by <a href="https://api.civinfo.net" target="_blank" class="text-nara-red hover:underline">api.civinfo.net</a>. Please contact <span class="font-medium">Gjum</span> if you spot any data errors. Player heads are sourced from <a href="https://mc-heads.net" target="_blank" class="text-nara-red hover:underline">mc-heads.net</a> and <a href="https://minotar.net" target="_blank" class="text-nara-red hover:underline">minotar.net</a>.</p>
                     
                     <p class="">Performance errors are likely my fault.</p>
                 </div>
@@ -195,7 +195,7 @@
 
                 <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300">
                     <p class="font-semibold text-white">Sources</p>
-                    <p class="mt-2 leading-relaxed">Playtime stats are provided by <a href="https://civapi.duckdns.org" target="_blank" class="text-nara-red hover:underline">civapi.duckdns.org</a>. Please contact <span class="font-medium">Gjum</span> if you spot any data errors. Player skins are sourced from <a href="https://mc-heads.net" target="_blank" class="text-nara-red hover:underline">mc-heads.net</a>.</p>
+                    <p class="mt-2 leading-relaxed">Playtime stats are provided by <a href="https://api.civinfo.net" target="_blank" class="text-nara-red hover:underline">api.civinfo.net</a>. Please contact <span class="font-medium">Gjum</span> if you spot any data errors. Player skins are sourced from <a href="https://mc-heads.net" target="_blank" class="text-nara-red hover:underline">mc-heads.net</a>.</p>
                     <p class="">Performance errors are likely my fault.</p>
                 </div>
             </div>
@@ -691,7 +691,7 @@
             document.getElementById('profile-namemc').href = `https://namemc.com/profile/${username}`;
 
             try {
-                const response = await fetch(`https://civapi.duckdns.org/mc-sessions/all?mcName=${username}&mcServer=civmc`);
+                const response = await fetch(`https://api.civinfo.net/mc-sessions/all?mcName=${username}`);
                 if (!response.ok) throw new Error('Failed to fetch history');
                 const data = await response.json();
                 processProfileData(data);
@@ -1259,31 +1259,51 @@
         }
         async function fetchPlayers() {
             try {
-                const response = await fetch('https://civapi.duckdns.org/mc-sessions/last');
+                const response = await fetch('https://api.civinfo.net/mc-sessions/all?limit=1000');
                 const data = await response.json();
                 
-                // Handle both {sessions: [...]} and [...] formats
-                const sessions = data.sessions || data;
-                if (!Array.isArray(sessions)) throw new Error('Invalid API response');
+                // New API format: parallel arrays for loginTimestamps, logoutTimestamps, mcNames
+                const logins = data.loginTimestamps || [];
+                const logouts = data.logoutTimestamps || [];
+                const names = data.mcNames || [];
+                
+                if (!Array.isArray(logins)) throw new Error('Invalid API response');
 
-                allPlayers = sessions.map(session => {
-                    let isOnline = !session.logoutTs; const loginTime = session.loginTs; const now = Date.now();
-                    let durationHours = 0; let durationMinutes = 0;
-                    if (isOnline && loginTime) {
-                        const diff = now - loginTime; durationHours = Math.floor(diff / 3600000); durationMinutes = Math.floor((diff % 3600000) / 60000);
-                        if (durationHours >= 24) isOnline = false;
+                // Build a map of latest session per player
+                const playerMap = new Map();
+                const now = Date.now();
+                
+                for (let i = 0; i < logins.length; i++) {
+                    const username = names[i] || 'Unknown';
+                    const loginTime = logins[i];
+                    const logoutTime = logouts[i]; // null if still online
+                    
+                    // Only keep the most recent session per player
+                    if (!playerMap.has(username) || loginTime > playerMap.get(username).loginTime) {
+                        let isOnline = logoutTime === null;
+                        let durationHours = 0;
+                        let durationMinutes = 0;
+                        
+                        if (isOnline && loginTime) {
+                            const diff = now - loginTime;
+                            durationHours = Math.floor(diff / 3600000);
+                            durationMinutes = Math.floor((diff % 3600000) / 60000);
+                            if (durationHours >= 24) isOnline = false;
+                        }
+                        
+                        playerMap.set(username, {
+                            username,
+                            lowerName: username.toLowerCase(),
+                            isOnline,
+                            loginTime,
+                            logoutTime: logoutTime || loginTime,
+                            durationHours,
+                            durationMinutes
+                        });
                     }
-                    const username = session.mcName || 'Unknown';
-                    return {
-                        username,
-                        lowerName: username.toLowerCase(),
-                        isOnline,
-                        loginTime,
-                        logoutTime: session.logoutTs || loginTime,
-                        durationHours,
-                        durationMinutes
-                    };
-                });
+                }
+                
+                allPlayers = Array.from(playerMap.values());
                 allPlayers.sort((a, b) => (a.isOnline === b.isOnline) ? (a.isOnline ? a.loginTime - b.loginTime : b.logoutTime - a.logoutTime) : (a.isOnline ? -1 : 1));
                 cachedElements.headerCount.textContent = allPlayers.filter(p => p.isOnline).length;
                 
