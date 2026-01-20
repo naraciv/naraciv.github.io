@@ -34,10 +34,30 @@ async function main() {
             const lastLogout = lastLogouts[i] || now;
             const username = names[i];
 
-            // Only include players who have been active in the past week
+            // Only include players who have been active in the past week 
             if (lastLogin > oneWeekAgo || lastLogout > oneWeekAgo) {
                 if (username) uniqueUsers.add(username);
             }
+        }
+
+        // Add anyone in top 20 for monthly or all-time just in case from current csv
+        const currentCsvPath = path.join(__dirname, '../data/leaderboard.csv');
+        if (fs.existsSync(currentCsvPath)) {
+            const currentCsv = fs.readFileSync(currentCsvPath, 'utf8');
+            const parsed = Papa.parse(currentCsv, { header: true });
+            const rows = parsed.data;
+            // Sort by Monthly and AllTime to find top 20
+            const topMonthly = rows
+                .filter(r => r.Username && r.Monthly)
+                .sort((a, b) => parseFloat(b.Monthly) - parseFloat(a.Monthly))
+                .slice(0, 20);
+            const topAllTime = rows
+                .filter(r => r.Username && r.AllTime)
+                .sort((a, b) => parseFloat(b.AllTime) - parseFloat(a.AllTime))
+                .slice(0, 20);
+
+            topMonthly.forEach(r => uniqueUsers.add(r.Username));
+            topAllTime.forEach(r => uniqueUsers.add(r.Username));
         }
 
         const usersArray = Array.from(uniqueUsers);
