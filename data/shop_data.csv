@@ -55,9 +55,9 @@ Timestamp,Input,Input_Lore,Output,Output_Lore,Coordinates,Exchanges_Available,Ci
 2025-10-29T18:40:16.953872,8 Iron Ingot,,1 Red Terracotta,Compacted Item,"3682,92,6953",T,Orakuru,Blocks,OreStraya
 2025-10-29T18:40:18.051043,2 Iron Ingot,,1 Red Dye,Compacted Item,"3683,92,6953",T,Orakuru,Other,OreStraya
 2025-10-29T18:47:58.825173,9 Diamond,,1 Beacon,,"3202,69,4822",T,Shiroyama,"Defense, Infra",HPLaptop
-2025-10-29T18:48:00.831780,3 Diamond,,1 Diamond Helmet,Condition: Undamaged|Never repaired,"3203,69,4820",T,Shiroyama,"Defense, Armor/Tools",HPLaptop
-2025-10-29T18:48:01.931769,6 Diamond,,1 Diamond Chestplate,Condition: Undamaged|Never repaired,"3204,69,4820",T,Shiroyama,"Defense, Armor/Tools",HPLaptop
-2025-10-29T18:48:03.175419,4 Diamond,,1 Diamond Leggings,Condition: Undamaged|Never repaired,"3205,69,4820",F,Shiroyama,"Defense, Armor/Tools",HPLaptop
+2025-10-29T18:48:00.831780,2 Diamond,,1 Diamond Helmet,Condition: Undamaged|Never repaired,"3203,69,4820",T,Shiroyama,"Defense, Armor/Tools",HPLaptop
+2025-10-29T18:48:01.931769,3 Diamond,,1 Diamond Chestplate,Condition: Undamaged|Never repaired,"3204,69,4820",T,Shiroyama,"Defense, Armor/Tools",HPLaptop
+2025-10-29T18:48:03.175419,3 Diamond,,1 Diamond Leggings,Condition: Undamaged|Never repaired,"3205,69,4820",F,Shiroyama,"Defense, Armor/Tools",HPLaptop
 2025-10-29T18:48:04.454116,2 Diamond,,1 Diamond Boots,Condition: Undamaged|Never repaired,"3206,69,4820",T,Shiroyama,"Defense, Armor/Tools",HPLaptop
 2025-11-09T17:51:21.689404,"1 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,1 Red Banner,,"3224,71,4888",T,Shiroyama,Blocks,JeyHey
 2025-11-09T17:51:29.927130,1 Diamond,,60 Gunpowder,,"3223,71,4888",F,Shiroyama,Mob Drops,JeyHey
