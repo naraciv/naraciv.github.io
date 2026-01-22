@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snitch Viewer | Nara</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="View and manage your CivMC snitches on an interactive map. Upload your snitch database to visualize coverage.">
+    <meta name="theme-color" content="#2596be">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js" defer></script>
+    <!-- SQL.js for parsing SQLite in browser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <!-- D3.js for fast canvas rendering -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="../style.css" fetchpriority="high">
+    <style>
+        /* Map Container */
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 350px);
+            min-height: 400px;
+            background: #1a1a1a;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            cursor: grab;
+        }
+        .map-container:active {
+            cursor: grabbing;
+        }
+        .map-container:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+        }
+        
+        .map-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        /* Tile layer container */
+        .tile-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .tile-layer img {
+            position: absolute;
+            opacity: 0.35;
+            image-rendering: pixelated;
+        }
+        
+        /* Snitch tooltip */
+        .snitch-tooltip {
+            position: fixed;
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            font-size: 0.75rem;
+            z-index: 100;
+            pointer-events: none;
+            min-width: 150px;
+            max-width: 280px;
+        }
+        .snitch-tooltip .header-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #374151;
+        }
+        .snitch-tooltip .status {
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .snitch-tooltip .status.active { background: #10b981; color: white; }
+        .snitch-tooltip .status.will-dormant { background: #eab308; color: black; }
+        .snitch-tooltip .status.dormant { background: #ef4444; color: white; }
+        .snitch-tooltip .status.culled { background: #6b7280; color: white; }
+        .snitch-tooltip .label {
+            color: #6b7280;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+        }
+        .snitch-tooltip .value {
+            color: white;
+            font-family: monospace;
+        }
+        .snitch-tooltip .group-name {
+            color: #d1d5db;
+            font-size: 0.75rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Selection panel */
+        .selection-panel {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            min-width: 200px;
+            max-width: 280px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 40;
+            font-size: 0.75rem;
+        }
+        .selection-panel .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #374151;
+        }
+        .selection-panel .header h4 {
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .selection-panel .header-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .selection-panel .header-btn {
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .selection-panel .header-btn:hover {
+            color: white;
+            background: #374151;
+        }
+        .selection-panel .selected-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #2d3748;
+        }
+        .selection-panel .selected-item:last-child {
+            border-bottom: none;
+        }
+        .selection-panel .item-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        .selection-panel .item-name {
+            color: white;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .selection-panel .item-coords {
+            color: #9ca3af;
+            font-size: 0.65rem;
+            font-family: monospace;
+        }
+        .selection-panel .item-copy {
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.25rem;
+            margin-left: 0.5rem;
+        }
+        .selection-panel .item-copy:hover {
+            color: #2596be;
+        }
+        
+        /* Group filter panel */
+        .filter-panel {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .filter-panel::-webkit-scrollbar { width: 6px; }
+        .filter-panel::-webkit-scrollbar-track { background: #1f2937; }
+        .filter-panel::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+        
+        .group-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .group-checkbox:hover {
+            background: #1f2937;
+        }
+        .group-checkbox input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+            accent-color: #2596be;
+            cursor: pointer;
+        }
+        .group-checkbox.drag-highlight {
+            background: #374151;
+        }
+        .group-checkbox .group-name {
+            flex: 1;
+            font-size: 0.875rem;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .group-checkbox .group-count {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        /* Upload area */
+        .upload-area {
+            border: 2px dashed #374151;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            transition: border-color 0.2s, background 0.2s;
+            cursor: pointer;
+        }
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #2596be;
+            background: rgba(37, 150, 190, 0.1);
+        }
+        
+        /* Map controls */
+        .map-controls {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 30;
+        }
+        .map-control-btn {
+            width: 36px;
+            height: 36px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 0.375rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .map-control-btn:hover {
+            background: #374151;
+        }
+        
+        /* Coordinates display */
+        .coords-display {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid #374151;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: white;
+            z-index: 30;
+            pointer-events: none;
+        }
+        
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            align-items: center;
+            width: fit-content;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .stat-label { color: #6b7280; }
+        .stat-value { color: white; font-weight: 600; }
+        
+        /* Stat pills with colored dots and background hue */
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.6rem;
+            padding-left: 0.35rem;
+            border-radius: 9999px;
+            border: 1px solid;
+        }
+        .stat-pill .stat-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .stat-pill.active { 
+            background: rgba(16, 185, 129, 0.15); 
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .stat-pill.active .stat-dot { background: #10b981; }
+        .stat-pill.will-dormant { 
+            background: rgba(234, 179, 8, 0.15); 
+            border-color: rgba(234, 179, 8, 0.3);
+        }
+        .stat-pill.will-dormant .stat-dot { background: #eab308; }
+        .stat-pill.dormant { 
+            background: rgba(239, 68, 68, 0.15); 
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        .stat-pill.dormant .stat-dot { background: #ef4444; }
+        .stat-pill.culled { 
+            background: rgba(107, 114, 128, 0.15); 
+            border-color: rgba(107, 114, 128, 0.3);
+        }
+        .stat-pill.culled .stat-dot { background: #6b7280; }
+        .stat-pill .stat-label { color: #9ca3af; font-size: 0.8rem; }
+        .stat-pill .stat-value { color: white; font-weight: 600; font-size: 0.8rem; }
+        
+        /* Bounds input */
+        .bounds-input {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            color: white;
+            font-size: 0.875rem;
+            width: 100px;
+            text-align: center;
+        }
+        .bounds-input:focus {
+            outline: none;
+            border-color: #2596be;
+        }
+        
+        /* World toggle */
+        .world-toggle {
+            display: inline-flex;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            width: fit-content;
+        }
+        .world-toggle button {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.7rem;
+            color: #9ca3af;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .world-toggle button.active {
+            background: #2596be;
+            color: white;
+        }
+        .world-toggle button:hover:not(.active) {
+            background: #374151;
+        }
+        
+        /* Toggle switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toggle-switch input[type="checkbox"] {
+            display: none;
+        }
+        .toggle-switch .toggle-slider {
+            position: relative;
+            display: block;
+            width: 36px;
+            height: 20px;
+            background: #4b5563;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .toggle-switch .toggle-slider::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        .toggle-switch input[type="checkbox"]:checked + .toggle-slider {
+            background: #2596be;
+        }
+        .toggle-switch input[type="checkbox"]:checked + .toggle-slider::after {
+            transform: translateX(16px);
+        }
+        
+        /* Y Level slider */
+        .settings-container {
+            padding: 0.75rem;
+            padding-bottom: 1rem;
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+        .settings-container .y-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .settings-container input[type="number"] {
+            width: 45px;
+            padding: 0.2rem 0.4rem;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 0.25rem;
+            color: white;
+            font-size: 0.7rem;
+            text-align: center;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .settings-container input[type="number"]::-webkit-outer-spin-button,
+        .settings-container input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .settings-container input[type="number"]:focus {
+            outline: none;
+            border-color: #2596be;
+        }
+        
+        /* Y Level slider (legacy) */
+        .y-slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            padding: 0.75rem;
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+        }
+        .y-slider-container .y-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .y-slider-container input[type="number"] {
+            width: 45px;
+            padding: 0.2rem 0.4rem;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 0.25rem;
+            color: white;
+            font-size: 0.7rem;
+            text-align: center;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .y-slider-container input[type="number"]::-webkit-outer-spin-button,
+        .y-slider-container input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .y-slider-container input[type="number"]:focus {
+            outline: none;
+            border-color: #2596be;
+        }
+        
+        /* Dual range slider */
+        .range-slider {
+            position: relative;
+            height: 20px;
+            margin: 0.5rem 0;
+        }
+        .range-slider .track {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 4px;
+            background: #374151;
+            border-radius: 2px;
+        }
+        .range-slider .range {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 4px;
+            background: #2596be;
+            border-radius: 2px;
+        }
+        .range-slider input[type="range"] {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            pointer-events: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .range-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #2596be;
+            border-radius: 50%;
+            cursor: pointer;
+            pointer-events: auto;
+            border: 2px solid #1f2937;
+        }
+        .range-slider input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: #2596be;
+            border-radius: 50%;
+            cursor: pointer;
+            pointer-events: auto;
+            border: 2px solid #1f2937;
+        }
+    </style>
+    <script src="../components/analytics.js" defer></script>
+    <script src="../components/navbar.js" defer></script>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col">
+    <custom-navbar></custom-navbar>
+
+    <div class="h-[80px] sm:h-[100px]"></div>
+
+    <main class="flex-grow px-2 sm:px-4 pb-8">
+        <div class="max-w-[98%] sm:max-w-[95%] mx-auto w-full">
+            
+            <!-- Page Title -->
+            <h1 class="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-center text-primary">Snitch Viewer</h1>
+            
+            <!-- Upload Section (shown when no data) -->
+            <div id="upload-section" class="max-w-2xl mx-auto mb-6">
+                <div class="upload-area" id="upload-area">
+                    <input type="file" id="file-input" accept=".sqlite,.db,.sqlite3" class="hidden">
+                    <i data-feather="upload-cloud" class="w-12 h-12 text-gray-500 mx-auto mb-3"></i>
+                    <p class="text-lg text-white mb-2">Drop your SnitchMod database here</p>
+                    <p class="text-sm text-gray-400">or click to browse (.sqlite, .db)</p>
+                </div>
+            </div>
+            
+            <!-- Controls (shown when data loaded) -->
+            <div id="controls-section" class="hidden mb-4">
+                <div class="flex flex-col gap-2">
+                    <!-- Snitch Info label -->
+                    <h3 class="text-sm font-semibold text-white">Snitch Info</h3>
+                    
+                    <!-- Stats bar row with Load New button -->
+                    <div class="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+                        <!-- Stats bar -->
+                        <div class="stats-bar flex-wrap">
+                            <div class="stat-item">
+                                <span class="stat-label">Total:</span>
+                                <span class="stat-value"><span id="stat-total">0</span> <span class="text-gray-500">(<span id="stat-visible">0</span> visible)</span></span>
+                            </div>
+                            <div class="stat-pill active" id="stat-pill-active">
+                                <span class="stat-dot"></span>
+                                <span class="stat-label">Active:</span>
+                                <span class="stat-value" id="stat-active">0</span>
+                            </div>
+                            <div class="stat-pill will-dormant" id="stat-pill-will-dormant">
+                                <span class="stat-dot"></span>
+                                <span class="stat-label">Will be dormant:</span>
+                                <span class="stat-value" id="stat-will-dormant">0</span>
+                            </div>
+                            <div class="stat-pill dormant" id="stat-pill-dormant">
+                                <span class="stat-dot"></span>
+                                <span class="stat-label">Dormant:</span>
+                                <span class="stat-value" id="stat-dormant">0</span>
+                            </div>
+                            <div class="stat-pill culled" id="stat-pill-culled">
+                                <span class="stat-dot"></span>
+                                <span class="stat-label">Culled:</span>
+                                <span class="stat-value" id="stat-culled">0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Load new file -->
+                        <button id="load-new-btn" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 rounded text-sm font-medium transition-colors flex items-center gap-2 self-start lg:self-auto">
+                            <i data-feather="upload" class="w-4 h-4"></i>
+                            Load New
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main content area -->
+            <div id="main-content" class="hidden">
+                <div class="flex flex-col lg:flex-row gap-4">
+                    <!-- Group filters sidebar -->
+                    <div class="w-full lg:w-64 flex-shrink-0">
+                        <div class="sticky top-24 flex flex-col gap-3">
+                            <!-- Settings label and container -->
+                            <div>
+                                <h3 class="text-sm font-semibold text-white mb-2">Settings</h3>
+                                <div class="settings-container">
+                                    <!-- World toggle -->
+                                    <div class="mb-6">
+                                        <div class="text-xs text-gray-400 mb-1">World</div>
+                                        <div class="world-toggle">
+                                            <button id="world-overworld" class="active">Overworld</button>
+                                            <button id="world-nether">Nether</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Y Level range slider -->
+                                    <div class="mb-4">
+                                        <div class="y-label">
+                                            <span class="text-xs text-gray-400">Y Level</span>
+                                            <span><input type="number" id="y-min-input" value="-64" min="-64" max="320"> to <input type="number" id="y-max-input" value="320" min="-64" max="320"></span>
+                                        </div>
+                                        <div class="range-slider">
+                                            <div class="track"></div>
+                                            <div class="range" id="y-range"></div>
+                                            <input type="range" id="y-min-slider" min="-64" max="320" value="-64">
+                                            <input type="range" id="y-max-slider" min="-64" max="320" value="320">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Click to Select toggle -->
+                                    <div class="pt-2 mb-4">
+                                        <div class="text-xs text-gray-400 mb-2">Click to Select</div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="click-select-toggle" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    
+                                    <!-- Show Will be Dormant toggle -->
+                                    <div class="pt-2">
+                                        <div class="text-xs text-gray-400 mb-2">Show which snitches will become dormant (5 days)</div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="show-will-dormant-toggle" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Groups -->
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-semibold text-white">Groups</h3>
+                                <div class="flex gap-2">
+                                    <button id="select-all-groups" class="text-xs text-nara-red hover:underline">All</button>
+                                    <button id="select-none-groups" class="text-xs text-gray-400 hover:text-white">None</button>
+                                </div>
+                            </div>
+                            <div class="filter-panel" id="group-filters">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Map container -->
+                    <div class="flex-1">
+                        <div class="map-container" id="map-container">
+                            <!-- Tile layer (background map using img elements) -->
+                            <div class="tile-layer" id="tile-layer"></div>
+                            <!-- Snitch canvas (markers) -->
+                            <canvas id="snitch-canvas" class="map-canvas"></canvas>
+                            
+                            <!-- Tooltip container (inside map for fullscreen support) -->
+                            <div id="snitch-tooltip" class="snitch-tooltip hidden"></div>
+                            
+                            <!-- Map controls -->
+                            <div class="map-controls">
+                                <button class="map-control-btn" id="zoom-in" title="Zoom In">
+                                    <i data-feather="plus" class="w-5 h-5"></i>
+                                </button>
+                                <button class="map-control-btn" id="zoom-out" title="Zoom Out">
+                                    <i data-feather="minus" class="w-5 h-5"></i>
+                                </button>
+                                <button class="map-control-btn" id="reset-view" title="Reset View">
+                                    <i data-feather="crosshair" class="w-5 h-5"></i>
+                                </button>
+                                <button class="map-control-btn" id="fullscreen-btn" title="Toggle Fullscreen">
+                                    <i data-feather="maximize" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Coordinates display -->
+                            <div class="coords-display" id="coords-display">
+                                <div id="coords-text">X: 0, Z: 0</div>
+                                <div class="text-gray-500 text-[0.65rem] mt-1 font-sans">Right click map to copy coordinates</div>
+                            </div>
+                            
+                            <!-- Selection panel -->
+                            <div class="selection-panel hidden" id="selection-panel">
+                                <div class="header">
+                                    <h4>Selected (<span id="selection-count">0</span>)</h4>
+                                    <div class="header-btns">
+                                        <button class="header-btn" id="copy-all-selected" title="Copy All">
+                                            <i data-feather="copy" class="w-4 h-4"></i>
+                                        </button>
+                                        <button class="header-btn" id="clear-selection" title="Clear">
+                                            <i data-feather="x" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="selection-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <custom-footer></custom-footer>
+    <script src="../components/footer.js"></script>
+    
+    <script>
+        // --- Global State ---
+        let db = null;
+        let snitches = [];
+        let groups = new Map(); // group_name -> { count, visible }
+        let visibleSnitches = [];
+        
+        // Canvas and context
+        let snitchCanvas, snitchCtx;
+        let tileLayer;
+        
+        // Map state
+        const TILE_SIZE = 256;
+        const WORLD_RADIUS = 6750; // World goes from -6750 to 6750
+        const WORLD_SIZE = WORLD_RADIUS * 2; // 13500
+        
+        // Zoom levels available: -6 to 0 (we'll use -4 as default)
+        // At zoom -5, each tile covers 256 * 2^5 = 8192 blocks
+        // At zoom 0, each tile covers 256 blocks
+        let currentZoom = -5;
+        let viewX = 0; // Center X in world coords
+        let viewZ = 0; // Center Z in world coords
+        
+        // Panning state
+        let isPanning = false;
+        let panStartX, panStartY;
+        let panStartViewX, panStartViewZ;
+        
+        // Tile cache - stores img elements
+        const tileElements = new Map();
+        
+        // Tile image cache (Cache API for 1-hour persistence)
+        const TILE_CACHE_NAME = 'snitch-viewer-tiles-v1';
+        const TILE_CACHE_DURATION = 60 * 60 * 1000; // 1 hour in ms
+        
+        // Bounds filter (fixed)
+        const bounds = {
+            minX: -10000,
+            maxX: 10000,
+            minZ: -10000,
+            maxZ: 10000
+        };
+        
+        // World and Y filters
+        let currentWorld = 'world'; // 'world' or 'world_nether'
+        let yMin = -64;
+        let yMax = 320;
+        
+        // Selection mode
+        let clickToSelectEnabled = true;
+        
+        // Show will be dormant toggle
+        let showWillBeDormant = true;
+        
+        // Selected snitches
+        let selectedSnitches = [];
+        
+        // DOM Elements
+        const uploadSection = document.getElementById('upload-section');
+        const controlsSection = document.getElementById('controls-section');
+        const mainContent = document.getElementById('main-content');
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const mapContainer = document.getElementById('map-container');
+        const coordsDisplay = document.getElementById('coords-display');
+        const groupFilters = document.getElementById('group-filters');
+        const tooltip = document.getElementById('snitch-tooltip');
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.feather) feather.replace();
+            
+            // Initialize SQL.js
+            window.SQL = await initSqlJs({
+                locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+            });
+            
+            initializeCanvas();
+            setupEventListeners();
+            render();
+        });
+        
+        function initializeCanvas() {
+            tileLayer = document.getElementById('tile-layer');
+            snitchCanvas = document.getElementById('snitch-canvas');
+            snitchCtx = snitchCanvas.getContext('2d');
+            
+            resizeCanvas();
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                render();
+            });
+        }
+        
+        function resizeCanvas() {
+            const rect = mapContainer.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+            
+            snitchCanvas.width = width;
+            snitchCanvas.height = height;
+        }
+        
+        // Convert world coordinates to screen coordinates
+        function worldToScreen(worldX, worldZ) {
+            const scale = getScale();
+            const screenX = (worldX - viewX) * scale + snitchCanvas.width / 2;
+            const screenY = (worldZ - viewZ) * scale + snitchCanvas.height / 2;
+            return { x: screenX, y: screenY };
+        }
+        
+        // Convert screen coordinates to world coordinates
+        function screenToWorld(screenX, screenY) {
+            const scale = getScale();
+            const worldX = (screenX - snitchCanvas.width / 2) / scale + viewX;
+            const worldZ = (screenY - snitchCanvas.height / 2) / scale + viewZ;
+            return { x: worldX, z: worldZ };
+        }
+        
+        // Get scale factor for current zoom level
+        // At zoom -5, 1 pixel = 32 blocks (256 * 2^5 / 256)
+        // At zoom 0, 1 pixel = 1 block
+        function getScale() {
+            return 1 / Math.pow(2, -currentZoom);
+        }
+        
+        // Get tile coordinates for a world position at current zoom
+        // Tile (0,0) contains world origin (0,0)
+        function getTileCoords(worldX, worldZ) {
+            const blocksPerTile = TILE_SIZE * Math.pow(2, -currentZoom);
+            const tileX = Math.floor(worldX / blocksPerTile);
+            const tileZ = Math.floor(worldZ / blocksPerTile);
+            return { x: tileX, z: tileZ };
+        }
+        
+        // Get world position of tile's top-left corner
+        function getTileWorldPos(tileX, tileZ) {
+            const blocksPerTile = TILE_SIZE * Math.pow(2, -currentZoom);
+            const worldX = tileX * blocksPerTile;
+            const worldZ = tileZ * blocksPerTile;
+            return { x: worldX, z: worldZ };
+        }
+        
+        function getTileUrl(tileX, tileY, zoom) {
+            // URL format: https://civmc-map.duckdns.org/tiles/terrain/z-5/-1,-1.png
+            return `https://civmc-map.duckdns.org/tiles/terrain/z${zoom}/${tileX},${tileY}.png`;
+        }
+        
+        function getTileKey(tileX, tileY, zoom) {
+            return `${zoom}/${tileX},${tileY}`;
+        }
+        
+        // Load tile with caching (1 hour)
+        async function loadTileWithCache(url) {
+            if (!('caches' in window)) {
+                // Cache API not supported, return URL directly
+                return url;
+            }
+            
+            try {
+                const cache = await caches.open(TILE_CACHE_NAME);
+                const cachedResponse = await cache.match(url);
+                
+                if (cachedResponse) {
+                    // Check if cache is still valid (1 hour)
+                    const cachedTime = cachedResponse.headers.get('x-cached-time');
+                    if (cachedTime && (Date.now() - parseInt(cachedTime)) < TILE_CACHE_DURATION) {
+                        const blob = await cachedResponse.blob();
+                        return URL.createObjectURL(blob);
+                    }
+                }
+                
+                // Fetch and cache
+                const response = await fetch(url);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    
+                    // Create a new response with cache timestamp header
+                    const headers = new Headers();
+                    headers.set('x-cached-time', Date.now().toString());
+                    headers.set('Content-Type', blob.type);
+                    
+                    const cachedResp = new Response(blob, { headers });
+                    await cache.put(url, cachedResp);
+                    
+                    return URL.createObjectURL(blob);
+                }
+                
+                return url; // Fallback to direct URL
+            } catch (e) {
+                console.warn('Tile cache error:', e);
+                return url; // Fallback to direct URL
+            }
+        }
+        
+        function render() {
+            renderTiles();
+            renderSnitches();
+        }
+        
+        function renderTiles() {
+            const rect = mapContainer.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+            
+            const scale = getScale();
+            const blocksPerTile = TILE_SIZE * Math.pow(2, -currentZoom);
+            
+            // Find visible tile range
+            const topLeft = screenToWorld(0, 0);
+            const bottomRight = screenToWorld(width, height);
+            
+            const startTile = getTileCoords(topLeft.x, topLeft.z);
+            const endTile = getTileCoords(bottomRight.x, bottomRight.z);
+            
+            // Track which tiles should be visible
+            const visibleTileKeys = new Set();
+
+            // Build list of tiles in the visible range (include one-tile padding)
+            const tiles = [];
+            for (let tz = startTile.z - 1; tz <= endTile.z + 1; tz++) {
+                for (let tx = startTile.x - 1; tx <= endTile.x + 1; tx++) {
+                    tiles.push({ tx, tz });
+                }
+            }
+
+            // Compute center tile (where the user is focused)
+            const centerTile = getTileCoords(viewX, viewZ);
+
+            // Sort tiles by distance from center tile so we load closest tiles first
+            tiles.sort((a, b) => {
+                const da = Math.hypot(a.tx - centerTile.x, a.tz - centerTile.z);
+                const db = Math.hypot(b.tx - centerTile.x, b.tz - centerTile.z);
+                return da - db;
+            });
+
+            // Create/update visible tiles in priority order (closest first)
+            for (const { tx, tz } of tiles) {
+                const key = getTileKey(tx, tz, currentZoom);
+                visibleTileKeys.add(key);
+
+                let img = tileElements.get(key);
+                
+                // Check if this tile is near the center (for priority loading)
+                const distFromCenter = Math.hypot(tx - centerTile.x, tz - centerTile.z);
+                const isHighPriority = distFromCenter <= 1;
+
+                if (!img) {
+                    // Create new tile image
+                    img = document.createElement('img');
+                    img.dataset.key = key;
+                    img.dataset.tileX = tx;
+                    img.dataset.tileZ = tz;
+                    img.dataset.zoom = currentZoom;
+                    img.style.width = TILE_SIZE + 'px';
+                    img.style.height = TILE_SIZE + 'px';
+                    img.style.display = 'none'; // Hidden until loaded
+                    img.loading = 'eager'; // Don't lazy load
+                    if (isHighPriority) {
+                        img.fetchPriority = 'high';
+                    }
+                    img.onerror = () => { img.style.display = 'none'; };
+                    img.onload = () => { img.style.display = 'block'; };
+                    tileLayer.appendChild(img);
+                    tileElements.set(key, img);
+                    
+                    // Set src directly for immediate loading
+                    const tileUrl = getTileUrl(tx, tz, currentZoom);
+                    img.src = tileUrl;
+                    
+                    // Also cache in background for future use
+                    loadTileWithCache(tileUrl);
+                }
+
+                // Position tile - no offset needed, worldToScreen handles it
+                const tileWorld = getTileWorldPos(tx, tz);
+                const screen = worldToScreen(tileWorld.x, tileWorld.z);
+                const tileScreenSize = blocksPerTile * scale;
+
+                img.style.left = screen.x + 'px';
+                img.style.top = screen.y + 'px';
+                img.style.width = tileScreenSize + 'px';
+                img.style.height = tileScreenSize + 'px';
+            }
+            
+            // Remove tiles that are no longer visible or wrong zoom level
+            for (const [key, img] of tileElements) {
+                const imgZoom = parseInt(img.dataset.zoom);
+                if (!visibleTileKeys.has(key) || imgZoom !== currentZoom) {
+                    img.remove();
+                    tileElements.delete(key);
+                }
+            }
+        }
+        
+        function renderSnitches() {
+            const width = snitchCanvas.width;
+            const height = snitchCanvas.height;
+            
+            // Clear canvas
+            snitchCtx.clearRect(0, 0, width, height);
+            
+            const scale = getScale();
+            // Points get bigger as you zoom in (zoom goes from -6 to 0, higher = more zoomed in)
+            // At zoom -6: radius = 1, at zoom 0: radius = 4
+            const markerRadius = Math.max(1, Math.min(6, 1 + (currentZoom + 6) * 0.8));
+            
+            // Draw each visible snitch
+            visibleSnitches.forEach(snitch => {
+                const screen = worldToScreen(snitch.x, snitch.z);
+                
+                // Skip if off screen
+                if (screen.x < -10 || screen.x > width + 10 || screen.y < -10 || screen.y > height + 10) {
+                    return;
+                }
+                
+                const status = getSnitchStatus(snitch);
+                
+                // Set color based on status
+                let color;
+                if (status === 'active') {
+                    color = '#10b981'; // green
+                } else if (status === 'will-dormant') {
+                    // Show as yellow if toggle is on, otherwise show as active (green)
+                    color = showWillBeDormant ? '#eab308' : '#10b981';
+                } else if (status === 'dormant') {
+                    color = '#ef4444'; // red
+                } else {
+                    color = '#6b7280'; // gray (culled)
+                }
+                
+                // Draw marker (no stroke, just fill)
+                snitchCtx.beginPath();
+                snitchCtx.arc(screen.x, screen.y, markerRadius, 0, Math.PI * 2);
+                snitchCtx.fillStyle = color;
+                snitchCtx.fill();
+                
+                // Draw selection ring if selected
+                const isSelected = selectedSnitches.some(s => 
+                    s.x === snitch.x && s.y === snitch.y && s.z === snitch.z
+                );
+                if (isSelected) {
+                    snitchCtx.beginPath();
+                    snitchCtx.arc(screen.x, screen.y, markerRadius + 3, 0, Math.PI * 2);
+                    snitchCtx.strokeStyle = '#ffffff';
+                    snitchCtx.lineWidth = 2;
+                    snitchCtx.stroke();
+                }
+            });
+        }
+        
+        function setupEventListeners() {
+            // File upload
+            uploadArea.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file) loadDatabase(file);
+            });
+            
+            // Load new button
+            document.getElementById('load-new-btn').addEventListener('click', () => fileInput.click());
+            
+            // Map controls
+            document.getElementById('zoom-in').addEventListener('click', () => {
+                if (currentZoom < 0) {
+                    currentZoom++;
+                    render();
+                }
+            });
+            document.getElementById('zoom-out').addEventListener('click', () => {
+                if (currentZoom > -6) {
+                    currentZoom--;
+                    render();
+                }
+            });
+            document.getElementById('reset-view').addEventListener('click', resetMapView);
+            
+            // Fullscreen toggle
+            document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+            
+            // Mouse panning
+            let hasPanned = false; // Track if mouse moved during pan (to prevent click-select)
+            const PAN_THRESHOLD = 3; // Minimum pixels moved to count as a pan
+            
+            snitchCanvas.addEventListener('mousedown', (e) => {
+                isPanning = true;
+                hasPanned = false;
+                panStartX = e.clientX;
+                panStartY = e.clientY;
+                panStartViewX = viewX;
+                panStartViewZ = viewZ;
+                mapContainer.style.cursor = 'grabbing';
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    const dx = e.clientX - panStartX;
+                    const dy = e.clientY - panStartY;
+                    
+                    // Check if we've moved enough to count as a pan
+                    if (Math.abs(dx) > PAN_THRESHOLD || Math.abs(dy) > PAN_THRESHOLD) {
+                        hasPanned = true;
+                    }
+                    
+                    const scale = getScale();
+                    viewX = panStartViewX - dx / scale;
+                    viewZ = panStartViewZ - dy / scale;
+                    render();
+                }
+                
+                // Update coordinates display
+                if (e.target === snitchCanvas) {
+                    const rect = mapContainer.getBoundingClientRect();
+                    const world = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
+                    document.getElementById('coords-text').textContent = `X: ${Math.round(world.x)}, Z: ${Math.round(world.z)}`;
+                    
+                    // Check for snitch hover
+                    checkSnitchHover(e.clientX - rect.left, e.clientY - rect.top, e.clientX, e.clientY);
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isPanning = false;
+                mapContainer.style.cursor = 'grab';
+            });
+            
+            // Mouse wheel zoom
+            snitchCanvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                
+                const rect = mapContainer.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                // Get world position under mouse before zoom
+                const worldBefore = screenToWorld(mouseX, mouseY);
+                
+                // Zoom
+                if (e.deltaY < 0 && currentZoom < 0) {
+                    currentZoom++;
+                } else if (e.deltaY > 0 && currentZoom > -6) {
+                    currentZoom--;
+                }
+                
+                // Adjust view to keep mouse position fixed
+                const worldAfter = screenToWorld(mouseX, mouseY);
+                viewX += worldBefore.x - worldAfter.x;
+                viewZ += worldBefore.z - worldAfter.z;
+                
+                render();
+            });
+            
+            // Touch support
+            let lastTouchDist = 0;
+            let lastTouchCenter = null;
+            
+            snitchCanvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isPanning = true;
+                    panStartX = e.touches[0].clientX;
+                    panStartY = e.touches[0].clientY;
+                    panStartViewX = viewX;
+                    panStartViewZ = viewZ;
+                } else if (e.touches.length === 2) {
+                    lastTouchDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    lastTouchCenter = {
+                        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+                        y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+                    };
+                }
+            }, { passive: false });
+            
+            snitchCanvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (e.touches.length === 1 && isPanning) {
+                    const dx = e.touches[0].clientX - panStartX;
+                    const dy = e.touches[0].clientY - panStartY;
+                    const scale = getScale();
+                    viewX = panStartViewX - dx / scale;
+                    viewZ = panStartViewZ - dy / scale;
+                    render();
+                } else if (e.touches.length === 2) {
+                    const dist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    if (lastTouchDist > 0) {
+                        const delta = dist - lastTouchDist;
+                        if (delta > 20 && currentZoom < 0) {
+                            currentZoom++;
+                            lastTouchDist = dist;
+                            render();
+                        } else if (delta < -20 && currentZoom > -6) {
+                            currentZoom--;
+                            lastTouchDist = dist;
+                            render();
+                        }
+                    }
+                }
+            }, { passive: false });
+            
+            snitchCanvas.addEventListener('touchend', () => {
+                isPanning = false;
+                lastTouchDist = 0;
+            });
+            
+            // Hide tooltip when leaving canvas
+            snitchCanvas.addEventListener('mouseleave', () => {
+                tooltip.classList.add('hidden');
+            });
+            
+            // Left click to select snitch
+            snitchCanvas.addEventListener('click', (e) => {
+                if (hasPanned) return; // Don't select if we just finished panning
+                if (!clickToSelectEnabled) return; // Check if selection is enabled
+                
+                const rect = mapContainer.getBoundingClientRect();
+                const screenX = e.clientX - rect.left;
+                const screenY = e.clientY - rect.top;
+                
+                const clickedSnitch = findSnitchAtPosition(screenX, screenY);
+                if (clickedSnitch) {
+                    // Check if already selected
+                    const idx = selectedSnitches.findIndex(s => 
+                        s.x === clickedSnitch.x && s.y === clickedSnitch.y && s.z === clickedSnitch.z
+                    );
+                    if (idx === -1) {
+                        selectedSnitches.push(clickedSnitch);
+                    } else {
+                        selectedSnitches.splice(idx, 1); // Deselect
+                    }
+                    updateSelectionPanel();
+                    render();
+                }
+            });
+            
+            // Right click to copy coordinates
+            snitchCanvas.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                const rect = mapContainer.getBoundingClientRect();
+                const world = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
+                const coords = `${Math.round(world.x)}, ${Math.round(world.z)}`;
+                navigator.clipboard.writeText(coords).then(() => {
+                    showCopyFeedback(e.clientX, e.clientY, 'Copied!');
+                });
+            });
+            
+            // Selection panel buttons
+            document.getElementById('clear-selection').addEventListener('click', () => {
+                selectedSnitches = [];
+                updateSelectionPanel();
+                render();
+            });
+            
+            document.getElementById('copy-all-selected').addEventListener('click', () => {
+                if (selectedSnitches.length === 0) return;
+                const text = selectedSnitches.map(s => {
+                    const name = s.name || s.group_name || 'Unknown';
+                    return `${name} (${s.x}, ${s.y}, ${s.z})`;
+                }).join('\n');
+                navigator.clipboard.writeText(text);
+            });
+            
+            // Group filters
+            document.getElementById('select-all-groups').addEventListener('click', () => toggleAllGroups(true));
+            document.getElementById('select-none-groups').addEventListener('click', () => toggleAllGroups(false));
+            
+            // World toggle
+            document.getElementById('world-overworld').addEventListener('click', () => {
+                currentWorld = 'world';
+                document.getElementById('world-overworld').classList.add('active');
+                document.getElementById('world-nether').classList.remove('active');
+                updateVisibleSnitches();
+                render();
+                updateStats();
+            });
+            document.getElementById('world-nether').addEventListener('click', () => {
+                currentWorld = 'world_nether';
+                document.getElementById('world-nether').classList.add('active');
+                document.getElementById('world-overworld').classList.remove('active');
+                updateVisibleSnitches();
+                render();
+                updateStats();
+            });
+            
+            // Click to Select toggle
+            document.getElementById('click-select-toggle').addEventListener('change', (e) => {
+                clickToSelectEnabled = e.target.checked;
+            });
+            
+            // Show Will be Dormant toggle
+            document.getElementById('show-will-dormant-toggle').addEventListener('change', (e) => {
+                showWillBeDormant = e.target.checked;
+                updateVisibleSnitches();
+                render();
+                updateStats();
+            });
+            
+            // Y level range slider
+            const yMinSlider = document.getElementById('y-min-slider');
+            const yMaxSlider = document.getElementById('y-max-slider');
+            const yMinInput = document.getElementById('y-min-input');
+            const yMaxInput = document.getElementById('y-max-input');
+            const yRange = document.getElementById('y-range');
+            
+            function updateYRange() {
+                const min = parseInt(yMinSlider.value);
+                const max = parseInt(yMaxSlider.value);
+                const range = 320 - (-64); // 384
+                const minPercent = ((min - (-64)) / range) * 100;
+                const maxPercent = ((max - (-64)) / range) * 100;
+                yRange.style.left = minPercent + '%';
+                yRange.style.width = (maxPercent - minPercent) + '%';
+            }
+            
+            function onYSliderChange() {
+                let min = parseInt(yMinSlider.value);
+                let max = parseInt(yMaxSlider.value);
+                
+                // Prevent crossing
+                if (min > max) {
+                    if (this === yMinSlider) {
+                        yMinSlider.value = max;
+                        min = max;
+                    } else {
+                        yMaxSlider.value = min;
+                        max = min;
+                    }
+                }
+                
+                yMinInput.value = min;
+                yMaxInput.value = max;
+                yMin = min;
+                yMax = max;
+                updateYRange();
+                updateVisibleSnitches();
+                render();
+                updateStats();
+            }
+            
+            function onYInputChange() {
+                let min = parseInt(yMinInput.value) || -64;
+                let max = parseInt(yMaxInput.value) || 320;
+                
+                // Clamp values
+                min = Math.max(-64, Math.min(320, min));
+                max = Math.max(-64, Math.min(320, max));
+                
+                // Prevent crossing
+                if (min > max) {
+                    if (this === yMinInput) min = max;
+                    else max = min;
+                }
+                
+                yMinInput.value = min;
+                yMaxInput.value = max;
+                yMinSlider.value = min;
+                yMaxSlider.value = max;
+                yMin = min;
+                yMax = max;
+                updateYRange();
+                updateVisibleSnitches();
+                render();
+                updateStats();
+            }
+            
+            yMinSlider.addEventListener('input', onYSliderChange);
+            yMaxSlider.addEventListener('input', onYSliderChange);
+            yMinInput.addEventListener('change', onYInputChange);
+            yMaxInput.addEventListener('change', onYInputChange);
+            
+            updateYRange();
+            
+            // Drag selection for groups
+            setupGroupDragSelection();
+        }
+        
+        function setupGroupDragSelection() {
+            let isDragging = false;
+            let dragStartState = null; // Will be set to the first checkbox's NEW state
+            let draggedGroups = new Set();
+            let hasMoved = false;
+            let startCheckbox = null;
+            let mouseDownPos = null;
+            let toggleApplied = false;
+            const DRAG_THRESHOLD = 5; // Pixels to move before counting as a drag
+            
+            groupFilters.addEventListener('mousedown', (e) => {
+                const checkbox = e.target.closest('.group-checkbox');
+                if (!checkbox) return;
+                
+                // Don't interfere with actual checkbox clicks
+                if (e.target.tagName === 'INPUT') return;
+                
+                // Prevent text selection during drag
+                e.preventDefault();
+                
+                isDragging = true;
+                hasMoved = false;
+                toggleApplied = false;
+                startCheckbox = checkbox;
+                mouseDownPos = { x: e.clientX, y: e.clientY };
+                draggedGroups.clear();
+                
+                const input = checkbox.querySelector('input[type="checkbox"]');
+                const groupName = input.dataset.group;
+                
+                // Don't toggle immediately - wait to see if it's a drag or click
+                dragStartState = !input.checked; // The state we'll set if toggled
+            });
+            
+            groupFilters.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const checkbox = e.target.closest('.group-checkbox');
+                
+                // Check if we've moved enough to start dragging
+                if (!toggleApplied && mouseDownPos) {
+                    const dx = Math.abs(e.clientX - mouseDownPos.x);
+                    const dy = Math.abs(e.clientY - mouseDownPos.y);
+                    
+                    if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
+                        // We're dragging now - apply toggle to start checkbox
+                        toggleApplied = true;
+                        const input = startCheckbox.querySelector('input[type="checkbox"]');
+                        const groupName = input.dataset.group;
+                        input.checked = dragStartState;
+                        groups.get(groupName).visible = dragStartState;
+                        draggedGroups.add(groupName);
+                        startCheckbox.classList.add('drag-highlight');
+                    }
+                }
+                
+                if (!checkbox || !toggleApplied) return;
+                
+                // Mark that we've moved to a different checkbox
+                if (checkbox !== startCheckbox) {
+                    hasMoved = true;
+                }
+                
+                const input = checkbox.querySelector('input[type="checkbox"]');
+                const groupName = input.dataset.group;
+                
+                if (!draggedGroups.has(groupName)) {
+                    input.checked = dragStartState;
+                    groups.get(groupName).visible = dragStartState;
+                    draggedGroups.add(groupName);
+                    checkbox.classList.add('drag-highlight');
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    // If we never moved enough to trigger drag, treat as a click
+                    if (!toggleApplied && startCheckbox) {
+                        const input = startCheckbox.querySelector('input[type="checkbox"]');
+                        const groupName = input.dataset.group;
+                        input.checked = dragStartState;
+                        groups.get(groupName).visible = dragStartState;
+                    }
+                    
+                    isDragging = false;
+                    dragStartState = null;
+                    draggedGroups.clear();
+                    startCheckbox = null;
+                    mouseDownPos = null;
+                    toggleApplied = false;
+                    hasMoved = false;
+                    
+                    // Remove all highlights
+                    groupFilters.querySelectorAll('.drag-highlight').forEach(el => {
+                        el.classList.remove('drag-highlight');
+                    });
+                    
+                    updateVisibleSnitches();
+                    render();
+                    updateStats();
+                }
+            });
+            
+            // Prevent default drag behavior
+            groupFilters.addEventListener('dragstart', (e) => e.preventDefault());
+        }
+        
+        function findSnitchAtPosition(screenX, screenY) {
+            const markerRadius = Math.max(3, Math.min(6, 4 / Math.pow(2, currentZoom + 5)));
+            const hitRadius = markerRadius + 5;
+            
+            for (const snitch of visibleSnitches) {
+                const screen = worldToScreen(snitch.x, snitch.z);
+                const dist = Math.hypot(screenX - screen.x, screenY - screen.y);
+                if (dist <= hitRadius) {
+                    return snitch;
+                }
+            }
+            return null;
+        }
+        
+        function updateSelectionPanel() {
+            const panel = document.getElementById('selection-panel');
+            const list = document.getElementById('selection-list');
+            const count = document.getElementById('selection-count');
+            
+            if (selectedSnitches.length === 0) {
+                panel.classList.add('hidden');
+                return;
+            }
+            
+            panel.classList.remove('hidden');
+            count.textContent = selectedSnitches.length;
+            
+            list.innerHTML = selectedSnitches.map((s, idx) => {
+                const name = s.name || s.group_name || 'Unknown';
+                return `
+                    <div class="selected-item">
+                        <div class="item-info">
+                            <div class="item-name">${name}</div>
+                            <div class="item-coords">${s.x}, ${s.y}, ${s.z}</div>
+                        </div>
+                        <button class="item-copy" data-idx="${idx}" title="Copy">
+                            <i data-feather="copy" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            
+            // Re-init feather icons
+            if (window.feather) feather.replace();
+            
+            // Add copy listeners
+            list.querySelectorAll('.item-copy').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.dataset.idx);
+                    const s = selectedSnitches[idx];
+                    const name = s.name || s.group_name || 'Unknown';
+                    const text = `${name} (${s.x}, ${s.y}, ${s.z})`;
+                    navigator.clipboard.writeText(text);
+                });
+            });
+        }
+        
+        function showCopyFeedback(x, y, message) {
+            const feedback = document.createElement('div');
+            feedback.textContent = message;
+            feedback.style.cssText = `
+                position: fixed;
+                left: ${x}px;
+                top: ${y}px;
+                background: #10b981;
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                pointer-events: none;
+                z-index: 1000;
+                animation: fadeUp 0.8s ease-out forwards;
+            `;
+            document.body.appendChild(feedback);
+            setTimeout(() => feedback.remove(), 800);
+        }
+        
+        // Add animation style
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeUp {
+                0% { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        function checkSnitchHover(screenX, screenY, clientX, clientY) {
+            const scale = getScale();
+            const markerRadius = Math.max(3, Math.min(6, 4 / Math.pow(2, currentZoom + 5)));
+            const hitRadius = markerRadius + 5;
+            
+            let hoveredSnitch = null;
+            
+            for (const snitch of visibleSnitches) {
+                const screen = worldToScreen(snitch.x, snitch.z);
+                const dist = Math.hypot(screenX - screen.x, screenY - screen.y);
+                
+                if (dist <= hitRadius) {
+                    hoveredSnitch = snitch;
+                    break;
+                }
+            }
+            
+            if (hoveredSnitch) {
+                showTooltip(hoveredSnitch, clientX, clientY);
+            } else {
+                tooltip.classList.add('hidden');
+            }
+        }
+        
+        function showTooltip(snitch, clientX, clientY) {
+            const status = getSnitchStatus(snitch);
+            let statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+            if (status === 'will-dormant') {
+                statusLabel = 'Will be Dormant';
+            }
+            
+            let html = `
+                <div class="header-row">
+                    <span class="status ${status}">${statusLabel}</span>
+                    <span class="group-name">${snitch.group_name || 'Unknown'}</span>
+                </div>
+            `;
+            
+            if (snitch.name) {
+                html += `<div class="mb-1"><span class="label">Name</span><div class="value">${snitch.name}</div></div>`;
+            }
+            
+            html += `<div class="mb-1"><span class="label">Coordinates</span><div class="value">${snitch.x}, ${snitch.y}, ${snitch.z}</div></div>`;
+            
+            // Show "Becomes Dormant" only for active snitches (not will-dormant or already dormant)
+            if (snitch.dormant_ts && snitch.dormant_ts > 0 && (status === 'active' || status === 'will-dormant')) {
+                html += `<div class="mb-1"><span class="label">Becomes Dormant</span><div class="value">${formatTimestamp(snitch.dormant_ts)}</div></div>`;
+            }
+            
+            // Show cull date for dormant and culled snitches (or any snitch with a cull date)
+            if (snitch.cull_ts && snitch.cull_ts > 0) {
+                html += `<div class="mb-1"><span class="label">Cull Date</span><div class="value">${formatTimestamp(snitch.cull_ts)}</div></div>`;
+            }
+            
+            // Show "Dormant in X days" for will-dormant snitches
+            if (status === 'will-dormant') {
+                const daysUntil = getDaysUntilDormant(snitch);
+                if (daysUntil !== null) {
+                    html += `<div class="mt-2 pt-2 border-t border-gray-600"><span class="text-yellow-400 font-medium">Dormant in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}</span></div>`;
+                }
+            }
+            
+            tooltip.innerHTML = html;
+            tooltip.classList.remove('hidden');
+            
+            // Position tooltip - use container-relative positioning in fullscreen
+            const container = document.fullscreenElement || document.body;
+            let x = clientX + 15;
+            let y = clientY + 15;
+            
+            const rect = tooltip.getBoundingClientRect();
+            const containerRect = container === document.body ? 
+                { width: window.innerWidth, height: window.innerHeight } : 
+                container.getBoundingClientRect();
+            
+            if (x + rect.width > containerRect.width) {
+                x = clientX - rect.width - 15;
+            }
+            if (y + rect.height > containerRect.height) {
+                y = clientY - rect.height - 15;
+            }
+            
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        }
+        
+        async function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) await loadDatabase(file);
+        }
+        
+        async function loadDatabase(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                
+                db = new SQL.Database(uint8Array);
+                
+                // Query snitches
+                const result = db.exec(`
+                    SELECT world, x, y, z, group_name, type, name, 
+                           dormant_ts, cull_ts, first_seen_ts, last_seen_ts, 
+                           created_ts, created_by_uuid
+                    FROM snitches_v2
+                `);
+                
+                if (result.length === 0) {
+                    alert('No snitch data found in database');
+                    return;
+                }
+                
+                const columns = result[0].columns;
+                const values = result[0].values;
+                
+                snitches = values.map(row => {
+                    const obj = {};
+                    columns.forEach((col, i) => obj[col] = row[i]);
+                    return obj;
+                });
+                
+                processData();
+                showMainView();
+                
+            } catch (error) {
+                console.error('Error loading database:', error);
+                alert('Error loading database: ' + error.message);
+            }
+        }
+        
+        function processData() {
+            // Build groups map
+            groups.clear();
+            snitches.forEach(snitch => {
+                const groupName = snitch.group_name || 'Unknown';
+                if (!groups.has(groupName)) {
+                    groups.set(groupName, { count: 0, visible: true });
+                }
+                groups.get(groupName).count++;
+            });
+            
+            // Sort groups by count (descending)
+            const sortedGroups = [...groups.entries()].sort((a, b) => b[1].count - a[1].count);
+            groups = new Map(sortedGroups);
+            
+            renderGroupFilters();
+            updateVisibleSnitches();
+            updateStats();
+        }
+        
+        function getSnitchStatus(snitch) {
+            const now = Date.now();
+            const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000;
+            
+            // If cull_ts is set and in the past, it's culled
+            if (snitch.cull_ts && snitch.cull_ts > 0 && snitch.cull_ts < now) {
+                return 'culled';
+            }
+            
+            // If dormant_ts is set and in the past, it's dormant
+            if (snitch.dormant_ts && snitch.dormant_ts > 0 && snitch.dormant_ts < now) {
+                return 'dormant';
+            }
+            
+            // If dormant_ts is set and within 5 days, it will be dormant soon
+            if (snitch.dormant_ts && snitch.dormant_ts > 0 && snitch.dormant_ts < now + FIVE_DAYS_MS) {
+                return 'will-dormant';
+            }
+            
+            // Otherwise active
+            return 'active';
+        }
+        
+        // Get days until dormant for will-dormant snitches
+        function getDaysUntilDormant(snitch) {
+            if (!snitch.dormant_ts || snitch.dormant_ts <= 0) return null;
+            const now = Date.now();
+            const diff = snitch.dormant_ts - now;
+            if (diff <= 0) return null;
+            return Math.ceil(diff / (24 * 60 * 60 * 1000));
+        }
+        
+        function showMainView() {
+            uploadSection.classList.add('hidden');
+            controlsSection.classList.remove('hidden');
+            mainContent.classList.remove('hidden');
+            
+            if (window.feather) feather.replace();
+            
+            setTimeout(() => {
+                resizeCanvas();
+                fitMapToSnitches();
+            }, 100);
+        }
+        
+        function renderGroupFilters() {
+            groupFilters.innerHTML = '';
+            
+            groups.forEach((data, name) => {
+                const label = document.createElement('label');
+                label.className = 'group-checkbox';
+                label.innerHTML = `
+                    <input type="checkbox" ${data.visible ? 'checked' : ''} data-group="${name}">
+                    <span class="group-name" title="${name}">${name}</span>
+                    <span class="group-count">${data.count}</span>
+                `;
+                
+                label.querySelector('input').addEventListener('change', (e) => {
+                    groups.get(name).visible = e.target.checked;
+                    updateVisibleSnitches();
+                    render();
+                    updateStats();
+                });
+                
+                groupFilters.appendChild(label);
+            });
+        }
+        
+        function toggleAllGroups(visible) {
+            groups.forEach((data) => {
+                data.visible = visible;
+            });
+            
+            groupFilters.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = visible;
+            });
+            
+            updateVisibleSnitches();
+            render();
+            updateStats();
+        }
+        
+        function updateVisibleSnitches() {
+            visibleSnitches = snitches.filter(s => {
+                // World filter
+                const snitchWorld = s.world || 'world';
+                if (snitchWorld !== currentWorld) return false;
+                
+                const groupName = s.group_name || 'Unknown';
+                const groupData = groups.get(groupName);
+                if (!groupData || !groupData.visible) return false;
+                
+                if (s.x < bounds.minX || s.x > bounds.maxX) return false;
+                if (s.z < bounds.minZ || s.z > bounds.maxZ) return false;
+                
+                // Y level filter
+                if (s.y < yMin || s.y > yMax) return false;
+                
+                return true;
+            });
+        }
+        
+        function updateStats() {
+            const total = snitches.length;
+            let active = 0, willDormant = 0, dormant = 0, culled = 0;
+            
+            snitches.forEach(s => {
+                const status = getSnitchStatus(s);
+                if (status === 'active') active++;
+                else if (status === 'will-dormant') willDormant++;
+                else if (status === 'dormant') dormant++;
+                else culled++;
+            });
+            
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-visible').textContent = visibleSnitches.length;
+            
+            // If showWillBeDormant is off, combine active + will-dormant into active
+            const willDormantPill = document.getElementById('stat-pill-will-dormant');
+            const activePill = document.getElementById('stat-pill-active');
+            const culledPill = document.getElementById('stat-pill-culled');
+            const statsBar = willDormantPill.parentElement;
+            
+            if (showWillBeDormant) {
+                document.getElementById('stat-active').textContent = active;
+                document.getElementById('stat-will-dormant').textContent = willDormant;
+                willDormantPill.style.visibility = 'visible';
+                // Move will-dormant pill after active pill
+                activePill.after(willDormantPill);
+            } else {
+                // Combine active and will-dormant when toggle is off
+                document.getElementById('stat-active').textContent = active + willDormant;
+                willDormantPill.style.visibility = 'hidden';
+                // Move will-dormant pill to end (after culled)
+                culledPill.after(willDormantPill);
+            }
+            
+            document.getElementById('stat-dormant').textContent = dormant;
+            document.getElementById('stat-culled').textContent = culled;
+        }
+        
+        function formatTimestamp(ts) {
+            if (!ts || ts === 0) return 'N/A';
+            return new Date(ts).toLocaleString();
+        }
+        
+        function toggleFullscreen() {
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            
+            if (!document.fullscreenElement) {
+                // Enter fullscreen
+                mapContainer.requestFullscreen().then(() => {
+                    fullscreenBtn.innerHTML = '<i data-feather="minimize" class="w-5 h-5"></i>';
+                    fullscreenBtn.title = 'Exit Fullscreen';
+                    if (window.feather) feather.replace();
+                    // Resize after entering fullscreen
+                    setTimeout(() => {
+                        resizeCanvas();
+                        render();
+                    }, 100);
+                }).catch(err => {
+                    console.error('Error entering fullscreen:', err);
+                });
+            } else {
+                // Exit fullscreen
+                document.exitFullscreen().then(() => {
+                    fullscreenBtn.innerHTML = '<i data-feather="maximize" class="w-5 h-5"></i>';
+                    fullscreenBtn.title = 'Toggle Fullscreen';
+                    if (window.feather) feather.replace();
+                    // Resize after exiting fullscreen
+                    setTimeout(() => {
+                        resizeCanvas();
+                        render();
+                    }, 100);
+                }).catch(err => {
+                    console.error('Error exiting fullscreen:', err);
+                });
+            }
+        }
+        
+        // Listen for fullscreen change (e.g., pressing Escape)
+        document.addEventListener('fullscreenchange', () => {
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            if (!document.fullscreenElement) {
+                fullscreenBtn.innerHTML = '<i data-feather="maximize" class="w-5 h-5"></i>';
+                fullscreenBtn.title = 'Toggle Fullscreen';
+                if (window.feather) feather.replace();
+                setTimeout(() => {
+                    resizeCanvas();
+                    render();
+                }, 100);
+            }
+        });
+        
+        function resetMapView() {
+            viewX = 0;
+            viewZ = 0;
+            // Fit the full world (-10000 to 10000) in view
+            const canvasSize = Math.min(snitchCanvas.width, snitchCanvas.height);
+            const worldRange = 20000; // -10000 to 10000
+            for (let z = -6; z <= 0; z++) {
+                const scale = 1 / Math.pow(2, -z);
+                if (worldRange * scale <= canvasSize) {
+                    currentZoom = z;
+                }
+            }
+            render();
+        }
+        
+        function fitMapToSnitches() {
+            if (visibleSnitches.length === 0) {
+                resetMapView();
+                return;
+            }
+            
+            let minX = Infinity, maxX = -Infinity;
+            let minZ = Infinity, maxZ = -Infinity;
+            
+            visibleSnitches.forEach(s => {
+                minX = Math.min(minX, s.x);
+                maxX = Math.max(maxX, s.x);
+                minZ = Math.min(minZ, s.z);
+                maxZ = Math.max(maxZ, s.z);
+            });
+            
+            // Center view on snitches
+            viewX = (minX + maxX) / 2;
+            viewZ = (minZ + maxZ) / 2;
+            
+            // Calculate zoom to fit
+            const rangeX = maxX - minX + 1000;
+            const rangeZ = maxZ - minZ + 1000;
+            const maxRange = Math.max(rangeX, rangeZ);
+            
+            // Find appropriate zoom level
+            const canvasSize = Math.min(snitchCanvas.width, snitchCanvas.height);
+            for (let z = 0; z >= -6; z--) {
+                const scale = 1 / Math.pow(2, -z);
+                if (maxRange * scale <= canvasSize) {
+                    currentZoom = z;
+                    break;
+                }
+            }
+            
+            render();
+        }
+        
+    </script>
+</body>
+</html>
