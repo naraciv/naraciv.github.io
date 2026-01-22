@@ -1901,7 +1901,8 @@
             const total = snitches.length;
             let active = 0, willDormant = 0, dormant = 0, culled = 0;
             
-            snitches.forEach(s => {
+            // Count status from visible snitches (filtered by groups, Y level, etc.)
+            visibleSnitches.forEach(s => {
                 const status = getSnitchStatus(s);
                 if (status === 'active') active++;
                 else if (status === 'will-dormant') willDormant++;
