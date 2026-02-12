@@ -1,463 +1,510 @@
 Timestamp,Input,Input_Lore,Output,Output_Lore,Coordinates,Exchanges_Available,City,Tags,Contact
-2025-10-29T18:15:13.160183,5 Diamond,,"1 Barrel ""Copper Workshop Repair Kit""",One kit will repair a Copper Workshop to full health.,"3736,81,7001",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:18.926341,4 Diamond,,"1 Barrel ""Grill Factory Repair Kit""",One kit will repair a Grill Factory to full health.,"3736,81,7003",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:21.422335,5 Diamond,,"1 Barrel ""Iron Forge Repair Kit""",One kit will repair an Iron Forge to full health.,"3736,81,7004",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:24.337609,2 Diamond,,"1 Barrel ""Printer Factory Repair Kit""",One kit will repair a Printer Factory to full health.,"3736,81,7011",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:26.033136,4 Diamond,,"1 Barrel ""Rail Factory Repair Kit""",One kit will repair a Rail Factory to full health.,"3736,81,7012",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:28.397656,4 Diamond,,"1 Barrel ""Redstone Factory Repair Kit""",One kit will repair a Redstone Factory to full health.,"3736,81,7013",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:31.855456,10 Diamond,,"1 Barrel ""Research Station Repair Kit""",One kit will repair a Research Station to full health.,"3736,81,7014",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:35.116788,1 Diamond,,48 Chest,Crate,"3723,81,7010",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:37.878102,10 Diamond,,"1 Barrel ""Compact Repair Kit""",One kit will repair a compactor to full health.,"3724,81,7009",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:54.780967,48 Diamond,,"1 Barrel ""Advanced Cauldron Repair Kit""",One kit will repair a Advanced Cauldron to full health.,"3716,81,6995",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:57.315592,25 Diamond,,"1 Barrel ""Advanced Ore Smelter Repair Kit""",One kit will repair an Advanced Ore Smelter to full health.,"3717,81,6995",T,Orakuru,Infra,OreStraya
-2025-10-29T18:15:58.950013,8 Diamond,,"1 Barrel ""Animal Husbandry Repair Kit""",One kit will repair an Animal Husbandry to full health.,"3718,81,6995",T,Orakuru,Infra,OreStraya
-2025-10-29T18:16:01.269572,8 Diamond,,"1 Barrel ""Basic Cauldron Repair Kit""",One kit will repair a Basic Cauldron to full health.,"3719,81,6995",T,Orakuru,Infra,OreStraya
-2025-10-29T18:16:10.904741,18 Diamond,,"1 Barrel ""Ore Smelter Repair Kit""",One kit will repair an Ore Smelter to full health.,"3726,81,6995",T,Orakuru,Infra,OreStraya
-2025-10-29T18:16:12.577007,128 Diamond,,"1 Barrel ""Bastion Factory Repair Kit""",One kit will repair a Bastion Factory to full health.,"3727,81,6995",T,Orakuru,Infra,OreStraya
-2025-10-29T18:16:13.831926,2 Diamond,,"1 Barrel ""Bio Factory Repair Kit""",One kit will repair a Bio Factory to full health.,"3728,81,6995",T,Orakuru,Infra,OreStraya
-2025-10-29T18:16:15.139472,2 Diamond,,"1 Barrel ""Concrete Mixer Repair Kit""",One kit will repair a Concrete Mixer to full health.,"3729,81,6995",T,Orakuru,Infra,OreStraya
-2025-10-29T18:16:25.025298,4 Diamond,,1 Block of Emerald,,"3728,88,7014",T,Orakuru,Raw Materials,OreStraya
-2025-10-29T18:16:29.504185,2 Diamond,,1 Amethyst Shard,Compacted Item,"3724,89,7014",T,Orakuru,Raw Materials,OreStraya
-2025-10-29T18:16:32.221006,3 Diamond,,16 Charcoal,Compacted Item,"3716,90,7005",T,Orakuru,Raw Materials,OreStraya
-2025-10-29T18:16:33.965376,1 Diamond,,8 Bone Meal,Compacted Item,"3716,88,7004",T,Orakuru,Raw Materials,OreStraya
-2025-10-29T18:16:45.141452,5 Diamond,,1 Anvil,,"3716,95,7003",F,Orakuru,Raw Materials,OreStraya
-2025-10-29T18:16:47.102216,1 Diamond,,64 Lapis Lazuli,,"3716,95,7002",T,Orakuru,"Blocks, Infra",OreStraya
-2025-10-29T18:16:48.367422,2 Diamond,,1 Crafter,,"3716,95,7001",T,Orakuru,Raw Materials,OreStraya
-2025-10-29T18:16:50.544829,1 Diamond,,64 Cooked Porkchop,,"3716,95,7000",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:16:52.549081,"3 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,1 Minecart,,"3716,95,6999",T,Orakuru,Food/Pots,OreStraya
-2025-10-29T18:16:54.317310,"3 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,1 Oak Boat,,"3716,95,6998",T,Orakuru,Other,OreStraya
-2025-10-29T18:16:56.124129,1 Diamond,,1 Bundle,,"3716,95,6997",T,Orakuru,Other,OreStraya
-2025-10-29T18:17:12.072645,8 Iron Ingot,,1 Bundle,,"3716,95,6997",T,Orakuru,Other,OreStraya
-2025-10-29T18:18:08.679059,16 Iron Ingot,,1 Black Dye,Compacted Item,"3649,77,6918",T,Orakuru,Other,OreStraya
-2025-10-29T18:18:10.014987,12 Iron Ingot,,1 Black Glazed Terracotta,Compacted Item,"3650,77,6916",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:18:12.245028,2 Iron Ingot,,1 Black Wool,Compacted Item,"3649,77,6913",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:18:14.300543,2 Iron Ingot,,1 Black Bed,Compacted Item,"3648,77,6915",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:18:19.503136,15 Iron Ingot,,1 Black Candle,Compacted Item,"3651,86,6909",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:18:20.992277,10 Iron Ingot,,1 Black Terracotta,Compacted Item,"3650,86,6911",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:18:23.092105,5 Iron Ingot,,1 Black Stained Glass,Compacted Item,"3652,86,6914",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:18:24.564452,4 Iron Ingot,,1 Black Concrete Powder,Compacted Item,"3653,86,6912",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:18:32.528313,2 Iron Ingot,,1 Black Bed,Compacted Item,"3648,77,6916",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:18:47.464680,16 Iron Ingot,,8 Black Wool,Compacted Item,"3649,77,6913",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:18:50.727253,4 Iron Ingot,,1 Black Carpet,Compacted Item,"3649,77,6913",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:19:37.453495,5 Iron Ingot,,1 Black Banner,Compacted Item,"3648,77,6916",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:19:38.688289,20 Iron Ingot,,4 Black Banner,Compacted Item,"3648,77,6916",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:19:42.587839,96 Iron Ingot,,8 Black Glazed Terracotta,Compacted Item,"3650,77,6916",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:23:07.887965,7 Iron Ingot,,1 Red Candle,Compacted Item,"3686,83,6964",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:23:09.235901,4 Iron Ingot,,1 Red Stained Glass,Compacted Item,"3686,83,6963",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:23:10.505310,32 Iron Ingot,,8 Red Stained Glass,Compacted Item,"3686,83,6963",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:23:13.039170,10 Iron Ingot,,1 Red Glazed Terracotta,Compacted Item,"3686,83,6962",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:23:13.994601,80 Iron Ingot,,8 Red Glazed Terracotta,Compacted Item,"3686,83,6962",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:23:15.552711,2 Iron Ingot,,1 Red Wool,Compacted Item,"3686,83,6961",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:23:16.638299,16 Iron Ingot,,8 Red Wool,Compacted Item,"3686,83,6961",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:23:17.767710,4 Iron Ingot,,1 Red Carpet,Compacted Item,"3686,83,6961",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:40:14.313282,5 Iron Ingot,,1 Red Banner,Compacted Item,"3680,92,6953",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:40:15.664765,5 Iron Ingot,,1 Red Concrete,Compacted Item,"3681,92,6953",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:40:16.953872,8 Iron Ingot,,1 Red Terracotta,Compacted Item,"3682,92,6953",T,Orakuru,Blocks,OreStraya
-2025-10-29T18:40:18.051043,2 Iron Ingot,,1 Red Dye,Compacted Item,"3683,92,6953",T,Orakuru,Other,OreStraya
-2025-10-29T18:47:58.825173,9 Diamond,,1 Beacon,,"3202,69,4822",T,Shiroyama,"Defense, Infra",HPLaptop
-2025-10-29T18:48:00.831780,2 Diamond,,1 Diamond Helmet,Condition: Undamaged|Never repaired,"3203,69,4820",T,Shiroyama,"Defense, Armor/Tools",HPLaptop
-2025-10-29T18:48:01.931769,3 Diamond,,1 Diamond Chestplate,Condition: Undamaged|Never repaired,"3204,69,4820",T,Shiroyama,"Defense, Armor/Tools",HPLaptop
-2025-10-29T18:48:03.175419,3 Diamond,,1 Diamond Leggings,Condition: Undamaged|Never repaired,"3205,69,4820",F,Shiroyama,"Defense, Armor/Tools",HPLaptop
-2025-10-29T18:48:04.454116,2 Diamond,,1 Diamond Boots,Condition: Undamaged|Never repaired,"3206,69,4820",T,Shiroyama,"Defense, Armor/Tools",HPLaptop
-2025-11-09T17:51:21.689404,"1 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,1 Red Banner,,"3224,71,4888",T,Shiroyama,Blocks,JeyHey
-2025-11-09T17:51:29.927130,1 Diamond,,60 Gunpowder,,"3223,71,4888",F,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:51:32.064261,1 Diamond,,3 Block of Quartz,Compacted Item,"3222,71,4888",T,Shiroyama,Blocks,JeyHey
-2025-11-09T17:51:33.431409,1 Diamond,,64 Slimeball,,"3221,71,4888",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:51:35.636274,1 Diamond,,4 Ice,Compacted Item,"3219,71,4889",T,Shiroyama,"Blocks, Defense",Gaperzo
-2025-11-09T17:51:37.366831,1 Diamond,,3 Leather,Compacted Item,"3219,71,4888",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:51:39.291175,1 Diamond,,3 String,Compacted Item,"3219,71,4887",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:52:04.546464,1 Diamond,,12 Ink Sac,,"3223,71,4887",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:52:05.895774,4 Diamond,,64 Ink Sac,,"3223,71,4887",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:52:08.361980,1 Diamond,,64 Golden Carrot,,"3226,71,4886",T,Shiroyama,"Food/Pots, Mob Drops",JeyHey
-2025-11-09T17:52:10.884944,1 Diamond,,2 Cooked Porkchop,Compacted Item,"3227,71,4888",T,Shiroyama,"Food/Pots, Mob Drops",JeyHey
-2025-11-09T17:52:12.205072,25 Diamond,,64 Cooked Porkchop,Compacted Item,"3227,71,4888",T,Shiroyama,"Food/Pots, Mob Drops",JeyHey
-2025-11-09T17:52:17.562159,2 Diamond,,1 Ender Pearl,,"3218,77,4888",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:52:18.739697,7 Diamond,,16 Ender Pearl,,"3218,77,4888",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:52:20.398719,1 Diamond,,2 Ghast Tear,,"3219,77,4888",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:52:21.868473,1 Diamond,,2 Rotten Flesh,Compacted Item,"3220,77,4888",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:52:23.950300,"1 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,192 Arrow,,"3221,77,4888",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:52:25.832514,1 Diamond,,32 Crying Obsidian,,"3222,77,4888",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T17:52:27.584227,1 Diamond,,3 Blackstone,Compacted Item,"3223,77,4888",T,Shiroyama,Blocks,JeyHey
-2025-11-09T17:52:57.075490,4 Diamond,,1 Dried Ghast,,"3224,77,4888",T,Shiroyama,Blocks,JeyHey
-2025-11-09T17:59:58.301172,20 Diamond,,64 Blackstone,Compacted Item,"3223,77,4888",T,Shiroyama,Blocks,JeyHey
-2025-11-09T18:00:08.989079,1 Iron Ingot,,64 Leather,,"3221,71,4872",F,Shiroyama,Mob Drops,JeyHey
-2025-11-09T18:00:11.459025,1 Diamond,,128 Cooked Porkchop,,"3224,71,4869",T,Shiroyama,"Food/Pots, Mob Drops",JeyHey
-2025-11-09T18:04:54.661561,3 Iron Ingot,,"1 Potion ""Wondrous Chicken Noodle Soup""",§tDelicious and nutritious|§u|§s[⭑⭑⭑⭑⭑],"3267,68,5007",T,Shiroyama,Food/Pots,
-2025-11-09T18:04:56.774714,3 Iron Ingot,,"1 Potion ""Incomparable Pho""",§tVietnamese staple|§u|§s⭑⭑⭑⭑⭒,"3267,68,5007",F,Shiroyama,Food/Pots,
-2025-11-09T18:04:58.260412,3 Iron Ingot,,"1 Potion ""Soju""",§tEasy to drink. Easy to get drunk on|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled,"3266,68,5007",F,Shiroyama,Food/Pots,
-2025-11-09T18:04:59.588067,2 Iron Ingot,,"1 Potion ""Fine Wheatbeer""",§tMake sure you pour at an angle|§u|§s⭑⭑⭑⭑|§y13 Years Barrel aged,"3265,68,5007",F,Shiroyama,Food/Pots,
-2025-11-09T18:05:13.876684,1 Diamond,,4 Bone Block,Compacted Item,"3287,68,5007",F,Shiroyama,"Blocks, Raw Materials",SuperShotGriff
-2025-11-09T18:05:15.238434,1 Iron Ingot,,32 Moss Block,,"3287,68,5008",F,Shiroyama,Blocks,SuperShotGriff
-2025-11-09T18:05:16.369972,1 Iron Ingot,,48 Moss Carpet,,"3287,68,5009",T,Shiroyama,Blocks,SuperShotGriff
-2025-11-09T18:05:17.958574,1 Iron Ingot,,32 Flowering Azalea,,"3287,68,5010",T,Shiroyama,Blocks,SuperShotGriff
-2025-11-09T18:05:20.020124,19 Diamond,,64 Obsidian,Compacted Item,"3287,68,5014",F,Shiroyama,"Blocks, Defense",SuperShotGriff
-2025-11-09T18:05:39.757526,4 Iron Ingot,,"1 Potion ""Brown Ale""",§tMalty and funky|§u|§s⭑⭑⭑⭑|§y8 Years Barrel aged,"3299,68,5031",T,Shiroyama,Food/Pots,
-2025-11-09T18:05:41.267005,4 Iron Ingot,,"1 Potion ""Pilsner""",§tA Czech point of pride|§u|§s⭑⭑⭑⭑⭑|§yOne Year Barrel aged,"3300,68,5031",T,Shiroyama,Food/Pots,
-2025-11-09T18:05:43.321210,4 Iron Ingot,,"1 Potion ""Pale Lager""",§tPale but punchy|§u|§s⭑⭑⭑⭑|§y6 Years Barrel aged,"3301,68,5031",T,Shiroyama,Food/Pots,
-2025-11-09T18:05:46.850885,5 Iron Ingot,,"1 Potion ""Dalgon Deep Stout""",§tTo get you through the winter|§u|§s⭑⭑⭑⭑⭑|§y5 Years Barrel aged,"3301,68,5032",F,Shiroyama,Food/Pots,
-2025-11-09T18:05:49.335079,5 Iron Ingot,,"1 Potion ""Perfect Pacem Pilsner""",§tWith hints of plum|§u|§s⭑⭑⭑⭑⭑|§y5 Years Barrel aged,"3301,68,5033",F,Shiroyama,Food/Pots,
-2025-11-09T18:05:51.953456,5 Iron Ingot,,"1 Potion ""Incredible Icenian Pale Ale""",§tCrisp as Chrispie|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged,"3301,68,5034",F,Shiroyama,Food/Pots,
-2025-11-09T18:06:05.207386,9 Diamond,,1 Beacon,,"3326,69,5037",T,Shiroyama,"Blocks, Defense",HPLaptop
-2025-11-09T18:06:07.316539,2 Diamond,,4 Coal,Compacted Item,"3327,69,5037",T,Shiroyama,Raw Materials,HPLaptop
-2025-11-09T18:06:10.260373,32 Diamond,,"1 Diamond Boots ""Takumi""",Feather Falling 4|Depth Strider 3|Unbreaking 3|Protection 4|Condition: Undamaged,"3326,69,5033",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:06:11.771987,24 Diamond,,"1 Diamond Leggings ""Takumi""",Unbreaking 3|Protection 4|Condition: Undamaged,"3327,69,5033",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:06:13.210636,28 Diamond,,"1 Diamond Chestplate ""Takumi""",Unbreaking 3|Protection 4|Condition: Undamaged,"3328,69,5033",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:06:15.333558,32 Diamond,,"1 Diamond Helmet ""Takumi""",Aqua Affinity 1|Unbreaking 3|Protection 4|Respiration 3|Condition: Undamaged,"3329,69,5033",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:07:06.137020,3 Iron Ingot,,"1 Potion ""Sarsaparilla""",§tDeeply flavourful|§u|§s⭑⭑⭑⭑⭑,"3387,70,5002",F,Shiroyama,Food/Pots,
-2025-11-09T18:07:07.620987,2 Iron Ingot,,64 Baked Potato,,"3387,70,5003",F,Shiroyama,Food/Pots,
-2025-11-09T18:07:09.025826,1 Diamond,,64 Cooked Chicken,,"3387,70,5004",F,Shiroyama,Food/Pots,
-2025-11-09T18:07:15.022445,2 Diamond,,1 Pig Spawn Egg,,"3395,70,5001",T,Shiroyama,Mob Drops,
-2025-11-09T18:07:16.143837,2 Diamond,,1 Rabbit Spawn Egg,,"3395,70,5002",T,Shiroyama,Mob Drops,
-2025-11-09T18:07:17.691541,2 Diamond,,1 Chicken Spawn Egg,,"3395,70,5001",F,Shiroyama,Mob Drops,
-2025-11-09T18:07:19.094754,2 Diamond,,1 Sheep Spawn Egg,,"3395,70,5002",F,Shiroyama,Mob Drops,
-2025-11-09T18:07:20.609779,2 Diamond,,1 Wolf Spawn Egg,,"3395,70,5003",F,Shiroyama,Mob Drops,
-2025-11-09T18:07:21.833430,2 Diamond,,1 Fox Spawn Egg,,"3395,70,5003",F,Shiroyama,Mob Drops,
-2025-11-09T18:07:23.084316,2 Diamond,,1 Turtle Spawn Egg,,"3395,70,5002",F,Shiroyama,Mob Drops,
-2025-11-09T18:07:24.290960,2 Diamond,,1 Squid Spawn Egg,,"3395,70,5001",T,Shiroyama,Mob Drops,
-2025-11-09T18:07:57.075285,15 Diamond,,3 Potion,,"3405,71,4967",T,Shiroyama,Food/Pots,
-2025-11-09T18:07:58.309186,1 Diamond,,3 Potion,,"3405,71,4968",F,Shiroyama,Food/Pots,
-2025-11-09T18:07:59.719286,10 Diamond,,3 Potion,,"3404,71,4968",F,Shiroyama,Food/Pots,
-2025-11-09T18:08:12.943019,4 Diamond,,64 Stone,Compacted Item,"3403,71,4951",F,Shiroyama,"Blocks, Defense",
-2025-11-09T18:09:30.877366,4 Iron Ingot,,"1 Potion ""Chicha""",§tA-maize-ing flavours|§u|§s⭑⭑⭑⭑⭑,"3451,69,5004",F,Shiroyama,Food/Pots,
-2025-11-09T18:09:32.193884,6 Iron Ingot,,"1 Potion ""Tequila""",§tOnce you've had too much you can't go back|§u|§s⭑⭑⭑⭑⭑|§p2-times Distilled|§yOne Year Barrel aged,"3451,69,5003",F,Shiroyama,Food/Pots,
-2025-11-09T18:09:33.487059,2 Iron Ingot,,"1 Potion ""Fine Wheatbeer""","§tFinally, a good use for all that wheat!|§u|§s⭑⭑⭑⭑⭑","3451,69,5003",F,Shiroyama,Food/Pots,
-2025-11-09T18:10:05.046074,1 Diamond,,1 Map,,"3447,71,5068",F,Shiroyama,Other,
-2025-11-09T18:10:20.023288,16 Iron Ingot,,1 Map,,"3443,71,5067",T,Shiroyama,Other,Earyx
-2025-11-09T18:10:31.597664,20 Diamond,,"1 Bucket of Axolotl ""Blue""",,"3437,71,5066",T,Shiroyama,Other,Earyx
-2025-11-09T18:10:34.028102,1 Iron Ingot,,"1 Potion ""Mate Tea""",§tA South American favourite|§u|§s⭑⭑⭑⭑⭑,"3438,71,5067",T,Shiroyama,Food/Pots,Earyx
-2025-11-09T18:10:37.069781,2 Diamond,,"1 Map ""Xólotl""",,"3435,72,5067",T,Shiroyama,Other,Earyx
-2025-11-09T18:10:41.378412,5 Iron Ingot,,"1 Potion ""Nara Pufferfish Wine""",§tAn acquired taste|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged,"3432,71,5062",T,Shiroyama,Food/Pots,Earyx
-2025-11-09T18:10:43.711881,2 Diamond,,16 Ink Sac,,"3431,71,5062",F,Shiroyama,Mob Drops,Earyx
-2025-11-09T18:10:45.424440,4 Diamond,,64 Ink Sac,,"3431,71,5062",F,Shiroyama,Mob Drops,Earyx
-2025-11-09T18:10:46.656599,2 Diamond,,1 Name Tag,,"3431,71,5062",F,Shiroyama,Other,Earyx
-2025-11-09T18:10:48.886296,5 Iron Ingot,,64 Cooked Cod,,"3431,71,5060",F,Shiroyama,Food/Pots,Earyx
-2025-11-09T18:10:50.017939,4 Iron Ingot,,32 Cooked Cod,,"3431,71,5060",F,Shiroyama,Food/Pots,Earyx
-2025-11-09T18:11:44.415828,6 Diamond,,64 Nether Wart,Compacted Item,"3408,70,5072",F,Shiroyama,Raw Materials,
-2025-11-09T18:11:46.780706,1 Iron Ingot,,1 Shroomlight,,"3409,70,5075",T,Shiroyama,Blocks,
-2025-11-09T18:11:48.332245,8 Iron Ingot,,1 Warped Stem,Compacted Item,"3409,70,5076",F,Shiroyama,Blocks,
-2025-11-09T18:11:49.529720,8 Iron Ingot,,64 Crimson Stem,,"3409,70,5076",F,Shiroyama,Blocks,
-2025-11-09T18:11:50.444522,6 Iron Ingot,,1 Crimson Roots,Compacted Item,"3409,70,5076",T,Shiroyama,Blocks,
-2025-11-09T18:11:51.607033,6 Iron Ingot,,1 Warped Roots,Compacted Item,"3409,70,5076",T,Shiroyama,Blocks,
-2025-11-09T18:11:52.921454,5 Iron Nugget,,1 Glowstone,,"3409,70,5076",F,Shiroyama,Blocks,
-2025-11-09T18:12:37.677020,4 Iron Ingot,,1 Red Banner,,"3373,68,5066",T,Shiroyama,,
-2025-11-09T18:12:42.629454,1 Iron Nugget,,1 Melon,,"3372,68,5066",T,Shiroyama,Food/Pots,
-2025-11-09T18:12:45.722716,2 Diamond,,1 Map,,"3372,68,5066",F,Shiroyama,,
-2025-11-09T18:13:02.858335,3 Iron Ingot,,1 Minecart,,"3355,68,5054",F,Shiroyama,Other,
-2025-11-09T18:13:06.621753,4 Iron Ingot,,1 Red Banner,,"3366,68,5041",T,Shiroyama,Blocks,
-2025-11-09T18:13:41.266503,1 Iron Ingot,,64 Baked Potato,,"3358,68,5030",F,Shiroyama,Food/Pots,
-2025-11-09T18:15:13.416336,1 Diamond,,8 Slimeball,,"3144,67,4916",F,Shiroyama,Mob Drops,JeyHey
-2025-11-09T18:15:15.426833,2 Diamond,,64 Bone,,"3145,67,4917",F,Shiroyama,Mob Drops,JeyHey
-2025-11-09T18:15:17.434149,2 Diamond,,64 Rotten Flesh,,"3143,67,4919",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T18:15:19.549107,5 Diamond,,64 Gunpowder,,"3140,67,4915",F,Shiroyama,Mob Drops,JeyHey
-2025-11-09T18:15:21.169596,2 Diamond,,1 Block of Emerald,,"3141,67,4915",F,Shiroyama,Raw Materials,JeyHey
-2025-11-09T18:15:24.582761,45 Diamond,,"1 Bow ""Federalist""",Power 5|Punch 2|Flame 1|Unbreaking 3|Infinity 1|Condition: Undamaged,"3142,66,4916",F,Shiroyama,Food/Pots,JeyHey
-2025-11-09T18:15:37.931595,7 Iron Nugget,,"1 Potion ""Cherry Liqueur""",§tSummer's bounty|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled|§yBarrel aged|§qAlcoholic,"3137,70,4873",T,Shiroyama,Food/Pots,
-2025-11-09T18:15:44.727356,8 Iron Nugget,,"1 Potion ""Whiskey""",§tThe classic|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled|§yBarrel aged|§qAlcoholic,"3137,70,4869",T,Shiroyama,Food/Pots,
-2025-11-09T18:15:47.466118,3 Iron Nugget,,"1 Potion ""Fine Wheatbeer""","§tFinally, a good use for all that wheat!|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged|§qAlcoholic","3137,70,4867",T,Shiroyama,Food/Pots,
-2025-11-09T18:15:48.936243,1 Iron Ingot,,"1 Potion ""Vodka""",§tPure and simple|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled|§qAlcoholic,"3137,70,4867",T,Shiroyama,Food/Pots,
-2025-11-09T18:17:35.528343,4 Iron Nugget,,"1 Potion ""Tea""",§tClassic tea|§u|§s⭑⭑⭑⭑⭑,"3132,70,4839",F,Shiroyama,Food/Pots,
-2025-11-09T18:17:37.128789,6 Iron Nugget,,"1 Potion ""English Breakfast Tea""",§tThe best way to wake up|§u|§s⭑⭑⭑⭑⭑,"3134,70,4840",T,Shiroyama,Food/Pots,
-2025-11-09T18:17:39.136024,3 Iron Nugget,,"1 Potion ""Redbush Tea""",§tFor the decaf drinkers|§u|§s⭑⭑⭑⭑⭑,"3134,70,4839",F,Shiroyama,Food/Pots,
-2025-11-09T18:17:40.151380,3 Iron Nugget,,"1 Potion ""Green Tea""",§tNot just grass!|§u|§s⭑⭑⭑⭑⭑,"3134,70,4839",F,Shiroyama,Food/Pots,
-2025-11-09T18:17:41.084447,1 Iron Ingot,,"1 Potion ""Majestic Melon Iced Tea""",§tRejuvenating|§u|§s⭑⭑⭑⭑⭑,"3134,70,4839",F,Shiroyama,Food/Pots,
-2025-11-09T18:17:50.924270,3 Iron Ingot,,64 Cooked Cod,,"3153,71,4823",F,Shiroyama,Food/Pots,Earyx
-2025-11-09T18:17:51.804980,5 Iron Ingot,,64 Cooked Salmon,,"3153,71,4823",F,Shiroyama,Food/Pots,Earyx
-2025-11-09T18:17:54.248601,1 Diamond,,64 Tropical Fish,,"3153,71,4819",F,Shiroyama,Food/Pots,Earyx
-2025-11-09T18:17:57.898411,2 Diamond,,1 Bucket of Axolotl,,"3153,71,4815",F,Shiroyama,Other,Earyx
-2025-11-09T18:17:58.925842,2 Diamond,,1 Bucket of Tropical Fish,,"3153,71,4815",T,Shiroyama,Other,Earyx
-2025-11-09T18:18:00.764555,2 Diamond,,1 Nautilus Shell,,"3154,71,4815",T,Shiroyama,Other,Earyx
-2025-11-09T18:18:01.764134,4 Diamond,,64 Ink Sac,,"3154,71,4815",F,Shiroyama,Mob Drops,Earyx
-2025-11-09T18:18:02.940444,2 Diamond,,16 Ink Sac,,"3154,71,4815",F,Shiroyama,Mob Drops,Earyx
-2025-11-09T18:18:05.870093,2 Diamond,,1 Name Tag,,"3154,71,4822",F,Shiroyama,Other,Earyx
-2025-11-09T18:18:07.027631,3 Iron Ingot,,1 Saddle,,"3154,71,4822",T,Shiroyama,Other,Earyx
-2025-11-09T18:18:11.927440,15 Iron Ingot,,1 Black Banner,,"3155,76,4814",T,Shiroyama,Mob Drops,Earyx
-2025-11-09T18:18:13.610368,15 Iron Ingot,,1 Yellow Banner,,"3155,76,4814",T,Shiroyama,Mob Drops,Earyx
-2025-11-09T18:18:19.576688,15 Iron Ingot,,1 Lime Banner,,"3153,76,4814",T,Shiroyama,Mob Drops,Earyx
-2025-11-09T18:18:23.297320,5 Iron Ingot,,1 Earyx Memories I,Author: Earyx|Generation: COPY_OF_COPY,"3155,76,4823",F,Shiroyama,Other,Earyx
-2025-11-09T18:18:24.890979,2 Iron Ingot,,64 Paper,,"3155,76,4823",F,Shiroyama,Other,Earyx
-2025-11-09T18:18:26.312315,1 Iron Ingot,,10 Leather,,"3155,76,4823",F,Shiroyama,Mob Drops,Earyx
-2025-11-09T18:18:28.262830,4 Iron Ingot,,1 Book and Quill,,"3153,76,4823",F,Shiroyama,Other,Earyx
-2025-11-09T18:18:29.642263,1 Iron Ingot,,5 Bookshelf,,"3153,76,4823",F,Shiroyama,Blocks,Earyx
-2025-11-09T18:18:40.223583,10 Iron Ingot,,64 Red Concrete,,"3164,71,4837",F,Shiroyama,Blocks,
-2025-11-09T18:18:41.699852,10 Iron Ingot,,64 Orange Concrete,,"3164,71,4838",T,Shiroyama,Blocks,
-2025-11-09T18:18:43.215432,10 Iron Ingot,,64 Yellow Concrete,,"3164,71,4839",T,Shiroyama,Blocks,
-2025-11-09T18:18:44.456914,10 Iron Ingot,,64 Lime Concrete,,"3164,71,4840",T,Shiroyama,Blocks,
-2025-11-09T18:18:45.936638,10 Iron Ingot,,64 Green Concrete,,"3164,71,4841",T,Shiroyama,Blocks,
-2025-11-09T18:18:47.231002,10 Iron Ingot,,64 Cyan Concrete,,"3164,71,4842",T,Shiroyama,Blocks,
-2025-11-09T18:18:48.551865,10 Iron Ingot,,64 Light Blue Concrete,,"3164,71,4843",T,Shiroyama,Blocks,
-2025-11-09T18:18:49.865224,10 Iron Ingot,,64 Blue Concrete,,"3164,71,4844",T,Shiroyama,Blocks,
-2025-11-09T18:18:52.697301,10 Iron Ingot,,64 Purple Concrete,,"3161,71,4844",T,Shiroyama,Blocks,
-2025-11-09T18:18:53.875547,10 Iron Ingot,,64 Magenta Concrete,,"3161,71,4843",T,Shiroyama,Blocks,
-2025-11-09T18:18:55.040729,10 Iron Ingot,,64 Pink Concrete,,"3161,71,4842",T,Shiroyama,Blocks,
-2025-11-09T18:18:56.364212,10 Iron Ingot,,64 White Concrete,,"3161,71,4841",F,Shiroyama,Blocks,
-2025-11-09T18:18:57.796814,10 Iron Ingot,,64 Light Gray Concrete,,"3161,71,4840",T,Shiroyama,Blocks,
-2025-11-09T18:18:59.063718,19 Iron Ingot,,64 Black Concrete,,"3161,71,4839",T,Shiroyama,Blocks,
-2025-11-09T18:19:00.303212,10 Iron Ingot,,64 Brown Concrete,,"3161,71,4838",T,Shiroyama,Blocks,
-2025-11-09T18:19:01.419797,3 Diamond,,1 Bucket of Pufferfish,,"3161,71,4837",T,Shiroyama,Other,
-2025-11-09T18:19:07.006701,1 Diamond,,1 Pearlescent Froglight,Compacted Item,"3174,71,4837",T,Shiroyama,Other,meenos
-2025-11-09T18:19:08.675031,30 Diamond,,1 Creeper Charge Banner Pattern,,"3174,71,4838",F,Shiroyama,Other,meenos
-2025-11-09T18:19:10.083913,4 Diamond,,64 Stone,Compacted Item,"3174,71,4839",T,Shiroyama,"Blocks, Defense",meenos
-2025-11-09T18:19:14.931811,1 Diamond,,64 Pointed Dripstone,,"3173,71,4840",T,Shiroyama,"Blocks, Defense",meenos
-2025-11-09T18:19:22.374269,5 Iron Ingot,,64 Bricks,,"3170,71,4837",T,Shiroyama,Blocks,Bronnakus
-2025-11-09T18:19:25.241301,4 Iron Ingot,,64 Terracotta,,"3170,71,4839",F,Shiroyama,Blocks,Bronnakus
-2025-11-09T18:19:39.601287,1 Diamond,,16 Ink Sac,,"3179,71,4838",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:40.905707,1 Diamond,,8 Gray Dye,,"3179,71,4837",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:42.134528,1 Diamond,,16 Light Gray Dye,,"3179,71,4836",T,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:43.290521,5 Iron Ingot,,64 White Dye,,"3179,71,4835",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:44.249820,4 Iron Ingot,,64 Magenta Dye,,"3179,71,4835",T,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:45.423225,6 Iron Ingot,,64 Lime Dye,,"3179,71,4836",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:46.424828,8 Iron Ingot,,64 Brown Dye,,"3179,71,4837",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:47.635010,5 Iron Ingot,,64 Pink Dye,,"3179,71,4838",T,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:48.865573,5 Iron Ingot,,64 Purple Dye,,"3179,71,4838",T,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:49.904776,4 Iron Ingot,,64 Light Blue Dye,,"3179,71,4837",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:50.956540,7 Iron Ingot,,64 Cyan Dye,,"3179,71,4836",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:52.250765,5 Iron Ingot,,64 Orange Dye,,"3179,71,4835",T,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:53.335244,5 Iron Ingot,,64 Yellow Dye,,"3179,71,4835",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:54.353036,8 Iron Ingot,,64 Green Dye,,"3179,71,4836",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:55.460195,5 Iron Ingot,,64 Blue Dye,,"3179,71,4837",T,Shiroyama,Other,Bronnakus
-2025-11-09T18:19:56.614308,5 Iron Ingot,,64 Red Dye,,"3179,71,4838",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:20:01.068032,1 Diamond,,192 Rose Bush,,"3181,71,4837",F,Shiroyama,Other,Bronnakus
-2025-11-09T18:20:58.388099,10 Iron Ingot,,1 Bucket of Axolotl,,"3198,71,4816",T,Shiroyama,Other,HPLaptop
-2025-11-09T18:20:59.535004,10 Iron Ingot,,1 Bucket of Tropical Fish,,"3198,71,4816",T,Shiroyama,Other,HPLaptop
-2025-11-09T18:21:00.908170,2 Iron Ingot,,1 Saddle,,"3198,71,4815",T,Shiroyama,Other,HPLaptop
-2025-11-09T18:21:02.421810,10 Diamond,,1 Name Tag,,"3198,71,4814",T,Shiroyama,Other,HPLaptop
-2025-11-09T18:21:04.213671,48 Raw Iron,,70 Iron Ingot,,"3198,71,4811",T,Shiroyama,Raw Materials,HPLaptop
-2025-11-09T18:21:41.404874,4 Iron Ingot,,"1 Potion ""Nara no Uisuki""","§tFrom distant shores to the Eas, eh South..|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled|§yBarrel aged","3196,72,4788",T,Shiroyama,Food/Pots,HPLaptop
-2025-11-09T18:21:42.706795,4 Iron Ingot,,"1 Potion ""Shiroyama Sake""",§tTaste of the Sakura trees|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged,"3196,72,4785",T,Shiroyama,Food/Pots,HPLaptop
-2025-11-09T18:21:46.127427,3 Iron Ingot,,"1 Potion ""Fine Wheatbeer""","§tFinally, a good use for all that wheat!|§u|§s[⭑⭑⭑⭑⭑]","3195,72,4783",T,Shiroyama,Food/Pots,HPLaptop
-2025-11-09T18:22:07.188900,5 Iron Ingot,,"1 Potion ""Venne Vodka""",§tDrink at a suitable Venne-ue|§u|§s⭑⭑⭑⭑⭑|§p5-times Distilled,"3214,68,4810",T,Shiroyama,Food/Pots,
-2025-11-09T18:22:08.240689,1 Iron Ingot,,"1 Potion ""Vodka""",§tPure and simple|§u|§s⭑⭑⭑⭑⭑|§p8-times Distilled,"3214,68,4810",F,Shiroyama,Food/Pots,
-2025-11-09T18:22:09.649756,8 Iron Ingot,,"1 Potion ""Venne Vodka""",§tDrink at a suitable Venne-ue|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled,"3215,68,4809",T,Shiroyama,Food/Pots,
-2025-11-09T18:23:04.874771,1 Iron Ingot,,1 Iron Sword,Condition: Undamaged|Never repaired,"3274,70,4800",T,Shiroyama,Armor/Tools,
-2025-11-09T18:23:11.092730,1 Iron Ingot,,1 Iron Hoe,Condition: Undamaged|Never repaired,"3273,70,4800",T,Shiroyama,Armor/Tools,
-2025-11-09T18:23:20.421859,1 Iron Ingot,,1 Iron Shovel,Condition: Undamaged|Never repaired,"3272,70,4800",T,Shiroyama,Armor/Tools,
-2025-11-09T18:23:23.301755,1 Iron Ingot,,1 Iron Axe,Condition: Undamaged|Never repaired,"3271,70,4800",T,Shiroyama,Armor/Tools,
-2025-11-09T18:23:33.236763,1 Iron Ingot,,1 Shears,Condition: Undamaged|Never repaired,"3270,70,4800",T,Shiroyama,Armor/Tools,
-2025-11-09T18:23:33.539478,1 Iron Ingot,,1 Iron Pickaxe,Condition: Undamaged|Never repaired,"3270,70,4800",T,Shiroyama,Armor/Tools,
-2025-11-09T18:23:35.909811,2 Iron Ingot,,1 Bucket,,"3270,70,4800",T,Shiroyama,Armor/Tools,
-2025-11-09T18:24:15.714773,1 Iron Ingot,,96 Cookie,,"3270,72,4819",F,Shiroyama,Food/Pots,
-2025-11-09T18:24:38.552277,2 Iron Ingot,,64 Cactus,,"3215,69,4825",T,Shiroyama,Raw Materials,VilyanZ
-2025-11-09T18:24:40.009598,1 Diamond,,576 Cactus,,"3215,69,4825",F,Shiroyama,Raw Materials,VilyanZ
-2025-11-09T18:24:41.441708,2 Iron Ingot,,64 Sugar Cane,,"3215,69,4824",F,Shiroyama,Raw Materials,VilyanZ
-2025-11-09T18:24:43.078920,3 Iron Ingot,,64 Cocoa Beans,,"3215,69,4823",T,Shiroyama,Raw Materials,VilyanZ
-2025-11-09T18:24:44.982972,1 Diamond,,64 Cooked Porkchop,,"3216,69,4823",T,Shiroyama,Food/Pots,VilyanZ
-2025-11-09T18:24:47.862494,1 Iron Ingot,,64 Cobblestone,,"3216,69,4824",T,Shiroyama,Blocks,VilyanZ
-2025-11-09T18:24:49.281002,1 Iron Ingot,,64 Bread,,"3216,69,4824",T,Shiroyama,Food/Pots,VilyanZ
-2025-11-09T18:24:50.529651,1 Iron Ingot,,1 Red Banner,,"3217,69,4824",T,Shiroyama,Blocks,VilyanZ
-2025-11-09T18:24:51.925877,1 Iron Ingot,,64 Cobbled Deepslate,,"3218,69,4824",T,Shiroyama,Blocks,VilyanZ
-2025-11-09T18:24:53.337994,1 Iron Ingot,,96 Stone,,"3218,69,4824",T,Shiroyama,Blocks,VilyanZ
-2025-11-09T18:24:56.722161,3 Diamond,,2 Diamond Pickaxe,,"3218,69,4824",T,Shiroyama,Armor/Tools,VilyanZ
-2025-11-09T18:25:00.539468,6 Diamond,,16 Ender Pearl,,"3218,69,4824",T,Shiroyama,Mob Drops,VilyanZ
-2025-11-09T18:25:02.407838,3 Iron Ingot,,64 Andesite,,"3219,69,4823",T,Shiroyama,Blocks,VilyanZ
-2025-11-09T18:25:03.660717,3 Iron Ingot,,64 Granite,,"3219,69,4823",T,Shiroyama,Blocks,VilyanZ
-2025-11-09T18:25:04.872382,3 Iron Ingot,,64 Diorite,,"3219,69,4823",T,Shiroyama,Blocks,VilyanZ
-2025-11-09T18:25:06.095478,3 Iron Ingot,,64 Tuff,,"3219,69,4823",T,Shiroyama,Blocks,VilyanZ
-2025-11-09T18:25:07.217001,3 Iron Ingot,,64 Calcite,,"3219,69,4823",T,Shiroyama,Blocks,VilyanZ
-2025-11-09T18:25:22.511626,16 Raw Iron,,3 Block of Iron,,"3224,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:23.876194,16 Raw Gold,,3 Block of Gold,,"3224,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:24.731587,23 Raw Iron,,39 Iron Ingot,,"3224,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:25.650809,23 Raw Gold,,39 Gold Ingot,,"3224,68,4840",F,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:26.699752,37 Raw Iron,,7 Block of Iron,,"3224,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:27.734905,37 Raw Gold,,7 Block of Gold,,"3224,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:28.770461,50 Raw Iron,,86 Iron Ingot,,"3224,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:29.714153,50 Raw Gold,,86 Gold Ingot,,"3224,68,4840",F,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:30.889030,5 Nether Gold Ore,,21 Gold Ingot,,"3224,68,4840",F,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:31.893127,12 Nether Gold Ore,,51 Gold Ingot,,"3224,68,4840",F,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:35.285331,3 Deepslate Diamond Ore,,11 Diamond,,"3223,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:36.213575,3 Diamond Ore,,11 Diamond,,"3223,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:37.112299,7 Deepslate Diamond Ore,,27 Diamond,,"3223,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:38.371957,7 Diamond Ore,,27 Diamond,,"3223,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:39.480502,11 Deepslate Diamond Ore,,41 Diamond,,"3223,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:40.831642,11 Diamond Ore,,41 Diamond,,"3223,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:42.389833,15 Deepslate Diamond Ore,,56 Diamond,,"3223,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:43.495470,15 Diamond Ore,,56 Diamond,,"3223,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:44.454430,50 Deepslate Diamond Ore,,187 Diamond,,"3223,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:25:45.493835,50 Diamond Ore,,187 Diamond,,"3223,68,4840",T,Shiroyama,Raw Materials,BooLTonian
-2025-11-09T18:27:32.690683,1 Iron Ingot,,1 Oak Boat,,"3327,65,4732",T,Shiroyama,Other,HPLaptop
-2025-11-09T18:27:42.785507,1 Iron Ingot,,"1 Potion ""Delightful Tonkatsu Ramen""",§tPride of Japan|§u|§s⭑⭑⭑⭑⭑,"3323,73,4719",T,Shiroyama,Food/Pots,HPLaptop
-2025-11-09T18:29:01.278725,6 Iron Ingot,,"1 Potion ""The Gay Agenda""",§tTurning everything gay!|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled,"3183,69,4889",F,Shiroyama,Food/Pots,
-2025-11-09T18:29:02.568354,4 Iron Ingot,,"1 Potion ""Leo's Orange Creamsicle""",§tA delicious tiger treat!|§u|§s[⭑⭑⭑⭑⭑]|§gBrewer: s0uthw3st,"3183,69,4888",T,Shiroyama,Food/Pots,
-2025-11-09T18:29:03.919404,4 Iron Ingot,,"1 Potion ""Frihavn Juniper Ale""",§tA viking's best friend - skål!|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged,"3183,69,4887",T,Shiroyama,Food/Pots,
-2025-11-09T18:29:06.059316,4 Iron Ingot,,"1 Potion ""Beautiful Beetroot Vodka""",§tBest drunk with Borscht|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled,"3181,69,4891",F,Shiroyama,Food/Pots,
-2025-11-09T18:29:10.070273,10 Iron Ingot,,"1 Potion ""Peerless Pridelands Mead""",§tA seaside specialty|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged,"3177,69,4887",T,Shiroyama,Food/Pots,
-2025-11-09T18:29:11.671266,9 Iron Ingot,,"1 Potion ""Colton's Love Martini""",§tMade with Colton's love and passion|§u|§s[⭑⭑⭑⭑⭑],"3179,69,4885",T,Shiroyama,Food/Pots,
-2025-11-09T18:29:12.732120,4 Iron Ingot,,"1 Potion ""Burning Blizzard""","§tCold to the touch, but burns the throat|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled","3180,69,4885",T,Shiroyama,Food/Pots,
-2025-11-09T18:29:13.738926,7 Iron Ingot,,"1 Potion ""5 o'Block Somewhere""",§tPina Colada's classier cousin|§u|§s[⭑⭑⭑⭑⭑],"3181,69,4885",F,Shiroyama,Food/Pots,
-2025-11-09T18:29:20.001425,2 Diamond,,64 Cherry Log,,"3201,71,4887",F,Shiroyama,"Raw Materials, Blocks",Zynarr
-2025-11-09T18:29:21.521425,6 Iron Ingot,,64 Birch Log,,"3201,71,4889",T,Shiroyama,"Raw Materials, Blocks",Zynarr
-2025-11-09T18:29:22.506444,1 Diamond,,196 Birch Log,,"3201,71,4889",T,Shiroyama,"Raw Materials, Blocks",Zynarr
-2025-11-09T18:29:24.705896,4 Diamond,,128 Cherry Log,,"3201,71,4887",F,Shiroyama,"Raw Materials, Blocks",Zynarr
-2025-11-09T18:29:26.331742,8 Iron Ingot,,64 Oak Log,,"3201,71,4890",T,Shiroyama,"Raw Materials, Blocks",Zynarr
-2025-11-09T18:29:27.144493,1 Diamond,,128 Oak Log,,"3201,71,4890",T,Shiroyama,"Raw Materials, Blocks",Zynarr
-2025-11-09T18:29:28.336063,6 Iron Ingot,,64 Spruce Log,,"3201,71,4892",T,Shiroyama,"Raw Materials, Blocks",Zynarr
-2025-11-09T18:29:29.162105,1 Diamond,,196 Spruce Log,,"3201,71,4892",T,Shiroyama,"Raw Materials, Blocks",Zynarr
-2025-11-09T18:29:44.590340,43 Diamond,,"1 Bow ""Takumi""",Power 5|Punch 2|Flame 1|Unbreaking 3|Infinity 1|Condition: Undamaged,"3177,69,4874",F,Shiroyama,,SQOpenSpellBook
-2025-11-09T18:29:45.856672,25 Diamond,,1 Netherite Pickaxe,,"3177,69,4874",F,Shiroyama,,SQOpenSpellBook
-2025-11-09T18:29:47.097281,69 Diamond,,"1 Diamond Sword ""Takumi""",Knockback 2|Sharpness 5|Unbreaking 3|Fire Aspect 2|Other enchantments allowed|Condition: Undamaged,"3177,69,4873",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:48.281089,79 Diamond,,"1 Diamond Sword ""Takumi""",Sharpness 5|Unbreaking 3|Looting 3|Fire Aspect 2|Other enchantments allowed|Condition: Undamaged,"3177,69,4873",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:49.263389,17 Diamond,,"1 Diamond Axe ""Takumi""",Fortune 3|Efficiency 5|Unbreaking 3|Condition: Undamaged|Repair level 3,"3177,69,4872",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:50.626528,20 Diamond,,"1 Diamond Axe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged|Repair level 3,"3177,69,4872",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:51.571132,19 Diamond,,"1 Diamond Axe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged|Repair level 5,"3177,69,4872",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:52.689578,75 Diamond,,"1 Netherite Pickaxe ""Takumi""",Fortune 3|Efficiency 5|Unbreaking 3|Condition: Undamaged,"3177,69,4871",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:53.584385,77 Diamond,,"1 Netherite Pickaxe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged,"3177,69,4871",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:54.696334,17 Diamond,,"1 Diamond Pickaxe ""Takumi""",Fortune 3|Efficiency 5|Unbreaking 3|Condition: Undamaged|Repair level 3,"3177,69,4871",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:55.617340,16 Diamond,,"1 Diamond Pickaxe ""Takumi""",Fortune 3|Efficiency 5|Unbreaking 3|Condition: Undamaged|Repair level 5,"3177,69,4871",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:56.301472,31 Diamond,,"2 Diamond Pickaxe ""Takumi""",Fortune 3|Efficiency 5|Unbreaking 3|Condition: Undamaged|Repair level 5,"3177,69,4871",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:57.031439,21 Diamond,,"1 Diamond Pickaxe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged|Repair level 3,"3177,69,4871",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:57.739362,20 Diamond,,"1 Diamond Pickaxe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged|Repair level 5,"3177,69,4871",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:58.359537,39 Diamond,,"2 Diamond Pickaxe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged|Repair level 5,"3177,69,4871",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:29:59.458083,12 Diamond,,"1 Diamond Shovel ""Takumi""",Efficiency 4|Silk Touch 1|Unbreaking 3|Condition: Undamaged,"3177,69,4870",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:00.794090,10 Diamond,,"1 Diamond Shovel ""Takumi""",Efficiency 4|Unbreaking 3|Condition: Undamaged,"3177,69,4870",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:01.628245,11 Diamond,,"1 Diamond Shovel ""Takumi""",Fortune 3|Efficiency 4|Unbreaking 3|Condition: Undamaged,"3177,69,4870",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:02.763297,29 Diamond,,"1 Diamond Leggings ""Takumi""",Unbreaking 3|Protection 4|Condition: Undamaged,"3177,69,4869",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:03.825766,39 Diamond,,1 Diamond Helmet,Aqua Affinity 1|Unbreaking 3|Protection 4|Respiration 3|Condition: Undamaged,"3177,69,4869",F,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:04.547325,8 Diamond,,"1 Diamond Helmet ""Takumi""",Unbreaking 3|Protection 4|Condition: Undamaged,"3177,69,4869",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:05.764003,34 Diamond,,"1 Diamond Chestplate ""Takumi""",Unbreaking 3|Protection 4|Condition: Undamaged,"3177,69,4868",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:06.579130,12 Diamond,,"1 Diamond Chestplate ""Takumi""",Unbreaking 3|Thorns 2|Protection 4|Condition: Undamaged,"3177,69,4868",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:07.737287,39 Diamond,,"1 Diamond Boots ""Takumi""",Feather Falling 4|Depth Strider 3|Unbreaking 3|Protection 4|Condition: Undamaged,"3177,69,4868",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:08.481839,8 Diamond,,"1 Diamond Boots ""Takumi""",Unbreaking 3|Protection 4|Condition: Undamaged,"3177,69,4868",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:09.715789,1 Diamond,,2 Ender Pearl,,"3177,69,4867",T,Shiroyama,Defense,SQOpenSpellBook
-2025-11-09T18:30:11.838729,12 Diamond,,1 Netherite Upgrade,,"3177,69,4867",T,Shiroyama,Defense,SQOpenSpellBook
-2025-11-09T18:30:24.765284,40 Diamond,,1 Netherite Helmet,,"3178,69,4865",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:25.900639,2 Diamond,,1 Diamond Helmet,,"3178,69,4865",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:27.151622,64 Diamond,,1 Netherite Chestplate,,"3179,69,4865",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:28.209490,3 Diamond,,1 Diamond Chestplate,,"3179,69,4865",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:29.500751,50 Diamond,,1 Netherite Leggings,,"3180,69,4865",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:30.560788,3 Diamond,,1 Diamond Leggings,,"3180,69,4865",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:31.718144,32 Diamond,,1 Netherite Boots,,"3181,69,4865",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:32.957138,2 Diamond,,1 Diamond Boots,,"3181,69,4865",T,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
-2025-11-09T18:30:34.309747,1 Diamond,,2 Diamond Shovel,,"3181,69,4865",T,Shiroyama,Armor/Tools,SQOpenSpellBook
-2025-11-09T18:30:35.759086,1 Diamond,,1 Diamond Pickaxe,,"3180,69,4865",F,Shiroyama,Armor/Tools,SQOpenSpellBook
-2025-11-09T18:30:37.385286,1 Diamond,,2 Diamond Axe,,"3179,69,4865",T,Shiroyama,Armor/Tools,SQOpenSpellBook
-2025-11-09T18:30:38.812869,1 Diamond,,1 Diamond Sword,,"3178,69,4865",T,Shiroyama,Armor/Tools,SQOpenSpellBook
-2025-11-09T18:30:43.373258,19 Iron Ingot,,64 Crimson Stem,,"3196,70,4868",T,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
-2025-11-09T18:30:44.631950,20 Iron Ingot,,64 Warped Stem,,"3197,70,4868",T,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
-2025-11-09T18:30:46.140695,4 Diamond,,64 Glowstone,,"3198,70,4868",T,Shiroyama,Blocks,Call_Me_M1ke
-2025-11-09T18:30:47.256454,9 Diamond,,64 Gilded Blackstone,,"3199,70,4868",T,Shiroyama,"Blocks, Defense",Call_Me_M1ke
-2025-11-09T18:30:50.160966,1 Diamond,,3 Nether Quartz,Compacted Item,"3200,70,4871",T,Shiroyama,Raw Materials,Call_Me_M1ke
-2025-11-09T18:30:51.420496,1 Diamond,,16 Shroomlight,,"3200,70,4872",T,Shiroyama,Blocks,Call_Me_M1ke
-2025-11-09T18:30:52.845664,6 Iron Ingot,,64 Oak Log,,"3199,70,4873",T,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
-2025-11-09T18:30:53.923447,5 Iron Ingot,,64 Spruce Log,,"3198,70,4873",T,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
-2025-11-09T18:30:55.009174,10 Iron Ingot,,64 Pale Oak Log,,"3197,70,4873",T,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
-2025-11-09T18:30:56.232771,7 Iron Ingot,,64 Dark Oak Log,,"3196,70,4873",T,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
-2025-11-09T18:31:06.474758,1 Diamond,,1 Long Regeneration,Potion Name: Long Regeneration,"3195,70,4860",T,Shiroyama,Food/Pots,Dragran
-2025-11-09T18:31:08.251165,1 Diamond,,1 Long Water Breathing,Potion Name: Long Water Breathing,"3197,70,4860",T,Shiroyama,Food/Pots,Dragran
-2025-11-09T18:31:10.481022,1 Diamond,,1 Long Fire Resistance,Compacted Item|Potion Name: Long Fire Resistance,"3200,70,4858",T,Shiroyama,Food/Pots,Dragran
-2025-11-09T18:31:13.972266,1 Diamond,,1 Long Swiftness,Compacted Item|Potion Name: Long Swiftness,"3200,70,4861",T,Shiroyama,Food/Pots,Dragran
-2025-11-09T18:31:19.980273,1 Diamond,,3 Potion,,"3198,70,4861",T,Shiroyama,Food/Pots,Dragran
-2025-11-09T18:31:21.483754,2 Diamond,,1 Strong Healing,Compacted Item|Potion Name: Strong Healing,"3197,70,4861",T,Shiroyama,Food/Pots,Dragran
-2025-11-09T18:31:23.392733,2 Diamond,,1 Long Strength,Compacted Item|Potion Name: Long Strength,"3195,70,4861",T,Shiroyama,Food/Pots,Dragran
-2025-11-09T18:31:32.629006,3 Iron Ingot,,1 Nara Shield,Condition: Undamaged|Never repaired,"3183,70,4854",T,Shiroyama,Food/Pots,_BaniShed
-2025-11-09T18:31:35.175806,10 Iron Ingot,,1 Sculk Orb Banner,,"3180,70,4854",T,Shiroyama,Blocks,_BaniShed
-2025-11-09T18:31:38.757414,3 Iron Ingot,,1 Apollan Guard Banner,,"3179,70,4848",T,Shiroyama,Blocks,_BaniShed
-2025-11-09T18:31:39.898395,3 Iron Ingot,,1 Whiskian Banner,,"3180,70,4848",T,Shiroyama,Blocks,_BaniShed
-2025-11-09T18:31:41.710056,1 Iron Ingot,,2 Nara Banner,,"3183,70,4848",T,Shiroyama,Blocks,_BaniShed
-2025-11-09T18:33:07.002818,1 Diamond,,42-62 Crimson Stem,Floating Exchange,"3168,77,4814",F,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
-2025-11-09T18:34:07.486214,1 Diamond,,42-62 Warped Stem,Floating Exchange,"3176,77,4814",T,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
-2025-11-09T18:34:11.890559,2-64 Iron Ingot,,6-64 Acacia Log,Floating Exchange,"3181,77,4817",T,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
-2025-11-09T18:34:15.519703,1-64 Iron Ingot,,1-6 Oak Log,Floating Exchange,"3173,77,4817",T,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
-2025-11-09T18:34:20.435143,2-7 Iron Ingot,,64 Dark Oak Log,Floating Exchange,"3168,77,4820",T,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
-2025-11-09T18:34:24.326142,2-7 Iron Ingot,,64 Jungle Log,Floating Exchange,"3176,77,4820",T,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
-2025-11-09T18:34:27.927053,2-7 Iron Ingot,,64 Birch Log,Floating Exchange,"3181,77,4823",T,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
-2025-11-09T18:34:33.332772,2-7 Iron Ingot,,64 Spruce Log,Floating Exchange,"3173,77,4823",T,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
-2025-11-09T18:34:40.482904,2 Diamond,,7-21 Iron Ingot,Floating Exchange,"3166,70,4819",T,Shiroyama,Raw Materials,SuperShotGriff
-2025-11-09T18:34:40.482904,2 Diamond,,6-21 Emerald,Floating Exchange,"3166,70,4819",T,Shiroyama,Raw Materials,SuperShotGriff
-2025-11-09T18:34:58.464580,3-17 Diamond,,2 Ancient Debris,Floating Exchange,"3166,57,4819",T,Shiroyama,Raw Materials,SuperShotGriff
-2025-11-09T18:35:03.887572,4 Diamond,,"6-20 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls|Floating Exchange,"3180,57,4817",T,Shiroyama,Raw Materials,SuperShotGriff
-2025-11-09T18:35:12.500327,1 Diamond,,12-60 Block of Copper,Floating Exchange,"3166,44,4819",T,Shiroyama,Raw Materials,SuperShotGriff
-2025-11-09T18:35:22.538914,1 Diamond,,16-64 Block of Redstone-Gold,Floating Exchange,"3180,44,4817",T,Shiroyama,Raw Materials,SuperShotGriff
-2025-11-09T18:35:40.594813,5 Block of Raw Gold,,68-74 Gold Ingot,Floating Exchange,"3166,31,4817",T,Shiroyama,Raw Materials,SuperShotGriff
-2025-11-09T18:35:44.425262,5 Block of Raw Iron,,67-73 Iron Ingot,Floating Exchange,"3174,31,4817",T,Shiroyama,Raw Materials,SuperShotGriff
-2025-11-09T18:36:09.155249,5 Diamond,,12-18 Gravel,Compacted Item|Floating Exchange,"3166,18,4819",T,Shiroyama,Blocks,SuperShotGriff
-2025-11-09T18:36:14.369670,5 Diamond,,12-18 Sand,Compacted Item|Floating Exchange,"3174,18,4819",T,Shiroyama,Blocks,SuperShotGriff
-2025-11-09T18:36:18.646842,2 Diamond,,12-18 Dirt,Compacted Item|Floating Exchange,"3180,18,4817",T,Shiroyama,Blocks,SuperShotGriff
-2025-11-09T18:37:21.184943,2 Diamond,,2-21 Block of Gold,Floating Exchange,"3322,2,5034",T,Shiroyama,Raw Materials,ArkenX
-2025-11-09T18:37:35.146755,2 Diamond,,2-21 Gilded Blackstone,Floating Exchange,"3331,2,5022",T,Shiroyama,"Blocks, Defense",ArkenX
-2025-11-09T18:37:48.974022,2 Diamond,,6-30 Iron Ingot,Floating Exchange,"3323,-50,5033",T,Shiroyama,Raw Materials,ArkenX
-2025-11-09T18:37:48.974022,2 Diamond,,2-26 Emerald,Floating Exchange,"3323,-50,5033",T,Shiroyama,Raw Materials,ArkenX
-2025-11-09T19:09:32.009465,"11 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,4 Diamond,,"3186,69,4873",T,Shiroyama,Raw Materials,SQOpenSpellBook
-2025-11-09T19:09:33.063787,"30 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,12 Diamond,,"3186,69,4873",T,Shiroyama,Raw Materials,SQOpenSpellBook
-2025-11-09T19:11:36.544456,1 Diamond,,64 Chest,Crate,"3219,71,4886",T,Shiroyama,Raw Materials,JeyHey
-2025-11-09T19:11:37.865810,1 Diamond,,2 Bone,Compacted Item,"3219,71,4886",T,Shiroyama,Mob Drops,JeyHey
-2025-11-09T19:11:39.460166,1 Diamond,,4 Glow Ink Sac,,"3219,71,4886",T,Shiroyama,Mob Drops,JeyHey
-2026-01-09T17:09:44.159758,1 Diamond,,1 Honeycomb,Compacted Item,"3193,70,4821",True,Shiroyama,Raw Materials,HPLaptop
-2026-01-09T17:09:46.777039,8 Diamond,,1 Honey Block,Compacted Item,"3196,70,4821",True,Shiroyama,"Blocks, Defense",HPLaptop
-2026-01-09T17:09:48.350809,4 Diamond,,64 Honeycomb Block,,"3197,70,4822",True,Shiroyama,"Blocks, Defense",HPLaptop
-2026-01-09T17:09:50.201971,4 Diamond,,64 Beehive,,"3197,70,4825",True,Shiroyama,Blocks,HPLaptop
-2026-01-09T17:09:54.078432,1 Diamond,,3 Black Wool,Compacted Item,"3195,71,4838",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:09:55.841601,1 Diamond,,3 Gray Wool,Compacted Item,"3195,71,4840",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:09:57.332650,1 Diamond,,3 Light Gray Wool,Compacted Item,"3195,71,4841",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:09:58.744738,1 Diamond,,3 Brown Wool,Compacted Item,"3195,71,4843",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:00.125551,1 Diamond,,3 Pink Wool,Compacted Item,"3195,71,4844",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:01.449147,1 Diamond,,3 Magenta Wool,Compacted Item,"3195,71,4845",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:06.086890,1 Diamond,,3 Blue Wool,Compacted Item,"3199,71,4841",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:07.555896,1 Diamond,,3 Light Blue Wool,Compacted Item,"3200,71,4841",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:12.999357,1 Diamond,,3 Purple Wool,Compacted Item,"3198,71,4841",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:15.105607,1 Diamond,,3 Cyan Wool,Compacted Item,"3201,71,4841",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:16.613539,1 Diamond,,3 Green Wool,Compacted Item,"3202,71,4840",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:17.975555,1 Diamond,,3 Lime Wool,Compacted Item,"3202,71,4839",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:19.364901,1 Diamond,,3 Yellow Wool,Compacted Item,"3202,71,4838",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:20.768830,1 Diamond,,3 Orange Wool,Compacted Item,"3202,71,4837",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:22.067671,1 Diamond,,3 Red Wool,Compacted Item,"3202,71,4836",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:27.236596,1 Diamond,,3 White Wool,Compacted Item,"3198,75,4840",True,Shiroyama,Blocks,mTfUJi
-2026-01-09T17:10:53.559068,64 Dirt,,4 Iron Ingot,,"3207,69,4835",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:10:54.761594,256 Dirt,,18 Iron Ingot,,"3207,69,4835",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:10:56.230370,64 Sand,,4 Iron Ingot,,"3207,69,4836",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:10:57.142759,256 Sand,,18 Iron Ingot,,"3207,69,4836",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:10:58.343865,256 Spruce Log,,1 Diamond,,"3207,69,4837",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:10:59.259368,256 Cherry Log,,1 Diamond,,"3207,69,4837",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:00.543785,128 Glowstone Dust,,1 Diamond,,"3207,69,4838",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:01.402169,32 Glowstone,,1 Diamond,,"3207,69,4838",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:02.692095,1 Ancient Debris,,2 Diamond,,"3207,69,4839",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:03.562525,4 Ancient Debris,,10 Diamond,,"3207,69,4839",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:04.581812,16 Ancient Debris,,45 Diamond,,"3207,69,4839",False,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:08.085379,64 Glowstone,,3 Diamond,,"3207,69,4838",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:10.238929,19 Iron Ingot,,2 Diamond,,"3207,69,4840",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:11.221386,2 Diamond,,15 Iron Ingot,,"3207,69,4840",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:12.659267,32 Deepslate Iron Ore,,3 Diamond,,"3207,69,4841",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:13.770512,64 Deepslate Iron Ore,,7 Diamond,,"3207,69,4841",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:17.353949,128 Deepslate Lapis Lazuli Ore,,1 Diamond,,"3207,69,4842",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:18.288930,64 Deepslate Lapis Lazuli Ore,,3 Iron Ingot,,"3207,69,4842",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:19.259052,128 Deepslate Lapis Lazuli Ore,,6 Iron Ingot,,"3207,69,4842",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:20.687524,16 Deepslate Redstone Ore,,1 Diamond,,"3207,69,4843",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:21.666070,64 Deepslate Redstone Ore,,5 Diamond,,"3207,69,4843",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:22.598091,16 Deepslate Redstone Ore,,7 Iron Ingot,,"3207,69,4843",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:23.770861,32 Deepslate Copper Ore,,1 Iron Ingot,,"3207,69,4844",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:24.675975,64 Deepslate Copper Ore,,3 Iron Ingot,,"3207,69,4844",True,Shiroyama,Raw Materials,IAmDoktah
-2026-01-09T17:11:33.577357,2 Diamond,,16 Item Frame,,"3213,69,4840",True,Shiroyama,Other,IAmDoktah
-2026-01-09T17:11:41.609821,42 Diamond,,"1 Bundle ""Map Art""",,"3215,69,4836",True,Shiroyama,Other,IAmDoktah
-2026-01-09T17:12:42.912734,4 Iron Ingot,,"1 Bundle ""Map Art""",,"3110,70,4900",True,Shiroyama,Food/Pots,chriiistiiina
-2026-01-09T17:12:51.003170,1 Diamond,,15 Iron Ingot,,"3115,70,4900",False,Shiroyama,Food/Pots,chriiistiiina
-2026-01-09T17:12:55.629389,2 Iron Ingot,,1 Bundle,,"3112,70,4891",True,Shiroyama,Food/Pots,chriiistiiina
-2026-01-09T17:13:00.323464,3 Iron Nugget,,1 Mushroom Stew,,"3114,71,4894",True,Shiroyama,Food/Pots,chriiistiiina
-2026-01-09T17:13:02.495439,6 Iron Nugget,,1 Cake,,"3114,70,4897",True,Shiroyama,Food/Pots,chriiistiiina
-2026-01-09T17:13:36.742463,16 Diamond,,1 Map,Copy protected by hokeypokeyty,"3149,72,4792",True,Shiroyama,Other,hokeypokeyty
-2026-01-09T17:16:07.186228,10 Iron Ingot,,1 Bundle,,"3350,62,5082",True,Shiroyama,"Other, Armor/Tools",HPLaptop
-2026-01-09T17:16:59.823800,4 Iron Ingot,,64 Pale Oak Log,,"3428,68,4988",False,Shiroyama,Blocks,ArkenX
-2026-01-09T17:17:00.820438,1 Diamond,,128 Pale Oak Log,,"3428,68,4988",False,Shiroyama,Blocks,ArkenX
-2026-01-09T17:17:05.768023,5 Diamond,,1 Diamond Helmet,Unbreaking 3|Protection 4|Condition: Undamaged|Repair level 3,"3428,68,4984",False,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:07.240293,5 Diamond,,1 Diamond Chestplate,Thorns 2|Unbreaking 3|Protection 4|Condition: Undamaged|Never repaired,"3428,68,4984",False,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:08.106289,13 Diamond,,1 Diamond Leggings,Unbreaking 3|Protection 4|Condition: Undamaged|Repair level 3,"3428,68,4984",False,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:09.045510,5 Diamond,,1 Diamond Boots,Unbreaking 3|Protection 4|Condition: Undamaged|Repair level 3,"3428,68,4984",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:11.455094,12 Iron Ingot,,3 Diamond Shovel,Condition: Undamaged|Never repaired,"3432,68,4982",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:12.560240,2 Diamond,,5 Diamond Shovel,Condition: Undamaged|Never repaired,"3432,68,4982",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:13.848619,12 Iron Ingot,,2 Diamond Axe,Condition: Undamaged|Never repaired,"3432,68,4983",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:14.715771,3 Diamond,,5 Diamond Axe,Condition: Undamaged|Never repaired,"3432,68,4983",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:15.869507,12 Iron Ingot,,1 Diamond Pickaxe,Condition: Undamaged|Never repaired,"3432,68,4984",False,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:20.219472,4 Diamond,,1 Diamond Pickaxe,Unbreaking 3|Efficiency 4|Condition: Undamaged|Never repaired,"3432,68,4986",False,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:21.475581,2 Iron Ingot,,8 Block of Resin,,"3432,68,4987",True,Shiroyama,Blocks,ArkenX
-2026-01-09T17:17:22.396502,1 Diamond,,32 Block of Resin,,"3432,68,4987",True,Shiroyama,Blocks,ArkenX
-2026-01-09T17:17:23.521088,1 Iron Ingot,,8 Open Eyeblossom,,"3432,68,4988",True,Shiroyama,Other,ArkenX
-2026-01-09T17:17:28.612873,2 Diamond,,1 Diamond Helmet,Condition: Undamaged|Never repaired,"3428,68,4980",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:29.540040,9 Diamond,,5 Diamond Helmet,Condition: Undamaged|Never repaired,"3428,68,4980",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:30.695094,3 Diamond,,1 Diamond Chestplate,Condition: Undamaged|Never repaired,"3428,68,4979",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:31.559637,14 Diamond,,5 Diamond Chestplate,Condition: Undamaged|Never repaired,"3428,68,4979",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:32.704551,3 Diamond,,1 Diamond Leggings,Condition: Undamaged|Never repaired,"3428,68,4978",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:33.455610,12 Diamond,,5 Diamond Leggings,Condition: Undamaged|Never repaired,"3428,68,4978",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:34.388285,2 Diamond,,1 Diamond Boots,Condition: Undamaged|Never repaired,"3428,68,4977",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:17:35.289300,7 Diamond,,5 Diamond Boots,Condition: Undamaged|Never repaired,"3428,68,4977",True,Shiroyama,"Defense, Armor/Tools",ArkenX
-2026-01-09T17:18:35.601108,1 Diamond,,128 Sand,,"3449,71,4844",True,Shiroyama,"Raw Materials, Blocks",grimvillager128
-2026-01-09T17:18:36.431573,10 Iron Ingot,,128 Sand,,"3449,71,4844",True,Shiroyama,"Raw Materials, Blocks",grimvillager128
-2026-01-09T17:18:41.898714,1 Iron Ingot,,"1 Dec 24, 2024",Author: Seldomsh0ck|Generation: COPY_OF_ORIGINAL,"3449,71,4839",False,Shiroyama,Other,Seldomsh0ck
-2026-01-09T17:18:43.802396,1 Iron Ingot,,"1 Dec 1, 2024",Author: Seldomsh0ck|Generation: COPY_OF_ORIGINAL,"3449,71,4838",False,Shiroyama,Other,Seldomsh0ck
-
+2025-11-09T18:31:32.629006,3 Iron Ingot,,1 Nara Shield,Condition: Undamaged|Never repaired,"3183,70,4854",FALSE,Shiroyama,Food/Pots,_BaniShed
+2025-11-09T18:31:35.175806,10 Iron Ingot,,1 Sculk Orb Banner,,"3180,70,4854",FALSE,Shiroyama,Blocks,_BaniShed
+2025-11-09T18:31:38.757414,3 Iron Ingot,,1 Apollan Guard Banner,,"3179,70,4848",FALSE,Shiroyama,Blocks,_BaniShed
+2025-11-09T18:31:39.898395,3 Iron Ingot,,1 Whiskian Banner,,"3180,70,4848",FALSE,Shiroyama,Blocks,_BaniShed
+2025-11-09T18:31:41.710056,1 Iron Ingot,,2 Nara Banner,,"3183,70,4848",FALSE,Shiroyama,Blocks,_BaniShed
+2025-11-09T18:37:21.184943,2 Diamond,,2-21 Block of Gold,Floating Exchange,"3322,2,5034",FALSE,Shiroyama,Raw Materials,ArkenX
+2025-11-09T18:37:35.146755,2 Diamond,,2-21 Gilded Blackstone,Floating Exchange,"3331,2,5022",FALSE,Shiroyama,"Blocks, Defense",ArkenX
+2025-11-09T18:37:48.974022,2 Diamond,,6-30 Iron Ingot,Floating Exchange,"3323,-50,5033",FALSE,Shiroyama,Raw Materials,ArkenX
+2025-11-09T18:37:48.974022,2 Diamond,,2-26 Emerald,Floating Exchange,"3323,-50,5033",FALSE,Shiroyama,Raw Materials,ArkenX
+2026-01-09T17:16:59.823800,4 Iron Ingot,,64 Pale Oak Log,,"3428,68,4988",FALSE,Shiroyama,Blocks,ArkenX
+2026-01-09T17:17:00.820438,1 Diamond,,128 Pale Oak Log,,"3428,68,4988",FALSE,Shiroyama,Blocks,ArkenX
+2026-01-09T17:17:05.768023,5 Diamond,,1 Diamond Helmet,Unbreaking 3|Protection 4|Condition: Undamaged|Repair level 3,"3428,68,4984",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:07.240293,5 Diamond,,1 Diamond Chestplate,Thorns 2|Unbreaking 3|Protection 4|Condition: Undamaged|Never repaired,"3428,68,4984",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:08.106289,13 Diamond,,1 Diamond Leggings,Unbreaking 3|Protection 4|Condition: Undamaged|Repair level 3,"3428,68,4984",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:09.045510,5 Diamond,,1 Diamond Boots,Unbreaking 3|Protection 4|Condition: Undamaged|Repair level 3,"3428,68,4984",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:11.455094,12 Iron Ingot,,3 Diamond Shovel,Condition: Undamaged|Never repaired,"3432,68,4982",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:12.560240,2 Diamond,,5 Diamond Shovel,Condition: Undamaged|Never repaired,"3432,68,4982",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:13.848619,12 Iron Ingot,,2 Diamond Axe,Condition: Undamaged|Never repaired,"3432,68,4983",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:14.715771,3 Diamond,,5 Diamond Axe,Condition: Undamaged|Never repaired,"3432,68,4983",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:15.869507,12 Iron Ingot,,1 Diamond Pickaxe,Condition: Undamaged|Never repaired,"3432,68,4984",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:20.219472,4 Diamond,,1 Diamond Pickaxe,Unbreaking 3|Efficiency 4|Condition: Undamaged|Never repaired,"3432,68,4986",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:21.475581,2 Iron Ingot,,8 Block of Resin,,"3432,68,4987",FALSE,Shiroyama,Blocks,ArkenX
+2026-01-09T17:17:22.396502,1 Diamond,,32 Block of Resin,,"3432,68,4987",FALSE,Shiroyama,Blocks,ArkenX
+2026-01-09T17:17:23.521088,1 Iron Ingot,,8 Open Eyeblossom,,"3432,68,4988",FALSE,Shiroyama,Other,ArkenX
+2026-01-09T17:17:28.612873,2 Diamond,,1 Diamond Helmet,Condition: Undamaged|Never repaired,"3428,68,4980",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:29.540040,9 Diamond,,5 Diamond Helmet,Condition: Undamaged|Never repaired,"3428,68,4980",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:30.695094,3 Diamond,,1 Diamond Chestplate,Condition: Undamaged|Never repaired,"3428,68,4979",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:31.559637,14 Diamond,,5 Diamond Chestplate,Condition: Undamaged|Never repaired,"3428,68,4979",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:32.704551,3 Diamond,,1 Diamond Leggings,Condition: Undamaged|Never repaired,"3428,68,4978",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:33.455610,12 Diamond,,5 Diamond Leggings,Condition: Undamaged|Never repaired,"3428,68,4978",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:34.388285,2 Diamond,,1 Diamond Boots,Condition: Undamaged|Never repaired,"3428,68,4977",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-01-09T17:17:35.289300,7 Diamond,,5 Diamond Boots,Condition: Undamaged|Never repaired,"3428,68,4977",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-02-04T18:30:49.628872,10 Iron Ingot,,64 Pale Oak Log,,"3428,68,4988",FALSE,Shiroyama,"Raw Materials, Blocks",ArkenX
+2026-02-04T18:30:50.522284,1 Diamond,,64 Pale Oak Log,,"3428,68,4988",FALSE,Shiroyama,"Raw Materials, Blocks",ArkenX
+2026-02-04T18:30:56.696215,5 Diamond,,1 Diamond Helmet,Protection 4|Unbreaking 3|Condition: Undamaged|Repair level 3,"3428,68,4984",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-02-04T18:30:57.760598,5 Diamond,,1 Diamond Chestplate,Thorns 2|Protection 4|Unbreaking 3|Condition: Undamaged|Never repaired,"3428,68,4984",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-02-04T18:30:58.688916,13 Diamond,,1 Diamond Leggings,Protection 4|Unbreaking 3|Condition: Undamaged|Repair level 3,"3428,68,4984",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-02-04T18:30:59.726229,5 Diamond,,1 Diamond Boots,Protection 4|Unbreaking 3|Condition: Undamaged|Repair level 3,"3428,68,4984",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2026-02-04T18:31:08.521781,4 Diamond,,1 Diamond Pickaxe,Efficiency 4|Unbreaking 3|Condition: Undamaged|Never repaired,"3432,68,4986",FALSE,Shiroyama,"Defense, Armor/Tools",ArkenX
+2025-11-09T18:25:22.511626,16 Raw Iron,,3 Block of Iron,,"3224,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:23.876194,16 Raw Gold,,3 Block of Gold,,"3224,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:24.731587,23 Raw Iron,,39 Iron Ingot,,"3224,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:25.650809,23 Raw Gold,,39 Gold Ingot,,"3224,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:26.699752,37 Raw Iron,,7 Block of Iron,,"3224,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:27.734905,37 Raw Gold,,7 Block of Gold,,"3224,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:28.770461,50 Raw Iron,,86 Iron Ingot,,"3224,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:29.714153,50 Raw Gold,,86 Gold Ingot,,"3224,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:30.889030,5 Nether Gold Ore,,21 Gold Ingot,,"3224,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:31.893127,12 Nether Gold Ore,,51 Gold Ingot,,"3224,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:35.285331,3 Deepslate Diamond Ore,,11 Diamond,,"3223,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:36.213575,3 Diamond Ore,,11 Diamond,,"3223,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:37.112299,7 Deepslate Diamond Ore,,27 Diamond,,"3223,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:38.371957,7 Diamond Ore,,27 Diamond,,"3223,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:39.480502,11 Deepslate Diamond Ore,,41 Diamond,,"3223,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:40.831642,11 Diamond Ore,,41 Diamond,,"3223,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:42.389833,15 Deepslate Diamond Ore,,56 Diamond,,"3223,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:43.495470,15 Diamond Ore,,56 Diamond,,"3223,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:44.454430,50 Deepslate Diamond Ore,,187 Diamond,,"3223,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:25:45.493835,50 Diamond Ore,,187 Diamond,,"3223,68,4840",FALSE,Shiroyama,Raw Materials,BooLTonian
+2025-11-09T18:30:43.373258,19 Iron Ingot,,64 Crimson Stem,,"3196,70,4868",FALSE,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
+2025-11-09T18:30:44.631950,20 Iron Ingot,,64 Warped Stem,,"3197,70,4868",FALSE,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
+2025-11-09T18:30:46.140695,4 Diamond,,64 Glowstone,,"3198,70,4868",FALSE,Shiroyama,Blocks,Call_Me_M1ke
+2025-11-09T18:30:47.256454,9 Diamond,,64 Gilded Blackstone,,"3199,70,4868",FALSE,Shiroyama,"Blocks, Defense",Call_Me_M1ke
+2025-11-09T18:30:50.160966,1 Diamond,,3 Nether Quartz,Compacted Item,"3200,70,4871",FALSE,Shiroyama,Raw Materials,Call_Me_M1ke
+2025-11-09T18:30:51.420496,1 Diamond,,16 Shroomlight,,"3200,70,4872",FALSE,Shiroyama,Blocks,Call_Me_M1ke
+2025-11-09T18:30:52.845664,6 Iron Ingot,,64 Oak Log,,"3199,70,4873",FALSE,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
+2025-11-09T18:30:53.923447,5 Iron Ingot,,64 Spruce Log,,"3198,70,4873",FALSE,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
+2025-11-09T18:30:55.009174,10 Iron Ingot,,64 Pale Oak Log,,"3197,70,4873",FALSE,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
+2025-11-09T18:30:56.232771,7 Iron Ingot,,64 Dark Oak Log,,"3196,70,4873",FALSE,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
+2026-02-04T18:28:30.162866,12 Iron Ingot,,64 Acacia Log,,"3196,70,4873",FALSE,Shiroyama,"Raw Materials, Blocks",Call_Me_M1ke
+2026-01-09T17:12:42.912734,4 Iron Ingot,,"1 Bundle ""Map Art""",,"3110,70,4900",FALSE,Shiroyama,Food/Pots,chriiistiiina
+2026-01-09T17:12:51.003170,1 Diamond,,15 Iron Ingot,,"3115,70,4900",FALSE,Shiroyama,Food/Pots,chriiistiiina
+2026-01-09T17:12:55.629389,2 Iron Ingot,,1 Bundle,,"3112,70,4891",FALSE,Shiroyama,Food/Pots,chriiistiiina
+2026-01-09T17:13:00.323464,3 Iron Nugget,,1 Mushroom Stew,,"3114,71,4894",FALSE,Shiroyama,Food/Pots,chriiistiiina
+2026-01-09T17:13:02.495439,6 Iron Nugget,,1 Cake,,"3114,70,4897",FALSE,Shiroyama,Food/Pots,chriiistiiina
+2025-11-09T18:31:06.474758,1 Diamond,,1 Long Regeneration,Potion Name: Long Regeneration,"3195,70,4860",FALSE,Shiroyama,Food/Pots,Dragran
+2025-11-09T18:31:08.251165,1 Diamond,,1 Long Water Breathing,Potion Name: Long Water Breathing,"3197,70,4860",FALSE,Shiroyama,Food/Pots,Dragran
+2025-11-09T18:31:10.481022,1 Diamond,,1 Long Fire Resistance,Compacted Item|Potion Name: Long Fire Resistance,"3200,70,4858",FALSE,Shiroyama,Food/Pots,Dragran
+2025-11-09T18:31:13.972266,1 Diamond,,1 Long Swiftness,Compacted Item|Potion Name: Long Swiftness,"3200,70,4861",FALSE,Shiroyama,Food/Pots,Dragran
+2025-11-09T18:31:19.980273,1 Diamond,,3 Potion,,"3198,70,4861",FALSE,Shiroyama,Food/Pots,Dragran
+2025-11-09T18:31:21.483754,2 Diamond,,1 Strong Healing,Compacted Item|Potion Name: Strong Healing,"3197,70,4861",FALSE,Shiroyama,Food/Pots,Dragran
+2025-11-09T18:31:23.392733,2 Diamond,,1 Long Strength,Compacted Item|Potion Name: Long Strength,"3195,70,4861",FALSE,Shiroyama,Food/Pots,Dragran
+2025-11-09T18:10:20.023288,16 Iron Ingot,,1 Map,,"3443,71,5067",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:10:31.597664,20 Diamond,,"1 Bucket of Axolotl ""Blue""",,"3437,71,5066",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:10:34.028102,1 Iron Ingot,,"1 Potion ""Mate Tea""",§tA South American favourite|§u|§s⭑⭑⭑⭑⭑,"3438,71,5067",FALSE,Shiroyama,Food/Pots,Earyx
+2025-11-09T18:10:37.069781,2 Diamond,,"1 Map ""Xólotl""",,"3435,72,5067",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:10:41.378412,5 Iron Ingot,,"1 Potion ""Nara Pufferfish Wine""",§tAn acquired taste|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged,"3432,71,5062",FALSE,Shiroyama,Food/Pots,Earyx
+2025-11-09T18:10:43.711881,2 Diamond,,16 Ink Sac,,"3431,71,5062",FALSE,Shiroyama,Mob Drops,Earyx
+2025-11-09T18:10:45.424440,4 Diamond,,64 Ink Sac,,"3431,71,5062",FALSE,Shiroyama,Mob Drops,Earyx
+2025-11-09T18:10:46.656599,2 Diamond,,1 Name Tag,,"3431,71,5062",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:10:48.886296,5 Iron Ingot,,64 Cooked Cod,,"3431,71,5060",FALSE,Shiroyama,Food/Pots,Earyx
+2025-11-09T18:10:50.017939,4 Iron Ingot,,32 Cooked Cod,,"3431,71,5060",FALSE,Shiroyama,Food/Pots,Earyx
+2025-11-09T18:17:50.924270,3 Iron Ingot,,64 Cooked Cod,,"3153,71,4823",FALSE,Shiroyama,Food/Pots,Earyx
+2025-11-09T18:17:51.804980,5 Iron Ingot,,64 Cooked Salmon,,"3153,71,4823",FALSE,Shiroyama,Food/Pots,Earyx
+2025-11-09T18:17:54.248601,1 Diamond,,64 Tropical Fish,,"3153,71,4819",FALSE,Shiroyama,Food/Pots,Earyx
+2025-11-09T18:17:57.898411,2 Diamond,,1 Bucket of Axolotl,,"3153,71,4815",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:17:58.925842,2 Diamond,,1 Bucket of Tropical Fish,,"3153,71,4815",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:18:00.764555,2 Diamond,,1 Nautilus Shell,,"3154,71,4815",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:18:01.764134,4 Diamond,,64 Ink Sac,,"3154,71,4815",FALSE,Shiroyama,Mob Drops,Earyx
+2025-11-09T18:18:02.940444,2 Diamond,,16 Ink Sac,,"3154,71,4815",FALSE,Shiroyama,Mob Drops,Earyx
+2025-11-09T18:18:05.870093,2 Diamond,,1 Name Tag,,"3154,71,4822",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:18:07.027631,3 Iron Ingot,,1 Saddle,,"3154,71,4822",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:18:11.927440,15 Iron Ingot,,1 Black Banner,,"3155,76,4814",FALSE,Shiroyama,Mob Drops,Earyx
+2025-11-09T18:18:13.610368,15 Iron Ingot,,1 Yellow Banner,,"3155,76,4814",FALSE,Shiroyama,Mob Drops,Earyx
+2025-11-09T18:18:19.576688,15 Iron Ingot,,1 Lime Banner,,"3153,76,4814",FALSE,Shiroyama,Mob Drops,Earyx
+2025-11-09T18:18:23.297320,5 Iron Ingot,,1 Earyx Memories I,Author: Earyx|Generation: COPY_OF_COPY,"3155,76,4823",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:18:24.890979,2 Iron Ingot,,64 Paper,,"3155,76,4823",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:18:26.312315,1 Iron Ingot,,10 Leather,,"3155,76,4823",FALSE,Shiroyama,Mob Drops,Earyx
+2025-11-09T18:18:28.262830,4 Iron Ingot,,1 Book and Quill,,"3153,76,4823",FALSE,Shiroyama,Other,Earyx
+2025-11-09T18:18:29.642263,1 Iron Ingot,,5 Bookshelf,,"3153,76,4823",FALSE,Shiroyama,Blocks,Earyx
+2025-11-09T17:51:35.636274,1 Diamond,,4 Ice,Compacted Item,"3219,71,4889",FALSE,Shiroyama,"Blocks, Defense",Gaperzo
+2026-01-09T17:18:35.601108,1 Diamond,,128 Sand,,"3449,71,4844",FALSE,Shiroyama,"Raw Materials, Blocks",grimvillager128
+2026-01-09T17:18:36.431573,10 Iron Ingot,,128 Sand,,"3449,71,4844",FALSE,Shiroyama,"Raw Materials, Blocks",grimvillager128
+2026-01-09T17:13:36.742463,16 Diamond,,1 Map,Copy protected by hokeypokeyty,"3149,72,4792",FALSE,Shiroyama,Other,hokeypokeyty
+2025-10-29T18:47:58.825173,9 Diamond,,1 Beacon,,"3202,69,4822",FALSE,Shiroyama,"Defense, Infra",HPLaptop
+2025-10-29T18:48:00.831780,3 Diamond,,1 Diamond Helmet,Condition: Undamaged|Never repaired,"3203,69,4820",FALSE,Shiroyama,"Defense, Armor/Tools",HPLaptop
+2025-10-29T18:48:01.931769,6 Diamond,,1 Diamond Chestplate,Condition: Undamaged|Never repaired,"3204,69,4820",FALSE,Shiroyama,"Defense, Armor/Tools",HPLaptop
+2025-10-29T18:48:03.175419,4 Diamond,,1 Diamond Leggings,Condition: Undamaged|Never repaired,"3205,69,4820",FALSE,Shiroyama,"Defense, Armor/Tools",HPLaptop
+2025-10-29T18:48:04.454116,2 Diamond,,1 Diamond Boots,Condition: Undamaged|Never repaired,"3206,69,4820",FALSE,Shiroyama,"Defense, Armor/Tools",HPLaptop
+2026-02-04T18:40:35.179170,9 Diamond,,1 Beacon,,"3326,69,5036",TRUE,Shiroyama,"Blocks, Defense",HPLaptop
+2026-02-04T18:40:36.599427,2 Diamond,,4 Coal,Compacted Item,"3327,69,5036",FALSE,Shiroyama,Raw Materials,HPLaptop
+2025-11-09T18:20:58.388099,10 Iron Ingot,,1 Bucket of Axolotl,,"3198,71,4816",FALSE,Shiroyama,Other,HPLaptop
+2025-11-09T18:20:59.535004,10 Iron Ingot,,1 Bucket of Tropical Fish,,"3198,71,4816",FALSE,Shiroyama,Other,HPLaptop
+2025-11-09T18:21:00.908170,2 Iron Ingot,,1 Saddle,,"3198,71,4815",FALSE,Shiroyama,Other,HPLaptop
+2025-11-09T18:21:02.421810,10 Diamond,,1 Name Tag,,"3198,71,4814",FALSE,Shiroyama,Other,HPLaptop
+2025-11-09T18:21:04.213671,48 Raw Iron,,70 Iron Ingot,,"3198,71,4811",FALSE,Shiroyama,Raw Materials,HPLaptop
+2025-11-09T18:21:41.404874,4 Iron Ingot,,"1 Potion ""Nara no Uisuki""","§tFrom distant shores to the Eas, eh South..|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled|§yBarrel aged","3196,72,4788",FALSE,Shiroyama,Food/Pots,HPLaptop
+2025-11-09T18:21:42.706795,4 Iron Ingot,,"1 Potion ""Shiroyama Sake""",§tTaste of the Sakura trees|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged,"3196,72,4785",FALSE,Shiroyama,Food/Pots,HPLaptop
+2025-11-09T18:21:46.127427,3 Iron Ingot,,"1 Potion ""Fine Wheatbeer""","§tFinally, a good use for all that wheat!|§u|§s[⭑⭑⭑⭑⭑]","3195,72,4783",FALSE,Shiroyama,Food/Pots,HPLaptop
+2025-11-09T18:27:32.690683,1 Iron Ingot,,1 Oak Boat,,"3327,65,4732",FALSE,Shiroyama,Other,HPLaptop
+2025-11-09T18:27:42.785507,1 Iron Ingot,,"1 Potion ""Delightful Tonkatsu Ramen""",§tPride of Japan|§u|§s⭑⭑⭑⭑⭑,"3323,73,4719",FALSE,Shiroyama,Food/Pots,HPLaptop
+2026-01-09T17:09:44.159758,1 Diamond,,1 Honeycomb,Compacted Item,"3193,70,4821",FALSE,Shiroyama,Raw Materials,HPLaptop
+2026-01-09T17:09:46.777039,8 Diamond,,1 Honey Block,Compacted Item,"3196,70,4821",FALSE,Shiroyama,"Blocks, Defense",HPLaptop
+2026-01-09T17:09:48.350809,4 Diamond,,64 Honeycomb Block,,"3197,70,4822",FALSE,Shiroyama,"Blocks, Defense",HPLaptop
+2026-01-09T17:09:50.201971,4 Diamond,,64 Beehive,,"3197,70,4825",FALSE,Shiroyama,Blocks,HPLaptop
+2026-01-09T17:16:07.186228,10 Iron Ingot,,1 Bundle,,"3350,62,5082",FALSE,Shiroyama,"Other, Armor/Tools",HPLaptop
+2026-01-09T17:10:53.559068,64 Dirt,,4 Iron Ingot,,"3207,69,4835",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:10:54.761594,256 Dirt,,18 Iron Ingot,,"3207,69,4835",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:10:56.230370,64 Sand,,4 Iron Ingot,,"3207,69,4836",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:10:57.142759,256 Sand,,18 Iron Ingot,,"3207,69,4836",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:10:58.343865,256 Spruce Log,,1 Diamond,,"3207,69,4837",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:10:59.259368,256 Cherry Log,,1 Diamond,,"3207,69,4837",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:00.543785,128 Glowstone Dust,,1 Diamond,,"3207,69,4838",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:01.402169,32 Glowstone,,1 Diamond,,"3207,69,4838",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:02.692095,1 Ancient Debris,,2 Diamond,,"3207,69,4839",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:03.562525,4 Ancient Debris,,10 Diamond,,"3207,69,4839",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:04.581812,16 Ancient Debris,,45 Diamond,,"3207,69,4839",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:08.085379,64 Glowstone,,3 Diamond,,"3207,69,4838",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:10.238929,19 Iron Ingot,,2 Diamond,,"3207,69,4840",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:11.221386,2 Diamond,,15 Iron Ingot,,"3207,69,4840",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:12.659267,32 Deepslate Iron Ore,,3 Diamond,,"3207,69,4841",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:13.770512,64 Deepslate Iron Ore,,7 Diamond,,"3207,69,4841",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:17.353949,128 Deepslate Lapis Lazuli Ore,,1 Diamond,,"3207,69,4842",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:18.288930,64 Deepslate Lapis Lazuli Ore,,3 Iron Ingot,,"3207,69,4842",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:19.259052,128 Deepslate Lapis Lazuli Ore,,6 Iron Ingot,,"3207,69,4842",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:20.687524,16 Deepslate Redstone Ore,,1 Diamond,,"3207,69,4843",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:21.666070,64 Deepslate Redstone Ore,,5 Diamond,,"3207,69,4843",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:22.598091,16 Deepslate Redstone Ore,,7 Iron Ingot,,"3207,69,4843",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:23.770861,32 Deepslate Copper Ore,,1 Iron Ingot,,"3207,69,4844",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:24.675975,64 Deepslate Copper Ore,,3 Iron Ingot,,"3207,69,4844",FALSE,Shiroyama,Raw Materials,IAmDoktah
+2026-01-09T17:11:33.577357,2 Diamond,,16 Item Frame,,"3213,69,4840",FALSE,Shiroyama,Other,IAmDoktah
+2026-01-09T17:11:41.609821,42 Diamond,,"1 Bundle ""Map Art""",,"3215,69,4836",FALSE,Shiroyama,Other,IAmDoktah
+2025-11-09T17:51:21.689404,"1 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,1 Red Banner,,"3224,71,4888",FALSE,Shiroyama,Blocks,JeyHey
+2025-11-09T17:51:29.927130,1 Diamond,,60 Gunpowder,,"3223,71,4888",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:51:32.064261,1 Diamond,,3 Block of Quartz,Compacted Item,"3222,71,4888",FALSE,Shiroyama,Blocks,JeyHey
+2025-11-09T17:51:33.431409,1 Diamond,,64 Slimeball,,"3221,71,4888",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:51:37.366831,1 Diamond,,3 Leather,Compacted Item,"3219,71,4888",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:51:39.291175,1 Diamond,,3 String,Compacted Item,"3219,71,4887",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:52:04.546464,1 Diamond,,12 Ink Sac,,"3223,71,4887",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:52:05.895774,4 Diamond,,64 Ink Sac,,"3223,71,4887",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:52:08.361980,1 Diamond,,64 Golden Carrot,,"3226,71,4886",FALSE,Shiroyama,"Food/Pots, Mob Drops",JeyHey
+2025-11-09T17:52:10.884944,1 Diamond,,2 Cooked Porkchop,Compacted Item,"3227,71,4888",FALSE,Shiroyama,"Food/Pots, Mob Drops",JeyHey
+2025-11-09T17:52:12.205072,25 Diamond,,64 Cooked Porkchop,Compacted Item,"3227,71,4888",FALSE,Shiroyama,"Food/Pots, Mob Drops",JeyHey
+2025-11-09T17:52:17.562159,2 Diamond,,1 Ender Pearl,,"3218,77,4888",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:52:18.739697,7 Diamond,,16 Ender Pearl,,"3218,77,4888",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:52:20.398719,1 Diamond,,2 Ghast Tear,,"3219,77,4888",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:52:21.868473,1 Diamond,,2 Rotten Flesh,Compacted Item,"3220,77,4888",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:52:23.950300,"1 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,192 Arrow,,"3221,77,4888",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:52:25.832514,1 Diamond,,32 Crying Obsidian,,"3222,77,4888",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T17:52:27.584227,1 Diamond,,3 Blackstone,Compacted Item,"3223,77,4888",FALSE,Shiroyama,Blocks,JeyHey
+2025-11-09T17:52:57.075490,4 Diamond,,1 Dried Ghast,,"3224,77,4888",FALSE,Shiroyama,Blocks,JeyHey
+2025-11-09T17:59:58.301172,20 Diamond,,64 Blackstone,Compacted Item,"3223,77,4888",FALSE,Shiroyama,Blocks,JeyHey
+2025-11-09T18:00:08.989079,1 Iron Ingot,,64 Leather,,"3221,71,4872",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T18:00:11.459025,1 Diamond,,128 Cooked Porkchop,,"3224,71,4869",FALSE,Shiroyama,"Food/Pots, Mob Drops",JeyHey
+2025-11-09T18:15:13.416336,1 Diamond,,8 Slimeball,,"3144,67,4916",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T18:15:15.426833,2 Diamond,,64 Bone,,"3145,67,4917",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T18:15:17.434149,2 Diamond,,64 Rotten Flesh,,"3143,67,4919",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T18:15:19.549107,5 Diamond,,64 Gunpowder,,"3140,67,4915",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T18:15:21.169596,2 Diamond,,1 Block of Emerald,,"3141,67,4915",FALSE,Shiroyama,Raw Materials,JeyHey
+2025-11-09T18:15:24.582761,45 Diamond,,"1 Bow ""Federalist""",Power 5|Punch 2|Flame 1|Unbreaking 3|Infinity 1|Condition: Undamaged,"3142,66,4916",FALSE,Shiroyama,Food/Pots,JeyHey
+2025-11-09T19:11:36.544456,1 Diamond,,64 Chest,Crate,"3219,71,4886",FALSE,Shiroyama,Raw Materials,JeyHey
+2025-11-09T19:11:37.865810,1 Diamond,,2 Bone,Compacted Item,"3219,71,4886",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T19:11:39.460166,1 Diamond,,4 Glow Ink Sac,,"3219,71,4886",FALSE,Shiroyama,Mob Drops,JeyHey
+2026-02-04T18:29:16.996029,5 Diamond,,5 Gunpowder,Compacted Item,"3223,71,4888",FALSE,Shiroyama,Mob Drops,JeyHey
+2026-02-04T18:29:21.759890,10 Diamond,,64 Ice,Compacted Item,"3219,71,4889",FALSE,Shiroyama,Mob Drops,JeyHey
+2026-02-04T18:29:24.589833,20 Diamond,,64 String,Compacted Item,"3219,71,4887",FALSE,Shiroyama,Mob Drops,JeyHey
+2026-02-04T18:29:29.432734,1 Diamond,,2 Glow Ink Sac,,"3220,71,4887",FALSE,Shiroyama,Mob Drops,JeyHey
+2026-02-04T18:29:33.264216,30 Diamond,,64 Glow Ink Sac,,"3219,71,4886",FALSE,Shiroyama,Mob Drops,JeyHey
+2025-11-09T18:19:07.006701,1 Diamond,,1 Pearlescent Froglight,Compacted Item,"3174,71,4837",FALSE,Shiroyama,Other,meenos
+2025-11-09T18:19:08.675031,30 Diamond,,1 Creeper Charge Banner Pattern,,"3174,71,4838",FALSE,Shiroyama,Other,meenos
+2025-11-09T18:19:10.083913,4 Diamond,,64 Stone,Compacted Item,"3174,71,4839",FALSE,Shiroyama,"Blocks, Defense",meenos
+2025-11-09T18:19:14.931811,1 Diamond,,64 Pointed Dripstone,,"3173,71,4840",FALSE,Shiroyama,"Blocks, Defense",meenos
+2026-01-09T17:09:54.078432,1 Diamond,,3 Black Wool,Compacted Item,"3195,71,4838",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:09:55.841601,1 Diamond,,3 Gray Wool,Compacted Item,"3195,71,4840",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:09:57.332650,1 Diamond,,3 Light Gray Wool,Compacted Item,"3195,71,4841",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:09:58.744738,1 Diamond,,3 Brown Wool,Compacted Item,"3195,71,4843",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:00.125551,1 Diamond,,3 Pink Wool,Compacted Item,"3195,71,4844",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:01.449147,1 Diamond,,3 Magenta Wool,Compacted Item,"3195,71,4845",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:06.086890,1 Diamond,,3 Blue Wool,Compacted Item,"3199,71,4841",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:07.555896,1 Diamond,,3 Light Blue Wool,Compacted Item,"3200,71,4841",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:12.999357,1 Diamond,,3 Purple Wool,Compacted Item,"3198,71,4841",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:15.105607,1 Diamond,,3 Cyan Wool,Compacted Item,"3201,71,4841",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:16.613539,1 Diamond,,3 Green Wool,Compacted Item,"3202,71,4840",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:17.975555,1 Diamond,,3 Lime Wool,Compacted Item,"3202,71,4839",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:19.364901,1 Diamond,,3 Yellow Wool,Compacted Item,"3202,71,4838",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:20.768830,1 Diamond,,3 Orange Wool,Compacted Item,"3202,71,4837",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:22.067671,1 Diamond,,3 Red Wool,Compacted Item,"3202,71,4836",FALSE,Shiroyama,Blocks,mTfUJi
+2026-01-09T17:10:27.236596,1 Diamond,,3 White Wool,Compacted Item,"3198,75,4840",FALSE,Shiroyama,Blocks,mTfUJi
+2025-10-29T18:15:13.160183,5 Diamond,,"1 Barrel ""Copper Workshop Repair Kit""",One kit will repair a Copper Workshop to full health.,"3736,81,7001",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:18.926341,4 Diamond,,"1 Barrel ""Grill Factory Repair Kit""",One kit will repair a Grill Factory to full health.,"3736,81,7003",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:21.422335,5 Diamond,,"1 Barrel ""Iron Forge Repair Kit""",One kit will repair an Iron Forge to full health.,"3736,81,7004",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:24.337609,2 Diamond,,"1 Barrel ""Printer Factory Repair Kit""",One kit will repair a Printer Factory to full health.,"3736,81,7011",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:26.033136,4 Diamond,,"1 Barrel ""Rail Factory Repair Kit""",One kit will repair a Rail Factory to full health.,"3736,81,7012",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:28.397656,4 Diamond,,"1 Barrel ""Redstone Factory Repair Kit""",One kit will repair a Redstone Factory to full health.,"3736,81,7013",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:31.855456,10 Diamond,,"1 Barrel ""Research Station Repair Kit""",One kit will repair a Research Station to full health.,"3736,81,7014",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:35.116788,1 Diamond,,48 Chest,Crate,"3723,81,7010",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:37.878102,10 Diamond,,"1 Barrel ""Compact Repair Kit""",One kit will repair a compactor to full health.,"3724,81,7009",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:54.780967,48 Diamond,,"1 Barrel ""Advanced Cauldron Repair Kit""",One kit will repair a Advanced Cauldron to full health.,"3716,81,6995",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:57.315592,25 Diamond,,"1 Barrel ""Advanced Ore Smelter Repair Kit""",One kit will repair an Advanced Ore Smelter to full health.,"3717,81,6995",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:15:58.950013,8 Diamond,,"1 Barrel ""Animal Husbandry Repair Kit""",One kit will repair an Animal Husbandry to full health.,"3718,81,6995",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:16:01.269572,8 Diamond,,"1 Barrel ""Basic Cauldron Repair Kit""",One kit will repair a Basic Cauldron to full health.,"3719,81,6995",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:16:10.904741,18 Diamond,,"1 Barrel ""Ore Smelter Repair Kit""",One kit will repair an Ore Smelter to full health.,"3726,81,6995",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:16:12.577007,128 Diamond,,"1 Barrel ""Bastion Factory Repair Kit""",One kit will repair a Bastion Factory to full health.,"3727,81,6995",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:16:13.831926,2 Diamond,,"1 Barrel ""Bio Factory Repair Kit""",One kit will repair a Bio Factory to full health.,"3728,81,6995",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:16:15.139472,2 Diamond,,"1 Barrel ""Concrete Mixer Repair Kit""",One kit will repair a Concrete Mixer to full health.,"3729,81,6995",FALSE,Orakuru,Infra,OreStraya
+2025-10-29T18:16:25.025298,4 Diamond,,1 Block of Emerald,,"3728,88,7014",FALSE,Orakuru,Raw Materials,OreStraya
+2025-10-29T18:16:29.504185,2 Diamond,,1 Amethyst Shard,Compacted Item,"3724,89,7014",FALSE,Orakuru,Raw Materials,OreStraya
+2025-10-29T18:16:32.221006,3 Diamond,,16 Charcoal,Compacted Item,"3716,90,7005",FALSE,Orakuru,Raw Materials,OreStraya
+2025-10-29T18:16:33.965376,1 Diamond,,8 Bone Meal,Compacted Item,"3716,88,7004",FALSE,Orakuru,Raw Materials,OreStraya
+2025-10-29T18:16:45.141452,5 Diamond,,1 Anvil,,"3716,95,7003",FALSE,Orakuru,Raw Materials,OreStraya
+2025-10-29T18:16:47.102216,1 Diamond,,64 Lapis Lazuli,,"3716,95,7002",FALSE,Orakuru,"Blocks, Infra",OreStraya
+2025-10-29T18:16:48.367422,2 Diamond,,1 Crafter,,"3716,95,7001",FALSE,Orakuru,Raw Materials,OreStraya
+2025-10-29T18:16:50.544829,1 Diamond,,64 Cooked Porkchop,,"3716,95,7000",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:16:52.549081,"3 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,1 Minecart,,"3716,95,6999",FALSE,Orakuru,Food/Pots,OreStraya
+2025-10-29T18:16:54.317310,"3 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,1 Oak Boat,,"3716,95,6998",FALSE,Orakuru,Other,OreStraya
+2025-10-29T18:16:56.124129,1 Diamond,,1 Bundle,,"3716,95,6997",FALSE,Orakuru,Other,OreStraya
+2025-10-29T18:17:12.072645,8 Iron Ingot,,1 Bundle,,"3716,95,6997",FALSE,Orakuru,Other,OreStraya
+2025-10-29T18:18:08.679059,16 Iron Ingot,,1 Black Dye,Compacted Item,"3649,77,6918",FALSE,Orakuru,Other,OreStraya
+2025-10-29T18:18:10.014987,12 Iron Ingot,,1 Black Glazed Terracotta,Compacted Item,"3650,77,6916",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:18:12.245028,2 Iron Ingot,,1 Black Wool,Compacted Item,"3649,77,6913",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:18:14.300543,2 Iron Ingot,,1 Black Bed,Compacted Item,"3648,77,6915",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:18:19.503136,15 Iron Ingot,,1 Black Candle,Compacted Item,"3651,86,6909",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:18:20.992277,10 Iron Ingot,,1 Black Terracotta,Compacted Item,"3650,86,6911",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:18:23.092105,5 Iron Ingot,,1 Black Stained Glass,Compacted Item,"3652,86,6914",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:18:24.564452,4 Iron Ingot,,1 Black Concrete Powder,Compacted Item,"3653,86,6912",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:18:32.528313,2 Iron Ingot,,1 Black Bed,Compacted Item,"3648,77,6916",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:18:47.464680,16 Iron Ingot,,8 Black Wool,Compacted Item,"3649,77,6913",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:18:50.727253,4 Iron Ingot,,1 Black Carpet,Compacted Item,"3649,77,6913",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:19:37.453495,5 Iron Ingot,,1 Black Banner,Compacted Item,"3648,77,6916",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:19:38.688289,20 Iron Ingot,,4 Black Banner,Compacted Item,"3648,77,6916",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:19:42.587839,96 Iron Ingot,,8 Black Glazed Terracotta,Compacted Item,"3650,77,6916",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:23:07.887965,7 Iron Ingot,,1 Red Candle,Compacted Item,"3686,83,6964",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:23:09.235901,4 Iron Ingot,,1 Red Stained Glass,Compacted Item,"3686,83,6963",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:23:10.505310,32 Iron Ingot,,8 Red Stained Glass,Compacted Item,"3686,83,6963",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:23:13.039170,10 Iron Ingot,,1 Red Glazed Terracotta,Compacted Item,"3686,83,6962",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:23:13.994601,80 Iron Ingot,,8 Red Glazed Terracotta,Compacted Item,"3686,83,6962",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:23:15.552711,2 Iron Ingot,,1 Red Wool,Compacted Item,"3686,83,6961",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:23:16.638299,16 Iron Ingot,,8 Red Wool,Compacted Item,"3686,83,6961",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:23:17.767710,4 Iron Ingot,,1 Red Carpet,Compacted Item,"3686,83,6961",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:40:14.313282,5 Iron Ingot,,1 Red Banner,Compacted Item,"3680,92,6953",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:40:15.664765,5 Iron Ingot,,1 Red Concrete,Compacted Item,"3681,92,6953",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:40:16.953872,8 Iron Ingot,,1 Red Terracotta,Compacted Item,"3682,92,6953",FALSE,Orakuru,Blocks,OreStraya
+2025-10-29T18:40:18.051043,2 Iron Ingot,,1 Red Dye,Compacted Item,"3683,92,6953",FALSE,Orakuru,Other,OreStraya
+2026-01-09T17:18:41.898714,1 Iron Ingot,,"1 Dec 24, 2024",Author: Seldomsh0ck|Generation: COPY_OF_ORIGINAL,"3449,71,4839",FALSE,Shiroyama,Other,Seldomsh0ck
+2026-01-09T17:18:43.802396,1 Iron Ingot,,"1 Dec 1, 2024",Author: Seldomsh0ck|Generation: COPY_OF_ORIGINAL,"3449,71,4838",FALSE,Shiroyama,Other,Seldomsh0ck
+2025-11-09T18:29:48.281089,79 Diamond,,"1 Diamond Sword ""Takumi""",Sharpness 5|Unbreaking 3|Looting 3|Fire Aspect 2|Other enchantments allowed|Condition: Undamaged,"3177,69,4873",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:49.263389,17 Diamond,,"1 Diamond Axe ""Takumi""",Fortune 3|Efficiency 5|Unbreaking 3|Condition: Undamaged|Repair level 3,"3177,69,4872",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:50.626528,20 Diamond,,"1 Diamond Axe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged|Repair level 3,"3177,69,4872",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:51.571132,19 Diamond,,"1 Diamond Axe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged|Repair level 5,"3177,69,4872",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:52.689578,75 Diamond,,"1 Netherite Pickaxe ""Takumi""",Fortune 3|Efficiency 5|Unbreaking 3|Condition: Undamaged,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:53.584385,77 Diamond,,"1 Netherite Pickaxe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:54.696334,17 Diamond,,"1 Diamond Pickaxe ""Takumi""",Fortune 3|Efficiency 5|Unbreaking 3|Condition: Undamaged|Repair level 3,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:55.617340,16 Diamond,,"1 Diamond Pickaxe ""Takumi""",Fortune 3|Efficiency 5|Unbreaking 3|Condition: Undamaged|Repair level 5,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:56.301472,31 Diamond,,"2 Diamond Pickaxe ""Takumi""",Fortune 3|Efficiency 5|Unbreaking 3|Condition: Undamaged|Repair level 5,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:57.031439,21 Diamond,,"1 Diamond Pickaxe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged|Repair level 3,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:57.739362,20 Diamond,,"1 Diamond Pickaxe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged|Repair level 5,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:58.359537,39 Diamond,,"2 Diamond Pickaxe ""Takumi""",Efficiency 5|Silk Touch 1|Unbreaking 3|Condition: Undamaged|Repair level 5,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:29:59.458083,12 Diamond,,"1 Diamond Shovel ""Takumi""",Efficiency 4|Silk Touch 1|Unbreaking 3|Condition: Undamaged,"3177,69,4870",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:00.794090,10 Diamond,,"1 Diamond Shovel ""Takumi""",Efficiency 4|Unbreaking 3|Condition: Undamaged,"3177,69,4870",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:01.628245,11 Diamond,,"1 Diamond Shovel ""Takumi""",Fortune 3|Efficiency 4|Unbreaking 3|Condition: Undamaged,"3177,69,4870",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:02.763297,29 Diamond,,"1 Diamond Leggings ""Takumi""",Unbreaking 3|Protection 4|Condition: Undamaged,"3177,69,4869",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:03.825766,39 Diamond,,1 Diamond Helmet,Aqua Affinity 1|Unbreaking 3|Protection 4|Respiration 3|Condition: Undamaged,"3177,69,4869",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:04.547325,8 Diamond,,"1 Diamond Helmet ""Takumi""",Unbreaking 3|Protection 4|Condition: Undamaged,"3177,69,4869",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:05.764003,34 Diamond,,"1 Diamond Chestplate ""Takumi""",Unbreaking 3|Protection 4|Condition: Undamaged,"3177,69,4868",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:06.579130,12 Diamond,,"1 Diamond Chestplate ""Takumi""",Unbreaking 3|Thorns 2|Protection 4|Condition: Undamaged,"3177,69,4868",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:07.737287,39 Diamond,,"1 Diamond Boots ""Takumi""",Feather Falling 4|Depth Strider 3|Unbreaking 3|Protection 4|Condition: Undamaged,"3177,69,4868",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:08.481839,8 Diamond,,"1 Diamond Boots ""Takumi""",Unbreaking 3|Protection 4|Condition: Undamaged,"3177,69,4868",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:09.715789,1 Diamond,,2 Ender Pearl,,"3177,69,4867",FALSE,Shiroyama,Defense,SQOpenSpellBook
+2025-11-09T18:30:11.838729,12 Diamond,,1 Netherite Upgrade,,"3177,69,4867",FALSE,Shiroyama,Defense,SQOpenSpellBook
+2025-11-09T18:30:24.765284,40 Diamond,,1 Netherite Helmet,,"3178,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:25.900639,2 Diamond,,1 Diamond Helmet,,"3178,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:27.151622,64 Diamond,,1 Netherite Chestplate,,"3179,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:28.209490,3 Diamond,,1 Diamond Chestplate,,"3179,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:29.500751,50 Diamond,,1 Netherite Leggings,,"3180,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:30.560788,3 Diamond,,1 Diamond Leggings,,"3180,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:31.718144,32 Diamond,,1 Netherite Boots,,"3181,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:32.957138,2 Diamond,,1 Diamond Boots,,"3181,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:30:34.309747,1 Diamond,,2 Diamond Shovel,,"3181,69,4865",FALSE,Shiroyama,Armor/Tools,SQOpenSpellBook
+2025-11-09T18:30:35.759086,1 Diamond,,1 Diamond Pickaxe,,"3180,69,4865",FALSE,Shiroyama,Armor/Tools,SQOpenSpellBook
+2025-11-09T18:30:37.385286,1 Diamond,,2 Diamond Axe,,"3179,69,4865",FALSE,Shiroyama,Armor/Tools,SQOpenSpellBook
+2025-11-09T18:30:38.812869,1 Diamond,,1 Diamond Sword,,"3178,69,4865",FALSE,Shiroyama,Armor/Tools,SQOpenSpellBook
+2025-11-09T19:09:32.009465,"11 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,4 Diamond,,"3186,69,4873",FALSE,Shiroyama,Raw Materials,SQOpenSpellBook
+2025-11-09T19:09:33.063787,"30 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls,12 Diamond,,"3186,69,4873",FALSE,Shiroyama,Raw Materials,SQOpenSpellBook
+2026-02-04T18:27:17.341317,19 Diamond,,"1 Diamond Pickaxe ""Takumi""",Efficiency 5|Unbreaking 3|Fortune 3|Condition: Undamaged|Repair level 3,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:19.584937,18 Diamond,,"1 Diamond Pickaxe ""Takumi""",Efficiency 5|Unbreaking 3|Fortune 3|Condition: Undamaged|Repair level 5,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:20.683625,35 Diamond,,"2 Diamond Pickaxe ""Takumi""",Efficiency 5|Unbreaking 3|Fortune 3|Condition: Undamaged|Repair level 5,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:21.680259,22 Diamond,,"1 Diamond Pickaxe ""Takumi""",Efficiency 5|Unbreaking 3|Silk Touch 1|Condition: Undamaged|Repair level 3,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:22.606833,21 Diamond,,"1 Diamond Pickaxe ""Takumi""",Efficiency 5|Unbreaking 3|Silk Touch 1|Condition: Undamaged|Repair level 5,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:23.554778,41 Diamond,,"2 Diamond Pickaxe ""Takumi""",Efficiency 5|Unbreaking 3|Silk Touch 1|Condition: Undamaged|Repair level 5,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:24.603729,17 Diamond,,"1 Diamond Axe ""Takumi""",Efficiency 5|Unbreaking 3|Fortune 3|Condition: Undamaged|Repair level 3,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:25.517471,16 Diamond,,"1 Diamond Axe ""Takumi""",Efficiency 5|Unbreaking 3|Fortune 3|Condition: Undamaged|Repair level 5,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:29.814798,20 Diamond,,1 Netherite Pickaxe,,"3177,69,4874",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:33.048158,21 Diamond,,"1 Diamond Axe ""Takumi""",Efficiency 5|Unbreaking 3|Silk Touch 1|Condition: Undamaged|Repair level 3,"3177,69,4872",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:34.395016,81 Diamond,,"1 Netherite Pickaxe ""Takumi""",Efficiency 5|Unbreaking 3|Silk Touch 1|Condition: Undamaged,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:35.344032,64 Diamond,,"1 Netherite Pickaxe ""Takumi""",Efficiency 5|Unbreaking 3|Fortune 3|Condition: Undamaged,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:36.255175,45 Diamond,,"1 Netherite Pickaxe ""Takumi""",Efficiency 4|Unbreaking 3|Fortune 3|Condition: Undamaged|Never repaired,"3177,69,4871",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:37.530451,9 Diamond,,"1 Diamond Shovel ""Takumi""",Efficiency 4|Unbreaking 3|Condition: Undamaged,"3177,69,4870",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:38.426935,9 Diamond,,"1 Diamond Shovel ""Takumi""",Efficiency 4|Unbreaking 3|Fortune 3|Condition: Undamaged,"3177,69,4870",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:39.330944,34 Diamond,,"1 Diamond Leggings ""Takumi""",Protection 4|Unbreaking 3|Condition: Undamaged,"3177,69,4869",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:40.883116,41 Diamond,,"1 Diamond Boots ""Takumi""",Feather Falling 4|Protection 4|Depth Strider 3|Unbreaking 3|Condition: Undamaged,"3177,69,4868",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:43.604257,9 Diamond,,"1 Diamond Boots ""Takumi""",Protection 4|Unbreaking 3|Condition: Undamaged,"3177,69,4868",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:50.563749,7 Diamond,,16 Ender Pearl,,"3177,69,4867",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:53.429367,37 Diamond,,"1 Diamond Chestplate ""Takumi""",Protection 4|Unbreaking 3|Condition: Undamaged,"3177,69,4868",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:54.505559,14 Diamond,,"1 Diamond Chestplate ""Takumi""",Thorns 2|Protection 4|Unbreaking 3|Condition: Undamaged,"3177,69,4868",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:55.871441,41 Diamond,,"1 Diamond Helmet ""Takumi""",Protection 4|Aqua Affinity 1|Unbreaking 3|Respiration 3|Condition: Undamaged,"3177,69,4869",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:56.839307,9 Diamond,,"1 Diamond Helmet ""Takumi""",Protection 4|Unbreaking 3|Condition: Undamaged,"3177,69,4869",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:27:58.492730,14 Diamond,,"1 Diamond Shovel ""Takumi""",Efficiency 4|Unbreaking 3|Silk Touch 1|Condition: Undamaged,"3177,69,4870",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:28:03.388487,36 Diamond,,1 Netherite Helmet,,"3178,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:28:05.526299,54 Diamond,,1 Netherite Chestplate,,"3179,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:28:07.794020,44 Diamond,,1 Netherite Leggings,,"3180,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:28:09.641814,30 Diamond,,1 Netherite Boots,,"3181,69,4865",FALSE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:40:41.815015,39 Diamond,,"1 Diamond Helmet ""Takumi""",Protection 4|Aqua Affinity 1|Unbreaking 3|Respiration 3|Condition: Undamaged,"3329,69,5033",TRUE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:40:42.208770,34 Diamond,,"1 Diamond Chestplate ""Takumi""",Protection 4|Unbreaking 3|Condition: Undamaged,"3328,69,5033",TRUE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:40:40.181937,29 Diamond,,"1 Diamond Leggings ""Takumi""",Protection 4|Unbreaking 3|Condition: Undamaged,"3327,69,5033",TRUE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2026-02-04T18:40:39.148219,39 Diamond,,"1 Diamond Boots ""Takumi""",Feather Falling 4|Protection 4|Depth Strider 3|Unbreaking 3|Condition: Undamaged,"3325,69,5034",TRUE,Shiroyama,"Defense, Armor/Tools",SQOpenSpellBook
+2025-11-09T18:05:13.876684,1 Diamond,,4 Bone Block,Compacted Item,"3287,68,5007",FALSE,Shiroyama,"Blocks, Raw Materials",SuperShotGriff
+2025-11-09T18:05:15.238434,1 Iron Ingot,,32 Moss Block,,"3287,68,5008",FALSE,Shiroyama,Blocks,SuperShotGriff
+2025-11-09T18:05:16.369972,1 Iron Ingot,,48 Moss Carpet,,"3287,68,5009",FALSE,Shiroyama,Blocks,SuperShotGriff
+2025-11-09T18:05:17.958574,1 Iron Ingot,,32 Flowering Azalea,,"3287,68,5010",FALSE,Shiroyama,Blocks,SuperShotGriff
+2025-11-09T18:05:20.020124,19 Diamond,,64 Obsidian,Compacted Item,"3287,68,5014",FALSE,Shiroyama,"Blocks, Defense",SuperShotGriff
+2025-11-09T18:33:07.002818,1 Diamond,,42-62 Crimson Stem,Floating Exchange,"3168,77,4814",FALSE,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
+2025-11-09T18:34:07.486214,1 Diamond,,42-62 Warped Stem,Floating Exchange,"3176,77,4814",FALSE,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
+2025-11-09T18:34:11.890559,2-64 Iron Ingot,,6-64 Acacia Log,Floating Exchange,"3181,77,4817",FALSE,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
+2025-11-09T18:34:15.519703,1-64 Iron Ingot,,1-6 Oak Log,Floating Exchange,"3173,77,4817",FALSE,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
+2025-11-09T18:34:20.435143,2-7 Iron Ingot,,64 Dark Oak Log,Floating Exchange,"3168,77,4820",FALSE,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
+2025-11-09T18:34:24.326142,2-7 Iron Ingot,,64 Jungle Log,Floating Exchange,"3176,77,4820",FALSE,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
+2025-11-09T18:34:27.927053,2-7 Iron Ingot,,64 Birch Log,Floating Exchange,"3181,77,4823",FALSE,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
+2025-11-09T18:34:33.332772,2-7 Iron Ingot,,64 Spruce Log,Floating Exchange,"3173,77,4823",FALSE,Shiroyama,"Raw Materials, Blocks",SuperShotGriff
+2025-11-09T18:34:40.482904,2 Diamond,,7-21 Iron Ingot,Floating Exchange,"3166,70,4819",FALSE,Shiroyama,Raw Materials,SuperShotGriff
+2025-11-09T18:34:40.482904,2 Diamond,,6-21 Emerald,Floating Exchange,"3166,70,4819",FALSE,Shiroyama,Raw Materials,SuperShotGriff
+2025-11-09T18:34:58.464580,3-17 Diamond,,2 Ancient Debris,Floating Exchange,"3166,57,4819",FALSE,Shiroyama,Raw Materials,SuperShotGriff
+2025-11-09T18:35:03.887572,4 Diamond,,"6-20 Eye of Ender ""Player Essence""",Activity reward used to fuel pearls|Floating Exchange,"3180,57,4817",FALSE,Shiroyama,Raw Materials,SuperShotGriff
+2025-11-09T18:35:12.500327,1 Diamond,,12-60 Block of Copper,Floating Exchange,"3166,44,4819",FALSE,Shiroyama,Raw Materials,SuperShotGriff
+2025-11-09T18:35:22.538914,1 Diamond,,16-64 Block of Redstone-Gold,Floating Exchange,"3180,44,4817",FALSE,Shiroyama,Raw Materials,SuperShotGriff
+2025-11-09T18:35:40.594813,5 Block of Raw Gold,,68-74 Gold Ingot,Floating Exchange,"3166,31,4817",FALSE,Shiroyama,Raw Materials,SuperShotGriff
+2025-11-09T18:35:44.425262,5 Block of Raw Iron,,67-73 Iron Ingot,Floating Exchange,"3174,31,4817",FALSE,Shiroyama,Raw Materials,SuperShotGriff
+2025-11-09T18:24:38.552277,2 Iron Ingot,,64 Cactus,,"3215,69,4825",FALSE,Shiroyama,Raw Materials,VilyanZ
+2025-11-09T18:24:40.009598,1 Diamond,,576 Cactus,,"3215,69,4825",FALSE,Shiroyama,Raw Materials,VilyanZ
+2025-11-09T18:24:41.441708,2 Iron Ingot,,64 Sugar Cane,,"3215,69,4824",FALSE,Shiroyama,Raw Materials,VilyanZ
+2025-11-09T18:24:43.078920,3 Iron Ingot,,64 Cocoa Beans,,"3215,69,4823",FALSE,Shiroyama,Raw Materials,VilyanZ
+2025-11-09T18:24:44.982972,1 Diamond,,64 Cooked Porkchop,,"3216,69,4823",FALSE,Shiroyama,Food/Pots,VilyanZ
+2025-11-09T18:24:47.862494,1 Iron Ingot,,64 Cobblestone,,"3216,69,4824",FALSE,Shiroyama,Blocks,VilyanZ
+2025-11-09T18:24:49.281002,1 Iron Ingot,,64 Bread,,"3216,69,4824",FALSE,Shiroyama,Food/Pots,VilyanZ
+2025-11-09T18:24:50.529651,1 Iron Ingot,,1 Red Banner,,"3217,69,4824",FALSE,Shiroyama,Blocks,VilyanZ
+2025-11-09T18:24:51.925877,1 Iron Ingot,,64 Cobbled Deepslate,,"3218,69,4824",FALSE,Shiroyama,Blocks,VilyanZ
+2025-11-09T18:24:53.337994,1 Iron Ingot,,96 Stone,,"3218,69,4824",FALSE,Shiroyama,Blocks,VilyanZ
+2025-11-09T18:24:56.722161,3 Diamond,,2 Diamond Pickaxe,,"3218,69,4824",FALSE,Shiroyama,Armor/Tools,VilyanZ
+2025-11-09T18:25:00.539468,6 Diamond,,16 Ender Pearl,,"3218,69,4824",FALSE,Shiroyama,Mob Drops,VilyanZ
+2025-11-09T18:25:02.407838,3 Iron Ingot,,64 Andesite,,"3219,69,4823",FALSE,Shiroyama,Blocks,VilyanZ
+2025-11-09T18:25:03.660717,3 Iron Ingot,,64 Granite,,"3219,69,4823",FALSE,Shiroyama,Blocks,VilyanZ
+2025-11-09T18:25:04.872382,3 Iron Ingot,,64 Diorite,,"3219,69,4823",FALSE,Shiroyama,Blocks,VilyanZ
+2025-11-09T18:25:06.095478,3 Iron Ingot,,64 Tuff,,"3219,69,4823",FALSE,Shiroyama,Blocks,VilyanZ
+2025-11-09T18:25:07.217001,3 Iron Ingot,,64 Calcite,,"3219,69,4823",FALSE,Shiroyama,Blocks,VilyanZ
+2025-11-09T18:29:20.001425,2 Diamond,,64 Cherry Log,,"3201,71,4887",FALSE,Shiroyama,"Raw Materials, Blocks",Zynarr
+2025-11-09T18:29:21.521425,6 Iron Ingot,,64 Birch Log,,"3201,71,4889",FALSE,Shiroyama,"Raw Materials, Blocks",Zynarr
+2025-11-09T18:29:22.506444,1 Diamond,,196 Birch Log,,"3201,71,4889",FALSE,Shiroyama,"Raw Materials, Blocks",Zynarr
+2025-11-09T18:29:24.705896,4 Diamond,,128 Cherry Log,,"3201,71,4887",FALSE,Shiroyama,"Raw Materials, Blocks",Zynarr
+2025-11-09T18:29:26.331742,8 Iron Ingot,,64 Oak Log,,"3201,71,4890",FALSE,Shiroyama,"Raw Materials, Blocks",Zynarr
+2025-11-09T18:29:27.144493,1 Diamond,,128 Oak Log,,"3201,71,4890",FALSE,Shiroyama,"Raw Materials, Blocks",Zynarr
+2025-11-09T18:29:28.336063,6 Iron Ingot,,64 Spruce Log,,"3201,71,4892",FALSE,Shiroyama,"Raw Materials, Blocks",Zynarr
+2025-11-09T18:29:29.162105,1 Diamond,,196 Spruce Log,,"3201,71,4892",FALSE,Shiroyama,"Raw Materials, Blocks",Zynarr
+2026-02-04T18:41:01.606578,3 Iron Ingot,,"1 Potion ""Wondrous Chicken Noodle Soup""",§tDelicious and nutritious|§u|§s[⭑⭑⭑⭑⭑],"3268,69,5005",TRUE,Shiroyama,Food/Pots,
+2026-02-04T18:41:00.190787,3 Iron Ingot,,"1 Potion ""Incomparable Pho""",§tVietnamese staple|§u|§s⭑⭑⭑⭑⭒,"3268,69,5005",TRUE,Shiroyama,Food/Pots,
+2026-02-04T18:41:02.509484,3 Iron Ingot,,"1 Potion ""Soju""",§tEasy to drink. Easy to get drunk on|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled,"3268,69,5005",FALSE,Shiroyama,Food/Pots,
+2026-02-04T18:41:03.360318,2 Iron Ingot,,"1 Potion ""Fine Wheatbeer""",§tMake sure you pour at an angle|§u|§s⭑⭑⭑⭑|§y13 Years Barrel aged,"3268,69,5005",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:05:39.757526,4 Iron Ingot,,"1 Potion ""Brown Ale""",§tMalty and funky|§u|§s⭑⭑⭑⭑|§y8 Years Barrel aged,"3299,68,5031",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:05:41.267005,4 Iron Ingot,,"1 Potion ""Pilsner""",§tA Czech point of pride|§u|§s⭑⭑⭑⭑⭑|§yOne Year Barrel aged,"3300,68,5031",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:05:43.321210,4 Iron Ingot,,"1 Potion ""Pale Lager""",§tPale but punchy|§u|§s⭑⭑⭑⭑|§y6 Years Barrel aged,"3301,68,5031",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:05:46.850885,5 Iron Ingot,,"1 Potion ""Dalgon Deep Stout""",§tTo get you through the winter|§u|§s⭑⭑⭑⭑⭑|§y5 Years Barrel aged,"3301,68,5032",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:05:49.335079,5 Iron Ingot,,"1 Potion ""Perfect Pacem Pilsner""",§tWith hints of plum|§u|§s⭑⭑⭑⭑⭑|§y5 Years Barrel aged,"3301,68,5033",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:05:51.953456,5 Iron Ingot,,"1 Potion ""Incredible Icenian Pale Ale""",§tCrisp as Chrispie|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged,"3301,68,5034",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:07:06.137020,3 Iron Ingot,,"1 Potion ""Sarsaparilla""",§tDeeply flavourful|§u|§s⭑⭑⭑⭑⭑,"3387,70,5002",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:07:07.620987,2 Iron Ingot,,64 Baked Potato,,"3387,70,5003",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:07:09.025826,1 Diamond,,64 Cooked Chicken,,"3387,70,5004",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:07:15.022445,2 Diamond,,1 Pig Spawn Egg,,"3395,70,5001",FALSE,Shiroyama,Mob Drops,
+2025-11-09T18:07:16.143837,2 Diamond,,1 Rabbit Spawn Egg,,"3395,70,5002",FALSE,Shiroyama,Mob Drops,
+2025-11-09T18:07:17.691541,2 Diamond,,1 Chicken Spawn Egg,,"3395,70,5001",FALSE,Shiroyama,Mob Drops,
+2025-11-09T18:07:19.094754,2 Diamond,,1 Sheep Spawn Egg,,"3395,70,5002",FALSE,Shiroyama,Mob Drops,
+2025-11-09T18:07:20.609779,2 Diamond,,1 Wolf Spawn Egg,,"3395,70,5003",FALSE,Shiroyama,Mob Drops,
+2025-11-09T18:07:21.833430,2 Diamond,,1 Fox Spawn Egg,,"3395,70,5003",FALSE,Shiroyama,Mob Drops,
+2025-11-09T18:07:23.084316,2 Diamond,,1 Turtle Spawn Egg,,"3395,70,5002",FALSE,Shiroyama,Mob Drops,
+2025-11-09T18:07:24.290960,2 Diamond,,1 Squid Spawn Egg,,"3395,70,5001",FALSE,Shiroyama,Mob Drops,
+2025-11-09T18:07:57.075285,15 Diamond,,3 Potion,,"3405,71,4967",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:07:58.309186,1 Diamond,,3 Potion,,"3405,71,4968",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:07:59.719286,10 Diamond,,3 Potion,,"3404,71,4968",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:08:12.943019,4 Diamond,,64 Stone,Compacted Item,"3403,71,4951",FALSE,Shiroyama,"Blocks, Defense",
+2025-11-09T18:09:30.877366,4 Iron Ingot,,"1 Potion ""Chicha""",§tA-maize-ing flavours|§u|§s⭑⭑⭑⭑⭑,"3451,69,5004",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:09:32.193884,6 Iron Ingot,,"1 Potion ""Tequila""",§tOnce you've had too much you can't go back|§u|§s⭑⭑⭑⭑⭑|§p2-times Distilled|§yOne Year Barrel aged,"3451,69,5003",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:09:33.487059,2 Iron Ingot,,"1 Potion ""Fine Wheatbeer""","§tFinally, a good use for all that wheat!|§u|§s⭑⭑⭑⭑⭑","3451,69,5003",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:10:05.046074,1 Diamond,,1 Map,,"3447,71,5068",FALSE,Shiroyama,Other,
+2025-11-09T18:11:44.415828,6 Diamond,,64 Nether Wart,Compacted Item,"3408,70,5072",FALSE,Shiroyama,Raw Materials,
+2025-11-09T18:11:46.780706,1 Iron Ingot,,1 Shroomlight,,"3409,70,5075",FALSE,Shiroyama,Blocks,
+2025-11-09T18:11:48.332245,8 Iron Ingot,,1 Warped Stem,Compacted Item,"3409,70,5076",FALSE,Shiroyama,Blocks,
+2025-11-09T18:11:49.529720,8 Iron Ingot,,64 Crimson Stem,,"3409,70,5076",FALSE,Shiroyama,Blocks,
+2025-11-09T18:11:50.444522,6 Iron Ingot,,1 Crimson Roots,Compacted Item,"3409,70,5076",FALSE,Shiroyama,Blocks,
+2025-11-09T18:11:51.607033,6 Iron Ingot,,1 Warped Roots,Compacted Item,"3409,70,5076",FALSE,Shiroyama,Blocks,
+2025-11-09T18:11:52.921454,5 Iron Nugget,,1 Glowstone,,"3409,70,5076",FALSE,Shiroyama,Blocks,
+2025-11-09T18:12:37.677020,4 Iron Ingot,,1 Red Banner,,"3373,68,5066",FALSE,Shiroyama,,
+2025-11-09T18:12:42.629454,1 Iron Nugget,,1 Melon,,"3372,68,5066",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:12:45.722716,2 Diamond,,1 Map,,"3372,68,5066",FALSE,Shiroyama,,
+2025-11-09T18:13:02.858335,3 Iron Ingot,,1 Minecart,,"3355,68,5054",FALSE,Shiroyama,Other,
+2025-11-09T18:13:06.621753,4 Iron Ingot,,1 Red Banner,,"3366,68,5041",FALSE,Shiroyama,Blocks,
+2025-11-09T18:13:41.266503,1 Iron Ingot,,64 Baked Potato,,"3358,68,5030",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:15:37.931595,7 Iron Nugget,,"1 Potion ""Cherry Liqueur""",§tSummer's bounty|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled|§yBarrel aged|§qAlcoholic,"3137,70,4873",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:15:44.727356,8 Iron Nugget,,"1 Potion ""Whiskey""",§tThe classic|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled|§yBarrel aged|§qAlcoholic,"3137,70,4869",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:15:47.466118,3 Iron Nugget,,"1 Potion ""Fine Wheatbeer""","§tFinally, a good use for all that wheat!|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged|§qAlcoholic","3137,70,4867",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:15:48.936243,1 Iron Ingot,,"1 Potion ""Vodka""",§tPure and simple|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled|§qAlcoholic,"3137,70,4867",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:17:35.528343,4 Iron Nugget,,"1 Potion ""Tea""",§tClassic tea|§u|§s⭑⭑⭑⭑⭑,"3132,70,4839",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:17:37.128789,6 Iron Nugget,,"1 Potion ""English Breakfast Tea""",§tThe best way to wake up|§u|§s⭑⭑⭑⭑⭑,"3134,70,4840",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:17:39.136024,3 Iron Nugget,,"1 Potion ""Redbush Tea""",§tFor the decaf drinkers|§u|§s⭑⭑⭑⭑⭑,"3134,70,4839",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:17:40.151380,3 Iron Nugget,,"1 Potion ""Green Tea""",§tNot just grass!|§u|§s⭑⭑⭑⭑⭑,"3134,70,4839",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:17:41.084447,1 Iron Ingot,,"1 Potion ""Majestic Melon Iced Tea""",§tRejuvenating|§u|§s⭑⭑⭑⭑⭑,"3134,70,4839",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:18:40.223583,10 Iron Ingot,,64 Red Concrete,,"3164,71,4837",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:41.699852,10 Iron Ingot,,64 Orange Concrete,,"3164,71,4838",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:43.215432,10 Iron Ingot,,64 Yellow Concrete,,"3164,71,4839",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:44.456914,10 Iron Ingot,,64 Lime Concrete,,"3164,71,4840",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:45.936638,10 Iron Ingot,,64 Green Concrete,,"3164,71,4841",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:47.231002,10 Iron Ingot,,64 Cyan Concrete,,"3164,71,4842",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:48.551865,10 Iron Ingot,,64 Light Blue Concrete,,"3164,71,4843",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:49.865224,10 Iron Ingot,,64 Blue Concrete,,"3164,71,4844",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:52.697301,10 Iron Ingot,,64 Purple Concrete,,"3161,71,4844",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:53.875547,10 Iron Ingot,,64 Magenta Concrete,,"3161,71,4843",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:55.040729,10 Iron Ingot,,64 Pink Concrete,,"3161,71,4842",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:56.364212,10 Iron Ingot,,64 White Concrete,,"3161,71,4841",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:57.796814,10 Iron Ingot,,64 Light Gray Concrete,,"3161,71,4840",FALSE,Shiroyama,Blocks,
+2025-11-09T18:18:59.063718,19 Iron Ingot,,64 Black Concrete,,"3161,71,4839",FALSE,Shiroyama,Blocks,
+2025-11-09T18:19:00.303212,10 Iron Ingot,,64 Brown Concrete,,"3161,71,4838",FALSE,Shiroyama,Blocks,
+2025-11-09T18:19:01.419797,3 Diamond,,1 Bucket of Pufferfish,,"3161,71,4837",FALSE,Shiroyama,Other,
+2025-11-09T18:22:07.188900,5 Iron Ingot,,"1 Potion ""Venne Vodka""",§tDrink at a suitable Venne-ue|§u|§s⭑⭑⭑⭑⭑|§p5-times Distilled,"3214,68,4810",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:22:08.240689,1 Iron Ingot,,"1 Potion ""Vodka""",§tPure and simple|§u|§s⭑⭑⭑⭑⭑|§p8-times Distilled,"3214,68,4810",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:22:09.649756,8 Iron Ingot,,"1 Potion ""Venne Vodka""",§tDrink at a suitable Venne-ue|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled,"3215,68,4809",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:23:04.874771,1 Iron Ingot,,1 Iron Sword,Condition: Undamaged|Never repaired,"3274,70,4800",FALSE,Shiroyama,Armor/Tools,
+2025-11-09T18:23:11.092730,1 Iron Ingot,,1 Iron Hoe,Condition: Undamaged|Never repaired,"3273,70,4800",FALSE,Shiroyama,Armor/Tools,
+2025-11-09T18:23:20.421859,1 Iron Ingot,,1 Iron Shovel,Condition: Undamaged|Never repaired,"3272,70,4800",FALSE,Shiroyama,Armor/Tools,
+2025-11-09T18:23:23.301755,1 Iron Ingot,,1 Iron Axe,Condition: Undamaged|Never repaired,"3271,70,4800",FALSE,Shiroyama,Armor/Tools,
+2025-11-09T18:23:33.236763,1 Iron Ingot,,1 Shears,Condition: Undamaged|Never repaired,"3270,70,4800",FALSE,Shiroyama,Armor/Tools,
+2025-11-09T18:23:33.539478,1 Iron Ingot,,1 Iron Pickaxe,Condition: Undamaged|Never repaired,"3270,70,4800",FALSE,Shiroyama,Armor/Tools,
+2025-11-09T18:23:35.909811,2 Iron Ingot,,1 Bucket,,"3270,70,4800",FALSE,Shiroyama,Armor/Tools,
+2025-11-09T18:24:15.714773,1 Iron Ingot,,96 Cookie,,"3270,72,4819",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:29:01.278725,6 Iron Ingot,,"1 Potion ""The Gay Agenda""",§tTurning everything gay!|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled,"3183,69,4889",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:29:02.568354,4 Iron Ingot,,"1 Potion ""Leo's Orange Creamsicle""",§tA delicious tiger treat!|§u|§s[⭑⭑⭑⭑⭑]|§gBrewer: s0uthw3st,"3183,69,4888",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:29:03.919404,4 Iron Ingot,,"1 Potion ""Frihavn Juniper Ale""",§tA viking's best friend - skål!|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged,"3183,69,4887",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:29:06.059316,4 Iron Ingot,,"1 Potion ""Beautiful Beetroot Vodka""",§tBest drunk with Borscht|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled,"3181,69,4891",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:29:10.070273,10 Iron Ingot,,"1 Potion ""Peerless Pridelands Mead""",§tA seaside specialty|§u|§s[⭑⭑⭑⭑⭑]|§yBarrel aged,"3177,69,4887",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:29:11.671266,9 Iron Ingot,,"1 Potion ""Colton's Love Martini""",§tMade with Colton's love and passion|§u|§s[⭑⭑⭑⭑⭑],"3179,69,4885",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:29:12.732120,4 Iron Ingot,,"1 Potion ""Burning Blizzard""","§tCold to the touch, but burns the throat|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled","3180,69,4885",FALSE,Shiroyama,Food/Pots,
+2025-11-09T18:29:13.738926,7 Iron Ingot,,"1 Potion ""5 o'Block Somewhere""",§tPina Colada's classier cousin|§u|§s[⭑⭑⭑⭑⭑],"3181,69,4885",FALSE,Shiroyama,Food/Pots,
+2026-02-11T14:08:30.925706,1 Diamond,,1 White Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:08:32.231182,1 Diamond,,1 Light Gray Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:08:33.507455,6 Diamond,,1 Gray Dye,Compacted Item,"3179,71,4836",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:08:34.910113,6 Diamond,,1 Black Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:08:36.022264,1 Diamond,,1 Brown Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:08:50.496940,6 Diamond,,1 Lime Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:08:51.848197,1 Diamond,,1 Magenta Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:08:53.114020,1 Diamond,,1 Purple Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:08:54.308271,1 Diamond,,1 Blue Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:08:57.806115,1 Diamond,,1 Cyan Dye,Compacted Item,"3179,71,4836",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:08:59.981633,6 Diamond,,1 Light Blue Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:09:01.332276,1 Diamond,,1 Yellow Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:09:02.691506,1 Diamond,,1 Orange Dye,Compacted Item,"3179,71,4836",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:09:03.901831,1 Diamond,,1 Pink Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:09:05.689405,1 Diamond,,1 Red Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:09:35.684793,1 Diamond,,64 Golden Carrot,,"3159,71,4774",TRUE,Shiroyama,Food/Pots,
+2026-02-11T14:09:37.265216,1 Diamond,,64 Chest,Crate,"3157,71,4774",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:09:39.508440,3 Diamond,,2 Diamond Pickaxe,,"3156,71,4772",TRUE,Shiroyama,Armor/Tools,
+2026-02-11T14:09:41.683562,22 Diamond,,1 Diamond Pickaxe,Unbreaking 3|Fortune 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3154,71,4770",FALSE,Shiroyama,Armor/Tools,
+2026-02-11T14:09:44.578031,19 Diamond,,1 Diamond Pickaxe,Silk Touch 1|Unbreaking 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3154,71,4768",FALSE,Shiroyama,Armor/Tools,
+2026-02-11T14:09:47.165264,2 Diamond,,7 Emerald,,"3155,71,4767",TRUE,Shiroyama,Raw Materials,
+2026-02-11T14:09:49.328713,79 Diamond,,1 Netherite Pickaxe,Silk Touch 1|Unbreaking 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3157,71,4765",TRUE,Shiroyama,Armor/Tools,
+2026-02-11T14:09:51.183201,69 Diamond,,1 Netherite Pickaxe,Unbreaking 3|Fortune 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3159,71,4765",TRUE,Shiroyama,Armor/Tools,
+2026-02-11T14:09:52.940154,20 Diamond,,1 Netherite Pickaxe,Condition: Undamaged|Never repaired,"3160,71,4766",TRUE,Shiroyama,Armor/Tools,
+2026-02-11T14:09:55.553589,1 Iron Ingot,,64 Stone,,"3163,71,4768",TRUE,Shiroyama,Blocks,
+2026-02-11T14:09:57.382069,1 Iron Ingot,,12 Obsidian,,"3163,71,4770",TRUE,Shiroyama,"Defense, Blocks",
+2026-02-11T14:11:13.759188,1 Iron Ingot,,95 Stone,,"3412,69,4733",TRUE,Shiroyama,,
+2026-02-11T14:11:16.348296,95 Stone,,1 Iron Ingot,,"3412,69,4733",TRUE,Shiroyama,,
+2026-02-11T14:11:18.237700,1 Iron Ingot,,64 Cobbled Deepslate,,"3412,69,4733",TRUE,Shiroyama,,
+2026-02-11T14:11:19.604183,64 Cobbled Deepslate,,1 Iron Ingot,,"3412,69,4733",TRUE,Shiroyama,,
+2026-02-11T14:11:20.866419,3 Iron Ingot,,64 Andesite,,"3412,69,4733",FALSE,Shiroyama,,
+2026-02-11T14:11:22.194245,64 Andesite,,3 Iron Ingot,,"3412,69,4733",FALSE,Shiroyama,,
