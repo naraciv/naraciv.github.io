@@ -476,35 +476,35 @@ Timestamp,Input,Input_Lore,Output,Output_Lore,Coordinates,Exchanges_Available,Ci
 2025-11-09T18:29:11.671266,9 Iron Ingot,,"1 Potion ""Colton's Love Martini""",§tMade with Colton's love and passion|§u|§s[⭑⭑⭑⭑⭑],"3179,69,4885",FALSE,Shiroyama,Food/Pots,
 2025-11-09T18:29:12.732120,4 Iron Ingot,,"1 Potion ""Burning Blizzard""","§tCold to the touch, but burns the throat|§u|§s[⭑⭑⭑⭑⭑]|§pDistilled","3180,69,4885",FALSE,Shiroyama,Food/Pots,
 2025-11-09T18:29:13.738926,7 Iron Ingot,,"1 Potion ""5 o'Block Somewhere""",§tPina Colada's classier cousin|§u|§s[⭑⭑⭑⭑⭑],"3181,69,4885",FALSE,Shiroyama,Food/Pots,
-2026-02-11T14:08:30.925706,1 Diamond,,1 White Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:08:32.231182,1 Diamond,,1 Light Gray Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:08:33.507455,6 Diamond,,1 Gray Dye,Compacted Item,"3179,71,4836",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:08:34.910113,6 Diamond,,1 Black Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:08:36.022264,1 Diamond,,1 Brown Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:08:50.496940,6 Diamond,,1 Lime Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:08:51.848197,1 Diamond,,1 Magenta Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:08:53.114020,1 Diamond,,1 Purple Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:08:54.308271,1 Diamond,,1 Blue Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:08:57.806115,1 Diamond,,1 Cyan Dye,Compacted Item,"3179,71,4836",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:08:59.981633,6 Diamond,,1 Light Blue Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:09:01.332276,1 Diamond,,1 Yellow Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:09:02.691506,1 Diamond,,1 Orange Dye,Compacted Item,"3179,71,4836",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:09:03.901831,1 Diamond,,1 Pink Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:09:05.689405,1 Diamond,,1 Red Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:09:35.684793,1 Diamond,,64 Golden Carrot,,"3159,71,4774",TRUE,Shiroyama,Food/Pots,
-2026-02-11T14:09:37.265216,1 Diamond,,64 Chest,Crate,"3157,71,4774",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:09:39.508440,3 Diamond,,2 Diamond Pickaxe,,"3156,71,4772",TRUE,Shiroyama,Armor/Tools,
-2026-02-11T14:09:41.683562,22 Diamond,,1 Diamond Pickaxe,Unbreaking 3|Fortune 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3154,71,4770",FALSE,Shiroyama,Armor/Tools,
-2026-02-11T14:09:44.578031,19 Diamond,,1 Diamond Pickaxe,Silk Touch 1|Unbreaking 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3154,71,4768",FALSE,Shiroyama,Armor/Tools,
-2026-02-11T14:09:47.165264,2 Diamond,,7 Emerald,,"3155,71,4767",TRUE,Shiroyama,Raw Materials,
-2026-02-11T14:09:49.328713,79 Diamond,,1 Netherite Pickaxe,Silk Touch 1|Unbreaking 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3157,71,4765",TRUE,Shiroyama,Armor/Tools,
-2026-02-11T14:09:51.183201,69 Diamond,,1 Netherite Pickaxe,Unbreaking 3|Fortune 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3159,71,4765",TRUE,Shiroyama,Armor/Tools,
-2026-02-11T14:09:52.940154,20 Diamond,,1 Netherite Pickaxe,Condition: Undamaged|Never repaired,"3160,71,4766",TRUE,Shiroyama,Armor/Tools,
-2026-02-11T14:09:55.553589,1 Iron Ingot,,64 Stone,,"3163,71,4768",TRUE,Shiroyama,Blocks,
-2026-02-11T14:09:57.382069,1 Iron Ingot,,12 Obsidian,,"3163,71,4770",TRUE,Shiroyama,"Defense, Blocks",
-2026-02-11T14:11:13.759188,1 Iron Ingot,,95 Stone,,"3412,69,4733",TRUE,Shiroyama,,
-2026-02-11T14:11:16.348296,95 Stone,,1 Iron Ingot,,"3412,69,4733",TRUE,Shiroyama,,
-2026-02-11T14:11:18.237700,1 Iron Ingot,,64 Cobbled Deepslate,,"3412,69,4733",TRUE,Shiroyama,,
-2026-02-11T14:11:19.604183,64 Cobbled Deepslate,,1 Iron Ingot,,"3412,69,4733",TRUE,Shiroyama,,
-2026-02-11T14:11:20.866419,3 Iron Ingot,,64 Andesite,,"3412,69,4733",FALSE,Shiroyama,,
-2026-02-11T14:11:22.194245,64 Andesite,,3 Iron Ingot,,"3412,69,4733",FALSE,Shiroyama,,
+2026-02-11T14:08:30.925706,1 Diamond,,1 White Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:08:32.231182,1 Diamond,,1 Light Gray Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:08:33.507455,6 Diamond,,1 Gray Dye,Compacted Item,"3179,71,4836",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:08:34.910113,6 Diamond,,1 Black Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:08:36.022264,1 Diamond,,1 Brown Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:08:50.496940,6 Diamond,,1 Lime Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:08:51.848197,1 Diamond,,1 Magenta Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:08:53.114020,1 Diamond,,1 Purple Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:08:54.308271,1 Diamond,,1 Blue Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:08:57.806115,1 Diamond,,1 Cyan Dye,Compacted Item,"3179,71,4836",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:08:59.981633,6 Diamond,,1 Light Blue Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:09:01.332276,1 Diamond,,1 Yellow Dye,Compacted Item,"3179,71,4835",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:09:02.691506,1 Diamond,,1 Orange Dye,Compacted Item,"3179,71,4836",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:09:03.901831,1 Diamond,,1 Pink Dye,Compacted Item,"3179,71,4837",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:09:05.689405,1 Diamond,,1 Red Dye,Compacted Item,"3179,71,4838",TRUE,Shiroyama,Raw Materials,Dragran
+2026-02-11T14:09:35.684793,1 Diamond,,64 Golden Carrot,,"3159,71,4774",TRUE,Shiroyama,Food/Pots,Genius_Flint
+2026-02-11T14:09:37.265216,1 Diamond,,64 Chest,Crate,"3157,71,4774",TRUE,Shiroyama,Raw Materials,Genius_Flint
+2026-02-11T14:09:39.508440,3 Diamond,,2 Diamond Pickaxe,,"3156,71,4772",TRUE,Shiroyama,Armor/Tools,Genius_Flint
+2026-02-11T14:09:41.683562,22 Diamond,,1 Diamond Pickaxe,Unbreaking 3|Fortune 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3154,71,4770",FALSE,Shiroyama,Armor/Tools,Genius_Flint
+2026-02-11T14:09:44.578031,19 Diamond,,1 Diamond Pickaxe,Silk Touch 1|Unbreaking 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3154,71,4768",FALSE,Shiroyama,Armor/Tools,Genius_Flint
+2026-02-11T14:09:47.165264,2 Diamond,,7 Emerald,,"3155,71,4767",TRUE,Shiroyama,Raw Materials,Genius_Flint
+2026-02-11T14:09:49.328713,79 Diamond,,1 Netherite Pickaxe,Silk Touch 1|Unbreaking 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3157,71,4765",TRUE,Shiroyama,Armor/Tools,Genius_Flint
+2026-02-11T14:09:51.183201,69 Diamond,,1 Netherite Pickaxe,Unbreaking 3|Fortune 3|Efficiency 5|Condition: Undamaged|Repair level 3,"3159,71,4765",TRUE,Shiroyama,Armor/Tools,Genius_Flint
+2026-02-11T14:09:52.940154,20 Diamond,,1 Netherite Pickaxe,Condition: Undamaged|Never repaired,"3160,71,4766",TRUE,Shiroyama,Armor/Tools,Genius_Flint
+2026-02-11T14:09:55.553589,1 Iron Ingot,,64 Stone,,"3163,71,4768",TRUE,Shiroyama,Blocks,Genius_Flint
+2026-02-11T14:09:57.382069,1 Iron Ingot,,12 Obsidian,,"3163,71,4770",TRUE,Shiroyama,"Defense, Blocks",Genius_Flint
+2026-02-11T14:11:13.759188,1 Iron Ingot,,95 Stone,,"3412,69,4733",TRUE,Shiroyama,Blocks,BoiAnimates
+2026-02-11T14:11:16.348296,95 Stone,,1 Iron Ingot,,"3412,69,4733",TRUE,Shiroyama,Blocks,BoiAnimates
+2026-02-11T14:11:18.237700,1 Iron Ingot,,64 Cobbled Deepslate,,"3412,69,4733",TRUE,Shiroyama,Blocks,BoiAnimates
+2026-02-11T14:11:19.604183,64 Cobbled Deepslate,,1 Iron Ingot,,"3412,69,4733",TRUE,Shiroyama,Blocks,BoiAnimates
+2026-02-11T14:11:20.866419,3 Iron Ingot,,64 Andesite,,"3412,69,4733",FALSE,Shiroyama,Blocks,BoiAnimates
+2026-02-11T14:11:22.194245,64 Andesite,,3 Iron Ingot,,"3412,69,4733",FALSE,Shiroyama,Blocks,BoiAnimates
