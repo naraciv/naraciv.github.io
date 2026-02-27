@@ -1580,6 +1580,7 @@
                 mapView.classList.add('hidden');
                 tableBtn.classList.add('active');
                 mapBtn.classList.remove('active');
+                removeSearchHint();
             } else {
                 tableView.classList.add('hidden');
                 mapView.classList.remove('hidden');
@@ -2486,6 +2487,19 @@
         }
         
         // ==================== SEARCH HINT TOOLTIP ====================
+        let _hintRepositionFn = null; // stored so we can clean up listeners
+
+        // Temporarily remove the hint (e.g. when switching to table) without permanently dismissing
+        function removeSearchHint() {
+            const el = document.getElementById('search-hint');
+            if (el) el.remove();
+            if (_hintRepositionFn) {
+                window.removeEventListener('scroll', _hintRepositionFn);
+                window.removeEventListener('resize', _hintRepositionFn);
+                _hintRepositionFn = null;
+            }
+        }
+
         function initSearchHint() {
             if (localStorage.getItem('shopSearchHintDismissed')) return;
             if (document.getElementById('search-hint')) return; // already showing
@@ -2496,54 +2510,44 @@
             const searchBar = searchInput.closest('.relative');
             if (!searchBar) return;
             
-            // Curved arrow SVG (bends from text on right, curves up-left to point at search bar)
+            // Curved arrow SVG (arrow curves down to point at search bar below)
             const arrowW = 60;
             const arrowH = 62;
             const arrowSvg = `<svg class="onboarding-arrow-svg" width="${arrowW}" height="${arrowH}" viewBox="0 0 ${arrowW} ${arrowH}" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M${arrowW - 5} ${arrowH - 8} C${arrowW * 0.4} ${arrowH - 8}, ${arrowW * 0.15} ${arrowH * 0.55}, ${arrowW * 0.15} 8" stroke="white" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.9"/>
-                <path d="M${arrowW * 0.15 - 5} 17 L${arrowW * 0.15} 5 L${arrowW * 0.15 + 5} 17" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+                <path d="M${arrowW - 5} 8 C${arrowW * 0.4} 8, ${arrowW * 0.15} ${arrowH * 0.45}, ${arrowW * 0.15} ${arrowH - 8}" stroke="white" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.9"/>
+                <path d="M${arrowW * 0.15 - 5} ${arrowH - 17} L${arrowW * 0.15} ${arrowH - 5} L${arrowW * 0.15 + 5} ${arrowH - 17}" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
             </svg>`;
             
             // Create the hint element
             const hint = document.createElement('div');
             hint.className = 'search-hint-tooltip';
             hint.id = 'search-hint';
-            hint.style.flexDirection = 'row';
-            hint.style.alignItems = 'flex-end';
+            hint.style.flexDirection = 'column';
+            hint.style.alignItems = 'flex-start';
             hint.innerHTML = `
-                <div style="display:flex;align-items:flex-start;">
-                    ${arrowSvg}
-                    <span class="hint-text" style="margin-top:auto;margin-bottom:2px;">Search to filter map results</span>
-                </div>
+                <span class="hint-text" style="margin-left:${arrowW + 4}px;margin-bottom:2px;">Search to filter map results</span>
+                ${arrowSvg}
             `;
             
             document.body.appendChild(hint);
             
-            // Position the tooltip below the search bar with arrow pointing up at it
+            // Position the tooltip above the search bar with arrow pointing down at it
             function repositionHint() {
                 const rect = searchBar.getBoundingClientRect();
                 const arrowTipX = arrowW * 0.15;
                 const left = rect.left + rect.width * 0.10 - arrowTipX;
-                hint.style.top = (rect.bottom + 6) + 'px';
+                hint.style.top = (rect.top - arrowH - 24) + 'px';
                 hint.style.left = Math.max(4, left) + 'px';
             }
+            _hintRepositionFn = repositionHint;
             repositionHint();
             
             window.addEventListener('scroll', repositionHint, { passive: true });
             window.addEventListener('resize', repositionHint, { passive: true });
             
-            // Dismiss on first input
+            // Dismiss permanently on first search input
             const dismissHint = () => {
-                const el = document.getElementById('search-hint');
-                if (el) {
-                    el.style.transition = 'opacity 0.3s';
-                    el.style.opacity = '0';
-                    setTimeout(() => {
-                        el.remove();
-                        window.removeEventListener('scroll', repositionHint);
-                        window.removeEventListener('resize', repositionHint);
-                    }, 300);
-                }
+                removeSearchHint();
                 localStorage.setItem('shopSearchHintDismissed', '1');
                 searchInput.removeEventListener('input', dismissHint);
             };
