@@ -25,7 +25,6 @@ async function main() {
         const now = Date.now();
         const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
         const oneMonthAgo = now - (30 * 24 * 60 * 60 * 1000);
-        const oneDayMs = 24 * 60 * 60 * 1000;
 
         // Extract unique usernames who have been active in the past week
         const uniqueUsers = new Set();
@@ -68,6 +67,8 @@ async function main() {
         const failedUsers = [];
 
         // Worker function to process a single user
+        // Follows the same logic as computeStats on the frontend:
+        // only count completed sessions (non-null logout), no capping/merging
         const processUser = async (username) => {
             try {
                 const historyRes = await fetch(`https://api.civinfo.net/mc-sessions/all?mcName=${username}`, fetchOptions);
@@ -80,72 +81,38 @@ async function main() {
                 const logins = history.loginTimestamps || [];
                 const logouts = history.logoutTimestamps || [];
 
-                // Pair logins with their corresponding logout and sort by login time
-                const sessionsArr = logins.map((login, i) => ({ login, logout: logouts[i] || null }));
-                sessionsArr.sort((a, b) => (a.login || 0) - (b.login || 0));
-                
-                // Normalize sessions (cap per-day), filter invalid and merge overlaps so we don't double-count
-                const normalized = [];
-                for (const s of sessionsArr) {
-                    let login = s.login;
-                    let logout = s.logout;
-                    if (!login) continue;
-                    if (!logout || logout <= login) logout = now;
-                    if (logout - login > oneDayMs) logout = login + oneDayMs;
-                    if (logout <= login) continue;
-                    normalized.push({ start: login, end: logout });
-                }
-                
-                const merged = [];
-                for (const s of normalized) {
-                    if (merged.length === 0) {
-                        merged.push({ ...s });
-                        continue;
-                    }
-                    const last = merged[merged.length - 1];
-                    if (s.start <= last.end) {
-                        // overlapping or adjacent -> extend the last segment
-                        last.end = Math.max(last.end, s.end);
-                    } else {
-                        merged.push({ ...s });
-                    }
-                }
-                
-                // Cap merged sessions to 23.8 hours max each
-                const maxSessionMs = 23.8 * 3600 * 1000;
-                for (const s of merged) {
-                    if (s.end - s.start > maxSessionMs) {
-                        s.end = s.start + maxSessionMs;
-                    }
-                }
-                
                 let weekly = 0;
                 let monthly = 0;
                 let allTime = 0;
-                
-                // Accumulate durations from merged sessions (use overlaps with week/month windows)
-                for (const s of merged) {
-                    const start = s.start;
-                    const end = s.end;
+
+                // Aggregate completed sessions only (skip ongoing/null logout)
+                const pairs = Math.min(logins.length, logouts.length);
+                for (let i = 0; i < pairs; i++) {
+                    const li = logins[i];
+                    const lo = logouts[i];
+                    if (!li || lo === null) continue; // skip ongoing sessions
+
+                    const start = li;
+                    const end = lo;
+                    if (end <= start) continue;
+
                     const duration = end - start;
                     allTime += duration;
-                    
+
+                    // Weekly overlap
                     const weekStart = Math.max(start, oneWeekAgo);
                     const weekEnd = Math.min(end, now);
                     if (weekEnd > weekStart) {
                         weekly += (weekEnd - weekStart);
                     }
-                    
+
+                    // Monthly overlap
                     const monthStart = Math.max(start, oneMonthAgo);
                     const monthEnd = Math.min(end, now);
                     if (monthEnd > monthStart) {
                         monthly += (monthEnd - monthStart);
                     }
                 }
-
-                // Clamp weekly to max 23.8 hours/day * 7 days to avoid impossible weekly totals
-                const WEEKLY_MAX_MS = 23.8 * 7 * 3600 * 1000;
-                weekly = Math.min(weekly, WEEKLY_MAX_MS);
 
                 if (allTime > 0) {
                     return { success: true, username, weekly, monthly, allTime };

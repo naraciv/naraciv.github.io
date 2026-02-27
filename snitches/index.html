@@ -354,6 +354,51 @@
         .stat-pill.culled .stat-dot { background: #6b7280; }
         .stat-pill .stat-label { color: #9ca3af; font-size: 0.8rem; }
         .stat-pill .stat-value { color: white; font-weight: 600; font-size: 0.8rem; }
+        .stat-pill {
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.2s, filter 0.2s;
+        }
+        .stat-pill:hover {
+            filter: brightness(1.2);
+        }
+        .stat-pill.disabled {
+            opacity: 0.35;
+            filter: grayscale(0.5);
+            text-decoration: line-through;
+        }
+        .stat-pill.disabled:hover {
+            opacity: 0.5;
+            filter: grayscale(0.3);
+        }
+        
+        /* Onboarding tooltip (non-blocking, text + bendy arrow) */
+        .onboarding-tooltip {
+            position: fixed;
+            z-index: 1000;
+            pointer-events: none;
+            animation: onboardFadeIn 0.5s ease-out;
+        }
+        .onboarding-tooltip .onboarding-inner {
+            display: flex;
+            align-items: start;
+        }
+        .onboarding-tooltip .onboarding-text {
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            text-shadow: 0 0 8px rgba(255,255,255,0.3);
+            margin-top: -7px;
+        }
+        .onboarding-tooltip .onboarding-arrow-svg {
+            display: block;
+            flex-shrink: 0;
+        }
+        @keyframes onboardFadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
         /* Bounds input */
         .bounds-input {
@@ -667,9 +712,16 @@
                                         </div>
                                     </div>
                                     
+                                    <!-- Dormant warning days -->
+                                    <div class="flex items-center gap-1 text-xs text-gray-400 mb-4">
+                                        <span>Dormant warning within</span>
+                                        <input type="number" id="dormant-days-input" value="5" min="1" max="90" style="width:40px">
+                                        <span>days</span>
+                                    </div>
+                                    
                                     <!-- Click to Select toggle -->
-                                    <div class="pt-2 mb-4">
-                                        <div class="text-xs text-gray-400 mb-2">Click to Select</div>
+                                    <div class="pt-2 mb-4 flex items-center justify-between">
+                                        <span class="text-xs text-gray-400" style="flex:0 0 80%">Click to Select</span>
                                         <label class="toggle-switch">
                                             <input type="checkbox" id="click-select-toggle" checked>
                                             <span class="toggle-slider"></span>
@@ -677,10 +729,19 @@
                                     </div>
                                     
                                     <!-- Show Will be Dormant toggle -->
-                                    <div class="pt-2">
-                                        <div class="text-xs text-gray-400 mb-2">Show which snitches will become dormant (5 days)</div>
+                                    <div class="pt-2 flex items-center justify-between mb-4">
+                                        <span class="text-xs text-gray-400" style="flex:0 0 80%">Show will be dormant</span>
                                         <label class="toggle-switch">
                                             <input type="checkbox" id="show-will-dormant-toggle" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    
+                                    <!-- Show Snitch Range toggle -->
+                                    <div class="pt-2 flex items-center justify-between">
+                                        <span class="text-xs text-gray-400" style="flex:0 0 80%">Show Snitch Range (21×21)</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="show-snitch-range-toggle">
                                             <span class="toggle-slider"></span>
                                         </label>
                                     </div>
@@ -812,6 +873,20 @@
         
         // Show will be dormant toggle
         let showWillBeDormant = true;
+        
+        // Show snitch range toggle
+        let showSnitchRange = false;
+        
+        // Dormant warning days (configurable)
+        let dormantWarningDays = 5;
+        
+        // Status type visibility (clickable pills)
+        let statusVisibility = {
+            active: true,
+            'will-dormant': true,
+            dormant: true,
+            culled: true
+        };
         
         // Selected snitches
         let selectedSnitches = [];
@@ -1066,16 +1141,25 @@
             // At zoom -6: radius = 1, at zoom 0: radius = 4
             const markerRadius = Math.max(1, Math.min(6, 1 + (currentZoom + 6) * 0.8));
             
+            // 21x21 range box size in screen pixels
+            const rangeSize = 21 * scale;
+            const halfRange = rangeSize / 2;
+            
             // Draw each visible snitch
             visibleSnitches.forEach(snitch => {
                 const screen = worldToScreen(snitch.x, snitch.z);
                 
-                // Skip if off screen
-                if (screen.x < -10 || screen.x > width + 10 || screen.y < -10 || screen.y > height + 10) {
+                // Skip if off screen (use larger margin for range boxes)
+                const margin = showSnitchRange ? halfRange + 10 : 10;
+                if (screen.x < -margin || screen.x > width + margin || screen.y < -margin || screen.y > height + margin) {
                     return;
                 }
                 
                 const status = getSnitchStatus(snitch);
+                
+                // Skip if this status type is disabled via pill toggle
+                const effectiveStatus = (!showWillBeDormant && status === 'will-dormant') ? 'active' : status;
+                if (!statusVisibility[effectiveStatus]) return;
                 
                 // Set color based on status
                 let color;
@@ -1090,22 +1174,42 @@
                     color = '#6b7280'; // gray (culled)
                 }
                 
-                // Draw marker (no stroke, just fill)
-                snitchCtx.beginPath();
-                snitchCtx.arc(screen.x, screen.y, markerRadius, 0, Math.PI * 2);
-                snitchCtx.fillStyle = color;
-                snitchCtx.fill();
+                if (showSnitchRange) {
+                    // Draw 21x21 range box with 50% opacity
+                    snitchCtx.globalAlpha = 0.5;
+                    snitchCtx.fillStyle = color;
+                    snitchCtx.fillRect(screen.x - halfRange, screen.y - halfRange, rangeSize, rangeSize);
+                    // Draw border at full opacity
+                    snitchCtx.globalAlpha = 0.8;
+                    snitchCtx.strokeStyle = color;
+                    snitchCtx.lineWidth = 1;
+                    snitchCtx.strokeRect(screen.x - halfRange, screen.y - halfRange, rangeSize, rangeSize);
+                    snitchCtx.globalAlpha = 1.0;
+                } else {
+                    // Draw circular marker (no stroke, just fill)
+                    snitchCtx.beginPath();
+                    snitchCtx.arc(screen.x, screen.y, markerRadius, 0, Math.PI * 2);
+                    snitchCtx.fillStyle = color;
+                    snitchCtx.fill();
+                }
                 
                 // Draw selection ring if selected
                 const isSelected = selectedSnitches.some(s => 
                     s.x === snitch.x && s.y === snitch.y && s.z === snitch.z
                 );
                 if (isSelected) {
-                    snitchCtx.beginPath();
-                    snitchCtx.arc(screen.x, screen.y, markerRadius + 3, 0, Math.PI * 2);
-                    snitchCtx.strokeStyle = '#ffffff';
-                    snitchCtx.lineWidth = 2;
-                    snitchCtx.stroke();
+                    if (showSnitchRange) {
+                        // Draw selection outline around range box
+                        snitchCtx.strokeStyle = '#ffffff';
+                        snitchCtx.lineWidth = 2;
+                        snitchCtx.strokeRect(screen.x - halfRange - 2, screen.y - halfRange - 2, rangeSize + 4, rangeSize + 4);
+                    } else {
+                        snitchCtx.beginPath();
+                        snitchCtx.arc(screen.x, screen.y, markerRadius + 3, 0, Math.PI * 2);
+                        snitchCtx.strokeStyle = '#ffffff';
+                        snitchCtx.lineWidth = 2;
+                        snitchCtx.stroke();
+                    }
                 }
             });
         }
@@ -1115,9 +1219,10 @@
             uploadArea.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', handleFileSelect);
             
-            // Drag and drop
+            // Drag and drop on upload area
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 uploadArea.classList.add('dragover');
             });
             uploadArea.addEventListener('dragleave', () => {
@@ -1125,9 +1230,26 @@
             });
             uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 uploadArea.classList.remove('dragover');
                 const file = e.dataTransfer.files[0];
                 if (file) loadDatabase(file);
+            });
+            
+            // Prevent browser default drag behavior on the whole document
+            // and allow dropping files anywhere on the page
+            document.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            document.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    if (['sqlite', 'db', 'sqlite3'].includes(ext)) {
+                        loadDatabase(file);
+                    }
+                }
             });
             
             // Load new button
@@ -1370,6 +1492,46 @@
                 updateVisibleSnitches();
                 render();
                 updateStats();
+            });
+            
+            // Show Snitch Range toggle
+            document.getElementById('show-snitch-range-toggle').addEventListener('change', (e) => {
+                showSnitchRange = e.target.checked;
+                render();
+            });
+            
+            // Dormant warning days input
+            document.getElementById('dormant-days-input').addEventListener('change', (e) => {
+                let val = parseInt(e.target.value) || 5;
+                val = Math.max(1, Math.min(90, val));
+                e.target.value = val;
+                dormantWarningDays = val;
+                updateVisibleSnitches();
+                render();
+                updateStats();
+            });
+            
+            // Stat pill click to toggle status visibility
+            const pillMap = {
+                'stat-pill-active': 'active',
+                'stat-pill-will-dormant': 'will-dormant',
+                'stat-pill-dormant': 'dormant',
+                'stat-pill-culled': 'culled'
+            };
+            Object.entries(pillMap).forEach(([id, status]) => {
+                document.getElementById(id).addEventListener('click', () => {
+                    statusVisibility[status] = !statusVisibility[status];
+                    document.getElementById(id).classList.toggle('disabled', !statusVisibility[status]);
+                    render();
+                    // Dismiss onboarding on first pill toggle
+                    const overlay = document.getElementById('onboarding-overlay');
+                    if (overlay) {
+                        localStorage.setItem('snitch-viewer-onboarded', 'true');
+                        overlay.style.transition = 'opacity 0.3s';
+                        overlay.style.opacity = '0';
+                        setTimeout(() => overlay.remove(), 300);
+                    }
+                });
             });
             
             // Y level range slider
@@ -1797,7 +1959,7 @@
         
         function getSnitchStatus(snitch) {
             const now = Date.now();
-            const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000;
+            const warningMs = dormantWarningDays * 24 * 60 * 60 * 1000;
             
             // If cull_ts is set and in the past, it's culled
             if (snitch.cull_ts && snitch.cull_ts > 0 && snitch.cull_ts < now) {
@@ -1809,8 +1971,8 @@
                 return 'dormant';
             }
             
-            // If dormant_ts is set and within 5 days, it will be dormant soon
-            if (snitch.dormant_ts && snitch.dormant_ts > 0 && snitch.dormant_ts < now + FIVE_DAYS_MS) {
+            // If dormant_ts is set and within configured warning days, it will be dormant soon
+            if (snitch.dormant_ts && snitch.dormant_ts > 0 && snitch.dormant_ts < now + warningMs) {
                 return 'will-dormant';
             }
             
@@ -1837,7 +1999,63 @@
             setTimeout(() => {
                 resizeCanvas();
                 fitMapToSnitches();
+                showOnboardingTooltip();
             }, 100);
+        }
+        
+        function showOnboardingTooltip() {
+            // Only show once, tracked via localStorage
+            if (localStorage.getItem('snitch-viewer-onboarded')) return;
+            
+            const activePill = document.getElementById('stat-pill-active');
+            if (!activePill) return;
+            
+            const pillRect = activePill.getBoundingClientRect();
+            
+            // Arrow SVG: starts at top-left, bends right-then-down, arrowhead at bottom pointing at pill
+            // The arrow tip lands at the bottom-center of the SVG
+            const arrowW = 60;
+            const arrowH = 62;
+            const arrowSvg = `<svg class="onboarding-arrow-svg" width="${arrowW}" height="${arrowH}" viewBox="0 0 ${arrowW} ${arrowH}" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M${arrowW - 5} 4 C${arrowW * 0.4} 4, ${arrowW * 0.15} ${arrowH * 0.35}, ${arrowW * 0.15} ${arrowH - 6}" stroke="white" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.9"/>
+                <path d="M${arrowW * 0.15 - 5} ${arrowH - 15} L${arrowW * 0.15} ${arrowH - 3} L${arrowW * 0.15 + 5  } ${arrowH - 15}" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+            </svg>`;
+            
+            const tip = document.createElement('div');
+            tip.className = 'onboarding-tooltip';
+            tip.id = 'onboarding-overlay';
+            tip.innerHTML = `
+                <div class="onboarding-inner">
+                    ${arrowSvg}
+                    <div class="onboarding-text">Click any box to toggle it</div>
+                </div>
+            `;
+            document.body.appendChild(tip);
+            
+            // Reposition helper: keeps tooltip anchored to the pill on scroll/resize
+            function repositionTooltip() {
+                const pr = activePill.getBoundingClientRect();
+                const tr = tip.getBoundingClientRect();
+                const arrowTipX = arrowW * 0.15;
+                const left = pr.left + pr.width / 2 - arrowTipX;
+                tip.style.top = (pr.top - tr.height - 6) + 'px';
+                tip.style.left = Math.max(4, left) + 'px';
+            }
+            repositionTooltip();
+            
+            // Follow the pill on scroll and resize
+            window.addEventListener('scroll', repositionTooltip, { passive: true });
+            window.addEventListener('resize', repositionTooltip, { passive: true });
+            
+            // Clean up listeners when tooltip is removed
+            const observer = new MutationObserver(() => {
+                if (!document.getElementById('onboarding-overlay')) {
+                    window.removeEventListener('scroll', repositionTooltip);
+                    window.removeEventListener('resize', repositionTooltip);
+                    observer.disconnect();
+                }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
         }
         
         function renderGroupFilters() {

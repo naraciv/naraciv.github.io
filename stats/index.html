@@ -73,6 +73,90 @@
             color: white; padding: 8px; border-radius: 4px; pointer-events: none; font-size: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 50;
         }
+
+        /* Rank Badge on Skin Viewer */
+        .rank-badge {
+            position: absolute; top: 8px; left: 8px; z-index: 20;
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px; color: #fff;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .rank-badge.rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-color: #fde68a; }
+        .rank-badge.rank-2 { background: linear-gradient(135deg, #9ca3af, #6b7280); border-color: #d1d5db; }
+        .rank-badge.rank-3 { background: linear-gradient(135deg, #d97706, #b45309); border-color: #fbbf24; }
+        .rank-badge.rank-other { background: linear-gradient(135deg, #374151, #1f2937); border-color: #4b5563; }
+
+        /* Username tile with online dot */
+        .username-tile {
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+        .online-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+            position: relative; cursor: default;
+        }
+        .online-dot::after {
+            content: attr(data-tooltip);
+            position: absolute; left: 50%; top: -32px; transform: translateX(-50%);
+            background: #1f2937; color: #e5e7eb; font-size: 11px; font-weight: 500;
+            padding: 3px 10px; border-radius: 6px; white-space: nowrap;
+            border: 1px solid #374151; pointer-events: none;
+            opacity: 0; transition: opacity 0.15s ease;
+        }
+        .online-dot:hover::after { opacity: 1; }
+        .online-dot.is-online { background-color: #10b981; box-shadow: 0 0 6px #10b981; }
+        .online-dot.is-offline { background-color: #ef4444; }
+
+        /* Heatmap Range Slider */
+        .range-slider-container {
+            position: relative; width: 100%; height: 40px; margin: 12px 0 4px;
+        }
+        .range-slider-container input[type="range"] {
+            position: absolute; width: 100%; top: 0; height: 40px; margin: 0;
+            -webkit-appearance: none; appearance: none; background: none; pointer-events: none; z-index: 2;
+        }
+        .range-slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 16px; height: 16px; border-radius: 50%; background: #ef4444;
+            border: 2px solid #fff; cursor: pointer; pointer-events: all;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+        .range-slider-container input[type="range"]::-moz-range-thumb {
+            width: 16px; height: 16px; border-radius: 50%; background: #ef4444;
+            border: 2px solid #fff; cursor: pointer; pointer-events: all;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+        .range-slider-track {
+            position: absolute; top: 18px; height: 4px; background: #374151; width: 100%;
+            border-radius: 2px; z-index: 0;
+        }
+        .range-slider-highlight {
+            position: absolute; top: 18px; height: 4px; background: #ef4444;
+            border-radius: 2px; z-index: 1;
+        }
+        .range-slider-ticks {
+            display: flex; justify-content: space-between; position: relative;
+            margin-top: 2px; padding: 0 8px; height: 16px;
+        }
+        .range-slider-ticks span {
+            font-size: 9px; color: #6b7280; white-space: nowrap;
+        }
+
+        /* Heatmap Styles */
+        .heatmap-container { overflow-x: auto; }
+        .heatmap-grid { display: grid; gap: 2px; }
+        .heatmap-cell {
+            border-radius: 2px; cursor: pointer; min-width: 18px; min-height: 22px;
+        }
+        .heatmap-label {
+            font-size: 11px; color: #9ca3af; display: flex; align-items: center;
+            justify-content: flex-end; padding-right: 6px; white-space: nowrap;
+        }
+        .heatmap-hour-label {
+            font-size: 10px; color: #6b7280; text-align: center;
+        }
     </style>
     
 <script src="../components/analytics.js" defer></script>
@@ -162,10 +246,16 @@
                     
                     <!-- 3D Skin Viewer Container -->
                     <div class="relative mb-4 w-full flex justify-center">
+                        <div id="rank-badge-container"></div>
                         <canvas id="skin-canvas" class="rounded-lg"></canvas>
                     </div>
 
-                    <h1 id="profile-username" class="text-3xl font-bold text-white mb-6"></h1>
+                    <div class="mb-6 flex justify-center">
+                        <div class="username-tile">
+                            <span id="profile-online-dot" class="online-dot is-offline" data-tooltip="Offline"></span>
+                            <h1 id="profile-username" class="text-3xl font-bold text-white"></h1>
+                        </div>
+                    </div>
                     
                     <div class="w-full space-y-4 text-left text-sm">
                         <div class="bg-gray-800/50 p-3 rounded-lg">
@@ -220,7 +310,8 @@
                         
                         <!-- Tabs (Left) -->
                         <div class="flex bg-gray-800 rounded-lg p-1">
-                            <button onclick="switchChart('calendar')" id="chart-tab-calendar" class="px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold">Calendar</button>
+                            <button onclick="switchChart('heatmap')" id="chart-tab-heatmap" class="px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold">Heatmap</button>
+                            <button onclick="switchChart('calendar')" id="chart-tab-calendar" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Calendar</button>
                             <button onclick="switchChart('line')" id="chart-tab-line" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Line</button>
                             <button onclick="switchChart('bar')" id="chart-tab-bar" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Bar</button>
                         </div>
@@ -240,6 +331,7 @@
                         <div id="chart-calendar" class="w-full min-h-[400px]"></div>
                         <div id="chart-d3-main" class="w-full h-[350px] hidden chart-container"></div>
                         <div id="chart-d3-brush" class="w-full h-[60px] hidden mt-2 chart-container"></div>
+                        <div id="chart-heatmap" class="w-full min-h-[300px] hidden"></div>
                     </div>
                     
                     <div class="text-xs text-gray-500 mt-2 text-center">
@@ -675,6 +767,41 @@
             if (scrollToTop) window.scrollTo(0, 0);
         }
 
+        // Resolve correct-case username and UUID via Mojang API (case-insensitive)
+        async function resolveCorrectUsername(inputName) {
+            // Try Ashcon Mojang proxy (CORS-friendly, case-insensitive)
+            try {
+                const resp = await fetch(`https://api.ashcon.app/mojang/v2/user/${encodeURIComponent(inputName)}`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data.username && data.uuid) {
+                        return { username: data.username, uuid: data.uuid.replace(/-/g, '') };
+                    }
+                }
+            } catch (e) {
+                console.warn('Ashcon lookup failed, trying fallbacks:', e);
+            }
+
+            // Fallback: PlayerDB (another CORS-friendly Mojang proxy)
+            try {
+                const resp = await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(inputName)}`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data.success && data.data?.player?.username) {
+                        return {
+                            username: data.data.player.username,
+                            uuid: data.data.player.raw_id || null,
+                        };
+                    }
+                }
+            } catch (e) {
+                console.warn('PlayerDB lookup failed:', e);
+            }
+
+            // Last resort: return input as-is
+            return { username: inputName, uuid: null };
+        }
+
         async function showProfileView(username) {
             cachedElements.viewList.classList.add('hidden');
             cachedElements.viewProfile.classList.remove('hidden');
@@ -684,19 +811,41 @@
             document.getElementById('monthly-data-container').innerHTML = '';
             document.getElementById('profile-status-container').classList.add('hidden');
             document.getElementById('profile-last-logout-container').classList.add('hidden');
+            document.getElementById('rank-badge-container').innerHTML = '';
+            document.getElementById('profile-online-dot').className = 'online-dot is-offline';
+            document.getElementById('profile-online-dot').setAttribute('data-tooltip', 'Offline');
+            heatmapSliderState = null;
             
-            // Fetch UUID from mc-accounts for skin
-            let playerUuid = null;
-            try {
-                const accountResponse = await fetchAPI(`https://api.civinfo.net/mc-accounts/all?mcName=${username}`);
-                if (accountResponse.ok) {
-                    const accountData = await accountResponse.json();
-                    if (accountData.uuids && accountData.uuids.length > 0) {
-                        playerUuid = accountData.uuids[0];
+            // Resolve correct-case username via Mojang API (case-insensitive lookup)
+            const resolved = await resolveCorrectUsername(username);
+            username = resolved.username;
+            let playerUuid = resolved.uuid;
+
+            // Update display and URL if the case was corrected
+            document.getElementById('profile-username').textContent = username;
+            updateRankBadge(username);
+            const currentPath = window.location.pathname;
+            const expectedSuffix = '/' + encodeURIComponent(username);
+            if (!currentPath.endsWith(expectedSuffix)) {
+                const url = new URL(window.location);
+                url.pathname = baseStatsPath + encodeURIComponent(username);
+                url.searchParams.delete('player');
+                window.history.replaceState({}, '', url);
+            }
+
+            // If Mojang lookup didn't return a UUID, try civinfo mc-accounts
+            if (!playerUuid) {
+                try {
+                    const accountResponse = await fetchAPI(`https://api.civinfo.net/mc-accounts/all?mcName=${encodeURIComponent(username)}`);
+                    if (accountResponse.ok) {
+                        const accountData = await accountResponse.json();
+                        if (accountData.uuids && accountData.uuids.length > 0) {
+                            playerUuid = accountData.uuids[0];
+                        }
                     }
+                } catch (e) {
+                    console.error('Failed to fetch UUID:', e);
                 }
-            } catch (e) {
-                console.error('Failed to fetch UUID:', e);
             }
             
             let viewerAvailable = true;
@@ -720,7 +869,7 @@
             document.getElementById('profile-namemc').href = `https://namemc.com/profile/${playerUuid || username}`;
 
             try {
-                const response = await fetchAPI(`https://api.civinfo.net/mc-sessions/all?mcName=${username}`);
+                const response = await fetchAPI(`https://api.civinfo.net/mc-sessions/all?mcName=${encodeURIComponent(username)}`);
                 if (!response.ok) throw new Error('Failed to fetch history');
                 const data = await response.json();
                 processProfileData(data);
@@ -804,163 +953,210 @@
         }
 
         // --- Profile Logic ---
+        function ym(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function computeStats(payload) {
+            const login = payload?.loginTimestamps || [];
+            const logout = payload?.logoutTimestamps || [];
+
+            let totalHours = 0;
+            let sessions = 0;
+            const monthly = new Map(); // key -> hours
+            let firstSeen = null;
+            let lastSeen = null;
+
+            if (!login.length) {
+                return {
+                    totalHours: 0,
+                    sessions: 0,
+                    monthly: {},
+                    firstSeen: null,
+                    lastSeen: null,
+                    isOnline: false,
+                    onlineSince: null,
+                    currentSessionHours: 0,
+                };
+            }
+
+            // Determine most recent session by max login timestamp
+            let latestIdx = 0;
+            let latestLogin = login[0] || 0;
+            for (let i = 1; i < login.length; i++) {
+                if (login[i] && login[i] > latestLogin) {
+                    latestLogin = login[i];
+                    latestIdx = i;
+                }
+            }
+
+            const isOnline = Array.isArray(logout) && logout[latestIdx] === null;
+            const onlineSince = isOnline ? new Date(login[latestIdx]) : null;
+
+            let currentSessionHours = 0;
+            if (isOnline && onlineSince && !isNaN(onlineSince)) {
+                const now = new Date();
+                currentSessionHours = Math.max(0, (now - onlineSince) / (1000 * 60 * 60));
+                lastSeen = now;
+            }
+
+            // Aggregate completed sessions only (exclude ongoing/null logout rows)
+            const pairs = Math.min(login.length, logout.length);
+            for (let i = 0; i < pairs; i++) {
+                const li = login[i];
+                const lo = logout[i];
+                if (!li || lo === null) continue; // skip ongoing
+
+                const start = new Date(li);
+                const end = new Date(lo);
+                if (isNaN(start) || isNaN(end) || end <= start) continue;
+
+                const hours = (end - start) / (1000 * 60 * 60);
+                totalHours += hours;
+                sessions += 1;
+
+                const key = ym(start);
+                monthly.set(key, (monthly.get(key) || 0) + hours);
+
+                if (!firstSeen || start < firstSeen) firstSeen = start;
+                if (!lastSeen || end > lastSeen) lastSeen = end;
+            }
+
+            const monthlyObj = Object.fromEntries(
+                [...monthly.entries()].sort(([a], [b]) => (a < b ? -1 : 1))
+            );
+
+            return {
+                totalHours,
+                sessions,
+                monthly: monthlyObj,
+                firstSeen,
+                lastSeen,
+                isOnline,
+                onlineSince,
+                currentSessionHours,
+            };
+        }
+
         function processProfileData(data) {
+            const stats = computeStats(data);
+
             const logins = data.loginTimestamps || [];
             const logouts = data.logoutTimestamps || [];
-            const now = Date.now();
-            const oneDayMs = 24 * 60 * 60 * 1000;
-            const maxSessionMs = 23.8 * 60 * 60 * 1000;
-            
-            // Track last login and logout for online status
-            let lastLoginTime = 0;
-            let lastLogoutTime = 0;
-            for (let i = 0; i < logins.length; i++) {
-                if (logins[i] && logins[i] > lastLoginTime) lastLoginTime = logins[i];
-                if (logouts[i] && logouts[i] > lastLogoutTime) lastLogoutTime = logouts[i];
-            }
-            
-            // Pair logins with their corresponding logout and sort by login time
-            const sessionsArr = logins.map((login, i) => ({ login, logout: logouts[i] || null }));
-            sessionsArr.sort((a, b) => (a.login || 0) - (b.login || 0));
-            
-            // Normalize sessions (cap per-day), filter invalid and merge overlaps so we don't double-count
-            const normalized = [];
-            for (const s of sessionsArr) {
-                let login = s.login;
-                let logout = s.logout;
-                
-                // Skip invalid entries
-                if (!login) continue;
-                if (login < SERVER_START_DATE) continue;
-                if (logout && logout < SERVER_START_DATE) continue;
-                
-                // Handle active sessions or bad data (logout before login or missing)
-                if (!logout || logout <= login) logout = now;
-                
-                // Cap sessions at 24 hours
-                if (logout - login > oneDayMs) logout = login + oneDayMs;
-                
-                if (logout <= login) continue;
-                normalized.push({ start: login, end: logout });
-            }
-            
-            // Merge overlapping sessions
-            const merged = [];
-            for (const s of normalized) {
-                if (merged.length === 0) {
-                    merged.push({ ...s });
-                    continue;
-                }
-                const last = merged[merged.length - 1];
-                if (s.start <= last.end) {
-                    // overlapping or adjacent -> extend the last segment
-                    last.end = Math.max(last.end, s.end);
-                } else {
-                    merged.push({ ...s });
-                }
-            }
-            
-            // Cap merged sessions to 23.8 hours max each
-            for (const s of merged) {
-                if (s.end - s.start > maxSessionMs) {
-                    s.end = s.start + maxSessionMs;
-                }
-            }
-            
-            let totalMs = 0;
-            let firstJoin = now;
-            let lastJoin = 0;
-            const dailyPlaytime = {};
-            const monthlyPlaytime = {};
 
-            // Process merged sessions
-            for (const session of merged) {
-                const login = session.start;
-                const logout = session.end;
-                
-                if (login < firstJoin) firstJoin = login;
-                if (login > lastJoin) lastJoin = login;
-                
-                const duration = logout - login;
-                totalMs += duration;
-                
-                // Split session across day boundaries for accurate daily bucketing
-                let currentTime = login;
-                while (currentTime < logout) {
+            // Build daily playtime from completed sessions for calendar/chart views
+            const dailyPlaytime = {};
+            const pairs = Math.min(logins.length, logouts.length);
+            for (let i = 0; i < pairs; i++) {
+                const li = logins[i];
+                const lo = logouts[i];
+                if (!li || lo === null) continue;
+                if (isNaN(new Date(li)) || isNaN(new Date(lo)) || lo <= li) continue;
+
+                let currentTime = li;
+                while (currentTime < lo) {
                     const d = new Date(currentTime);
                     const dayStart = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-                    const dayEnd = dayStart + (24 * 60 * 60 * 1000); // Next day start
-                    
-                    // How much of this session falls on this day?
-                    const sessionEndOnThisDay = Math.min(logout, dayEnd);
+                    const dayEnd = dayStart + (24 * 60 * 60 * 1000);
+                    const sessionEndOnThisDay = Math.min(lo, dayEnd);
                     const durationOnThisDay = sessionEndOnThisDay - currentTime;
-                    
                     dailyPlaytime[dayStart] = (dailyPlaytime[dayStart] || 0) + durationOnThisDay;
-                    
-                    // Monthly bucket (UTC)
-                    const monthKey = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
-                    monthlyPlaytime[monthKey] = (monthlyPlaytime[monthKey] || 0) + durationOnThisDay;
-                    
                     currentTime = dayEnd;
                 }
             }
-            
-            // Cap daily playtime to 23.8 hours max per day
-            for (const dayKey of Object.keys(dailyPlaytime)) {
-                if (dailyPlaytime[dayKey] > maxSessionMs) {
-                    dailyPlaytime[dayKey] = maxSessionMs;
+
+            // Convert monthly hours to ms for backward compat with chart rendering
+            const monthlyPlaytime = {};
+            for (const [key, hours] of Object.entries(stats.monthly)) {
+                monthlyPlaytime[key] = hours * 3600000;
+            }
+
+            // Build heatmap data: accumulate minutes per [dayOfWeek][hourOfDay] in LOCAL time
+            const heatmapGrid = Array.from({ length: 7 }, () => new Float64Array(24));
+            for (let i = 0; i < pairs; i++) {
+                const li = logins[i];
+                const lo = logouts[i];
+                if (!li || lo === null) continue;
+                if (isNaN(new Date(li)) || isNaN(new Date(lo)) || lo <= li) continue;
+                // Walk through each minute of the session in local time
+                let cursor = li;
+                while (cursor < lo) {
+                    const d = new Date(cursor);
+                    const dow = d.getDay(); // 0=Sun
+                    const hour = d.getHours();
+                    const nextHourBoundary = new Date(d.getFullYear(), d.getMonth(), d.getDate(), hour + 1, 0, 0).getTime();
+                    const chunkEnd = Math.min(lo, nextHourBoundary);
+                    heatmapGrid[dow][hour] += (chunkEnd - cursor) / 60000; // minutes
+                    cursor = chunkEnd;
                 }
             }
-            
-            if (totalMs === 0) { firstJoin = 0; lastJoin = 0; }
 
-            // Prepare D3 Data
+            // Store raw session pairs for heatmap range filtering
+            const rawSessions = [];
+            for (let i = 0; i < pairs; i++) {
+                const li = logins[i];
+                const lo = logouts[i];
+                if (!li || lo === null) continue;
+                if (isNaN(new Date(li)) || isNaN(new Date(lo)) || lo <= li) continue;
+                rawSessions.push({ login: li, logout: lo });
+            }
+
+            // Prepare D3 Data (capped at 24h)
+            const MAX_DAILY_MS = 24 * 3600000;
             const dailyData = [];
-            Object.keys(dailyPlaytime).sort((a,b)=>a-b).forEach(ts => {
-                // Cap daily playtime at 23.8h to prevent graph artifacts
-                const hours = Math.min(23.8, dailyPlaytime[ts] / 3600000);
+            Object.keys(dailyPlaytime).sort((a, b) => a - b).forEach(ts => {
+                const capped = Math.min(dailyPlaytime[ts], MAX_DAILY_MS);
+                const hours = Math.min(24, capped / 3600000);
                 dailyData.push({ date: new Date(parseInt(ts)), value: hours });
             });
 
             const weeklyMap = {};
             Object.keys(dailyPlaytime).forEach(ts => {
                 const d = new Date(parseInt(ts));
-                // Get Monday (UTC)
-                const day = d.getUTCDay(), diff = d.getUTCDate() - day + (day == 0 ? -6:1); 
+                const day = d.getUTCDay(), diff = d.getUTCDate() - day + (day == 0 ? -6 : 1);
                 const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), diff));
-                // Ensure we don't go before server start for the bin
-                const validMonday = Math.max(monday.getTime(), SERVER_START_DATE); 
-                weeklyMap[validMonday] = (weeklyMap[validMonday] || 0) + dailyPlaytime[ts];
+                const validMonday = Math.max(monday.getTime(), SERVER_START_DATE);
+                weeklyMap[validMonday] = (weeklyMap[validMonday] || 0) + Math.min(dailyPlaytime[ts], MAX_DAILY_MS);
             });
-            
-            // Cap weekly playtime to 23.8 * 7 hours max
-            const maxWeeklyMs = 23.8 * 7 * 3600 * 1000;
+            const MAX_WEEKLY_H = 24 * 7;
             const weeklyData = [];
-            Object.keys(weeklyMap).sort((a,b)=>a-b).forEach(ts => {
-                const cappedMs = Math.min(weeklyMap[ts], maxWeeklyMs);
-                weeklyData.push({ date: new Date(parseInt(ts)), value: cappedMs / 3600000 });
+            Object.keys(weeklyMap).sort((a, b) => a - b).forEach(ts => {
+                const hours = Math.min(MAX_WEEKLY_H, weeklyMap[ts] / 3600000);
+                weeklyData.push({ date: new Date(parseInt(ts)), value: hours });
             });
 
-            profileData = { totalMs, firstJoin, lastJoin, dailyPlaytime, monthlyPlaytime, dailyData, weeklyData };
-            
-            document.getElementById('profile-playtime').textContent = (totalMs / 3600000).toFixed(1) + 'h';
+            const totalMs = stats.totalHours * 3600000;
+            const firstJoin = stats.firstSeen ? stats.firstSeen.getTime() : 0;
+            const lastJoin = stats.lastSeen ? stats.lastSeen.getTime() : 0;
+
+            profileData = { totalMs, firstJoin, lastJoin, dailyPlaytime, monthlyPlaytime, dailyData, weeklyData, heatmapGrid, rawSessions, isOnline: stats.isOnline };
+
+            document.getElementById('profile-playtime').textContent = stats.totalHours.toFixed(1) + 'h';
+
+            // Update online status dot
+            const onlineDot = document.getElementById('profile-online-dot');
+            onlineDot.className = 'online-dot ' + (stats.isOnline ? 'is-online' : 'is-offline');
+            onlineDot.setAttribute('data-tooltip', stats.isOnline ? 'Online' : 'Offline');
+
             const dateTimeOpts = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' };
-            
-            // Check if player is online (last login > last logout)
-            const isOnline = lastLoginTime > lastLogoutTime;
+
             const statusContainer = document.getElementById('profile-status-container');
             const lastLogoutContainer = document.getElementById('profile-last-logout-container');
-            
-            if (firstJoin > 0) {
-                document.getElementById('profile-first-join').textContent = new Date(firstJoin).toLocaleString(undefined, dateTimeOpts);
-                document.getElementById('profile-last-join').textContent = new Date(lastJoin).toLocaleString(undefined, dateTimeOpts);
-                
-                // Show online status if player is currently online, otherwise show last logout
-                if (isOnline) {
+
+            if (stats.firstSeen) {
+                document.getElementById('profile-first-join').textContent = stats.firstSeen.toLocaleString(undefined, dateTimeOpts);
+                document.getElementById('profile-last-join').textContent = stats.lastSeen.toLocaleString(undefined, dateTimeOpts);
+
+                if (stats.isOnline) {
                     statusContainer.classList.remove('hidden');
                     lastLogoutContainer.classList.add('hidden');
                 } else {
                     statusContainer.classList.add('hidden');
+                    // Find last logout time for display
+                    let lastLogoutTime = 0;
+                    for (let i = 0; i < logouts.length; i++) {
+                        if (logouts[i] && logouts[i] > lastLogoutTime) lastLogoutTime = logouts[i];
+                    }
                     if (lastLogoutTime > 0) {
                         document.getElementById('profile-last-logout').textContent = new Date(lastLogoutTime).toLocaleString(undefined, dateTimeOpts);
                         lastLogoutContainer.classList.remove('hidden');
@@ -975,7 +1171,9 @@
                 lastLogoutContainer.classList.add('hidden');
             }
             renderMonthlyList();
-            switchChart('calendar');
+            const urlGraphType = new URLSearchParams(window.location.search).get('graph_type');
+            const validTypes = ['calendar', 'line', 'bar', 'heatmap'];
+            switchChart(validTypes.includes(urlGraphType) ? urlGraphType : 'heatmap');
         }
 
         function renderMonthlyList() {
@@ -1007,24 +1205,35 @@
         // --- D3 Charting Logic ---
         async function switchChart(type) {
             currentChartType = type;
-            ['calendar', 'line', 'bar'].forEach(t => {
+            // Update graph_type URL param
+            const url = new URL(window.location);
+            url.searchParams.set('graph_type', type);
+            window.history.replaceState({}, '', url);
+            ['calendar', 'line', 'bar', 'heatmap'].forEach(t => {
                 const btn = document.getElementById(`chart-tab-${t}`);
-                btn.className = t === type ? 'px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold' : 'px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white';
+                if (btn) btn.className = t === type ? 'px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold' : 'px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white';
             });
 
             const calDiv = document.getElementById('chart-calendar');
             const mainDiv = document.getElementById('chart-d3-main');
             const brushDiv = document.getElementById('chart-d3-brush');
+            const heatmapDiv = document.getElementById('chart-heatmap');
             const hint = document.getElementById('chart-hint-zoom');
             const granularityControls = document.getElementById('granularity-controls');
 
+            // Hide all first
+            calDiv.classList.add('hidden'); mainDiv.classList.add('hidden'); brushDiv.classList.add('hidden');
+            heatmapDiv.classList.add('hidden'); hint.classList.add('hidden'); granularityControls.classList.add('hidden');
+
             if (type === 'calendar') {
-                calDiv.classList.remove('hidden'); mainDiv.classList.add('hidden'); brushDiv.classList.add('hidden'); hint.classList.add('hidden');
-                granularityControls.classList.add('hidden');
+                calDiv.classList.remove('hidden');
                 renderCalendarChart();
+            } else if (type === 'heatmap') {
+                heatmapDiv.classList.remove('hidden');
+                renderPlaytimeHeatmap();
             } else {
                 await ensureD3();
-                calDiv.classList.add('hidden'); mainDiv.classList.remove('hidden'); brushDiv.classList.remove('hidden'); hint.classList.remove('hidden');
+                mainDiv.classList.remove('hidden'); brushDiv.classList.remove('hidden'); hint.classList.remove('hidden');
                 granularityControls.classList.remove('hidden');
                 granularityControls.classList.add('flex');
                 updateGranularityButtons();
@@ -1089,8 +1298,8 @@
                 let html = `<h4 class="text-xs font-bold text-gray-400 mb-1 text-center truncate">${mData.name}</h4><div class="calendar-grid">`;
                 for(let i=0; i<firstDayOffset; i++) html += `<div></div>`;
                 for(let d=1; d<=daysInMonth; d++) {
-                    const ms = mData.days[d] || 0;
-                    const hours = (ms / 3600000).toFixed(1);
+                    const ms = Math.min(mData.days[d] || 0, 24 * 3600000);
+                    const hours = Math.min(24, ms / 3600000).toFixed(1);
                     let opacity = 0.1;
                     if (mData.max > 0) opacity = 0.2 + (0.8 * (ms / mData.max));
                     const bg = ms > 0 ? `rgba(16, 185, 129, ${opacity})` : 'rgba(55, 65, 81, 0.3)';
@@ -1136,8 +1345,9 @@
 
             // Domains
             const xDomain = [new Date(profileData.firstJoin), new Date()];
+            const yMax = currentGranularity === 'daily' ? 24 : 24 * 7;
             x.domain(xDomain);
-            y.domain([0, d3.max(data, d => d.value) * 1.1]);
+            y.domain([0, Math.min(yMax, d3.max(data, d => d.value) * 1.1)]);
             xBrush.domain(xDomain);
             yBrush.domain(y.domain());
 
@@ -1288,6 +1498,303 @@
             el.style.left = (e.pageX + 10) + 'px'; el.style.top = (e.pageY + 10) + 'px';
         }
         function hideTooltip() { document.getElementById('calendar-tooltip').style.display = 'none'; }
+
+        // --- Playtime Heatmap ---
+        function buildHeatmapGrid(sessions) {
+            const grid = Array.from({ length: 7 }, () => new Float64Array(24));
+            for (const s of sessions) {
+                let cursor = s.login;
+                while (cursor < s.logout) {
+                    const d = new Date(cursor);
+                    const dow = d.getDay();
+                    const hour = d.getHours();
+                    const nextHourBoundary = new Date(d.getFullYear(), d.getMonth(), d.getDate(), hour + 1, 0, 0).getTime();
+                    const chunkEnd = Math.min(s.logout, nextHourBoundary);
+                    grid[dow][hour] += (chunkEnd - cursor) / 60000;
+                    cursor = chunkEnd;
+                }
+            }
+            return grid;
+        }
+
+        function getSliderTicks(minDate, maxDate) {
+            const spanMs = maxDate - minDate;
+            const spanMonths = spanMs / (30.44 * 24 * 3600000);
+            let stepMonths;
+            if (spanMonths <= 6) stepMonths = 1;
+            else if (spanMonths <= 12) stepMonths = 2;
+            else if (spanMonths <= 24) stepMonths = 4;
+            else stepMonths = 6;
+            const ticks = [];
+            const start = new Date(minDate);
+            let current = new Date(start.getFullYear(), start.getMonth(), 1);
+            if (current < start) current.setMonth(current.getMonth() + stepMonths);
+            while (current.getTime() <= maxDate) {
+                ticks.push({ time: current.getTime(), label: current.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) });
+                current = new Date(current.getFullYear(), current.getMonth() + stepMonths, 1);
+            }
+            return ticks;
+        }
+
+        let heatmapSliderState = null;
+        let heatmapDisplayMode = 'percent'; // 'percent' or 'total'
+
+        function renderPlaytimeHeatmap() {
+            const container = document.getElementById('chart-heatmap');
+            container.innerHTML = '';
+            if (!profileData || !profileData.rawSessions || profileData.rawSessions.length === 0) {
+                container.innerHTML = '<div class="text-center py-20 text-gray-500">No heatmap data available.</div>';
+                return;
+            }
+
+            const sessions = profileData.rawSessions;
+            const allMinTime = sessions[0].login;
+            const allMaxTime = sessions[sessions.length - 1].logout;
+
+            // Initialize slider state to full range
+            if (!heatmapSliderState || heatmapSliderState.allMin !== allMinTime) {
+                heatmapSliderState = { allMin: allMinTime, allMax: allMaxTime, curMin: allMinTime, curMax: allMaxTime };
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'heatmap-container';
+
+            // --- Range Slider ---
+            const sliderSection = document.createElement('div');
+            sliderSection.className = 'mt-4';
+
+            const sliderLabel = document.createElement('div');
+            sliderLabel.className = 'flex justify-between text-xs text-gray-400 mb-1';
+            const sliderLabelFrom = document.createElement('span');
+            const sliderLabelTo = document.createElement('span');
+            const formatSliderDate = (ts) => new Date(ts).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+            sliderLabelFrom.textContent = formatSliderDate(heatmapSliderState.curMin);
+            sliderLabelTo.textContent = formatSliderDate(heatmapSliderState.curMax);
+            sliderLabel.appendChild(sliderLabelFrom);
+            sliderLabel.appendChild(sliderLabelTo);
+            sliderSection.appendChild(sliderLabel);
+
+            const sliderContainer = document.createElement('div');
+            sliderContainer.className = 'range-slider-container';
+
+            const track = document.createElement('div');
+            track.className = 'range-slider-track';
+            sliderContainer.appendChild(track);
+
+            const highlight = document.createElement('div');
+            highlight.className = 'range-slider-highlight';
+            sliderContainer.appendChild(highlight);
+
+            const rangeMin = document.createElement('input');
+            rangeMin.type = 'range';
+            rangeMin.min = allMinTime;
+            rangeMin.max = allMaxTime;
+            rangeMin.value = heatmapSliderState.curMin;
+            rangeMin.step = 86400000; // 1 day
+
+            const rangeMax = document.createElement('input');
+            rangeMax.type = 'range';
+            rangeMax.min = allMinTime;
+            rangeMax.max = allMaxTime;
+            rangeMax.value = heatmapSliderState.curMax;
+            rangeMax.step = 86400000;
+
+            sliderContainer.appendChild(rangeMin);
+            sliderContainer.appendChild(rangeMax);
+            sliderSection.appendChild(sliderContainer);
+
+            // Tick marks
+            const ticks = getSliderTicks(allMinTime, allMaxTime);
+            if (ticks.length > 0) {
+                const tickRow = document.createElement('div');
+                tickRow.className = 'range-slider-ticks';
+                for (const tick of ticks) {
+                    const pct = ((tick.time - allMinTime) / (allMaxTime - allMinTime)) * 100;
+                    const sp = document.createElement('span');
+                    sp.textContent = tick.label;
+                    sp.style.position = 'absolute';
+                    sp.style.left = pct + '%';
+                    sp.style.transform = 'translateX(-50%)';
+                    tickRow.appendChild(sp);
+                }
+                sliderSection.appendChild(tickRow);
+            }
+
+            // --- Heatmap Display Mode Toggle ---
+            const toggleRow = document.createElement('div');
+            toggleRow.className = 'flex items-center justify-end gap-2 mb-3';
+            const toggleLabel = document.createElement('span');
+            toggleLabel.className = 'text-xs text-gray-500';
+            toggleLabel.textContent = 'Display:';
+            toggleRow.appendChild(toggleLabel);
+            const toggleBtnGroup = document.createElement('div');
+            toggleBtnGroup.className = 'flex bg-gray-800 rounded-lg p-1';
+            const btnPct = document.createElement('button');
+            btnPct.textContent = '% Playtime';
+            btnPct.id = 'heatmap-mode-percent';
+            const btnAvg = document.createElement('button');
+            btnAvg.textContent = 'Total Time';
+            btnAvg.id = 'heatmap-mode-total';
+            function applyModeStyles() {
+                const active = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
+                const inactive = 'px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white';
+                btnPct.className = heatmapDisplayMode === 'percent' ? active : inactive;
+                btnAvg.className = heatmapDisplayMode === 'total' ? active : inactive;
+            }
+            applyModeStyles();
+            btnPct.addEventListener('click', () => { heatmapDisplayMode = 'percent'; applyModeStyles(); renderHeatmapGrid(heatmapSliderState.curMin, heatmapSliderState.curMax); });
+            btnAvg.addEventListener('click', () => { heatmapDisplayMode = 'total'; applyModeStyles(); renderHeatmapGrid(heatmapSliderState.curMin, heatmapSliderState.curMax); });
+            toggleBtnGroup.appendChild(btnPct);
+            toggleBtnGroup.appendChild(btnAvg);
+            toggleRow.appendChild(toggleBtnGroup);
+            wrapper.appendChild(toggleRow);
+
+            // --- Heatmap Grid ---
+            const gridContainer = document.createElement('div');
+            gridContainer.id = 'heatmap-grid-inner';
+            wrapper.appendChild(gridContainer);
+
+            // --- Range Slider (below heatmap) ---
+            wrapper.appendChild(sliderSection);
+
+            container.appendChild(wrapper);
+
+            function updateHighlight() {
+                const lo = parseInt(rangeMin.value);
+                const hi = parseInt(rangeMax.value);
+                const range = allMaxTime - allMinTime;
+                const leftPct = range > 0 ? ((lo - allMinTime) / range) * 100 : 0;
+                const rightPct = range > 0 ? ((hi - allMinTime) / range) * 100 : 100;
+                highlight.style.left = leftPct + '%';
+                highlight.style.width = (rightPct - leftPct) + '%';
+            }
+            updateHighlight();
+
+            let heatmapDebounceTimer = null;
+            function onSliderChange() {
+                let lo = parseInt(rangeMin.value);
+                let hi = parseInt(rangeMax.value);
+                if (lo > hi) { const tmp = lo; lo = hi; hi = tmp; }
+                heatmapSliderState.curMin = lo;
+                heatmapSliderState.curMax = hi;
+                sliderLabelFrom.textContent = formatSliderDate(lo);
+                sliderLabelTo.textContent = formatSliderDate(hi);
+                updateHighlight();
+                clearTimeout(heatmapDebounceTimer);
+                heatmapDebounceTimer = setTimeout(() => renderHeatmapGrid(lo, hi), 200);
+            }
+
+            rangeMin.addEventListener('input', onSliderChange);
+            rangeMax.addEventListener('input', onSliderChange);
+
+            renderHeatmapGrid(heatmapSliderState.curMin, heatmapSliderState.curMax);
+        }
+
+        function renderHeatmapGrid(filterMin, filterMax) {
+            const gridContainer = document.getElementById('heatmap-grid-inner');
+            if (!gridContainer) return;
+            gridContainer.innerHTML = '';
+
+            // Filter sessions to range
+            const filtered = profileData.rawSessions.filter(s => s.logout >= filterMin && s.login <= filterMax)
+                .map(s => ({ login: Math.max(s.login, filterMin), logout: Math.min(s.logout, filterMax) }));
+
+            const grid = buildHeatmapGrid(filtered);
+
+            // Total minutes across all cells (for percentage)
+            let totalMinutes = 0;
+            for (let d = 0; d < 7; d++) {
+                for (let h = 0; h < 24; h++) totalMinutes += grid[d][h];
+            }
+
+            // Max value for color scaling
+            let maxVal = 0;
+            for (let d = 0; d < 7; d++) {
+                for (let h = 0; h < 24; h++) if (grid[d][h] > maxVal) maxVal = grid[d][h];
+            }
+
+            // Locale helpers
+            const use12h = new Date(2000, 0, 1, 13, 0).toLocaleTimeString(undefined, { hour: 'numeric' }).match(/[APap]/);
+            const dayNames = [];
+            for (let i = 0; i < 7; i++) dayNames.push(new Date(2000, 0, 2 + i).toLocaleDateString(undefined, { weekday: 'short' }));
+            const hourLabels = [];
+            for (let h = 0; h < 24; h++) hourLabels.push(new Date(2000, 0, 1, h, 0).toLocaleTimeString(undefined, { hour: 'numeric', hour12: !!use12h }));
+
+            const gridEl = document.createElement('div');
+            gridEl.className = 'heatmap-grid';
+            gridEl.style.gridTemplateColumns = '60px repeat(24, 1fr)';
+
+            // Header row
+            gridEl.innerHTML += '<div></div>';
+            for (let h = 0; h < 24; h++) gridEl.innerHTML += `<div class="heatmap-hour-label">${hourLabels[h]}</div>`;
+
+            // Data rows
+            for (let d = 0; d < 7; d++) {
+                gridEl.innerHTML += `<div class="heatmap-label">${dayNames[d]}</div>`;
+                for (let h = 0; h < 24; h++) {
+                    const val = grid[d][h];
+                    let title;
+                    if (heatmapDisplayMode === 'total') {
+                        const totalHours = val / 60;
+                        title = `${dayNames[d]} ${hourLabels[h]}: ${totalHours < 0.01 && val > 0 ? '<0.01' : totalHours.toFixed(1)}h total`;
+                    } else {
+                        const pct = totalMinutes > 0 ? ((val / totalMinutes) * 100) : 0;
+                        title = `${dayNames[d]} ${hourLabels[h]}: ${pct.toFixed(1)}% of total playtime`;
+                    }
+                    let opacity = 0.05;
+                    if (maxVal > 0 && val > 0) opacity = 0.15 + 0.85 * (val / maxVal);
+                    const bg = val > 0 ? `rgba(239, 68, 68, ${opacity})` : 'rgba(55, 65, 81, 0.3)';
+                    gridEl.innerHTML += `<div class="heatmap-cell" style="background-color: ${bg}" onmouseenter="showTooltip(event, '${title}')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
+                }
+            }
+
+            gridContainer.appendChild(gridEl);
+
+            // Legend
+            const legend = document.createElement('div');
+            legend.className = 'flex items-center justify-center gap-2 mt-3 text-xs text-gray-500';
+            legend.innerHTML = '<span>Less</span>';
+            for (let i = 0; i < 5; i++) {
+                const op = 0.15 + (0.85 * i / 4);
+                legend.innerHTML += `<div style="width:14px;height:14px;border-radius:2px;background:rgba(239,68,68,${i === 0 ? 0.05 : op})"></div>`;
+            }
+            legend.innerHTML += '<span>More</span>';
+            gridContainer.appendChild(legend);
+
+            // Timezone note
+            const tzNote = document.createElement('div');
+            const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || 'local';
+            tzNote.className = 'text-center text-xs text-gray-600 mt-2';
+            tzNote.textContent = `Times shown in your local timezone (${tzName})`;
+            gridContainer.appendChild(tzNote);
+        }
+
+        // --- Rank Badge Logic ---
+        function getPlayerRank(username) {
+            if (!leaderboardData || leaderboardData.length === 0) return -1;
+            const keys = Object.keys(leaderboardData[0]);
+            const userKey = keys.find(k => k.toLowerCase().includes('user') || k.toLowerCase().includes('name')) || keys[0];
+            const timeKey = keys.find(k => k.toLowerCase().includes('alltime')) || keys[1];
+            const sorted = [...leaderboardData].sort((a, b) => (parseFloat(b[timeKey]) || 0) - (parseFloat(a[timeKey]) || 0)).slice(0, 10);
+            const idx = sorted.findIndex(row => row[userKey] && row[userKey].toLowerCase() === username.toLowerCase());
+            return idx; // 0-based, -1 if not in top 10
+        }
+
+        function updateRankBadge(username) {
+            const container = document.getElementById('rank-badge-container');
+            container.innerHTML = '';
+            const rank = getPlayerRank(username);
+            if (rank < 0 || rank >= 10) return;
+            const badge = document.createElement('div');
+            let rankClass = 'rank-other';
+            if (rank === 0) rankClass = 'rank-1';
+            else if (rank === 1) rankClass = 'rank-2';
+            else if (rank === 2) rankClass = 'rank-3';
+            badge.className = `rank-badge ${rankClass}`;
+            badge.textContent = `#${rank + 1}`;
+            badge.title = `#${rank + 1} All-Time`;
+            container.appendChild(badge);
+        }
 
         function setFontSize(sizeClass) {
             const container = document.getElementById('view-profile');

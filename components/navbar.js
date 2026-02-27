@@ -12,7 +12,7 @@ class CustomNavbar extends HTMLElement {
           top: 0;
           left: 0;
           right: 0;
-          z-index: 1000;
+          z-index: 9000;
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         .nav-container {
@@ -27,7 +27,7 @@ class CustomNavbar extends HTMLElement {
           font-weight: bold;
           color: #2596be;
           text-decoration: none;
-          z-index: 1001;
+          z-index: 9001;
           position: relative;
         }
         .nav-logo::after {
@@ -137,7 +137,7 @@ class CustomNavbar extends HTMLElement {
           display: none;
           flex-direction: column;
           cursor: pointer;
-          z-index: 1001;
+          z-index: 9001;
           background: none;
           border: none;
           padding: 0.5rem;
