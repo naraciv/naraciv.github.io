@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="../style.css">
     <style>
         /* Mobile Responsive Improvements for Shops Page */
@@ -209,6 +210,435 @@
                 height: 16px;
             }
         }
+
+        /* Map View Styles */
+        .map-view-container {
+            display: flex;
+            gap: 0;
+            height: calc(100vh - 200px);
+            min-height: 500px;
+        }
+
+        .map-sidebar {
+            width: 340px;
+            min-width: 280px;
+            max-width: 400px;
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 0.5rem 0 0 0.5rem;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .map-sidebar::-webkit-scrollbar { width: 6px; }
+        .map-sidebar::-webkit-scrollbar-track { background: #1f2937; }
+        .map-sidebar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-bottom: 1px solid #1f2937;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 0.8rem;
+        }
+
+        .sidebar-item:hover {
+            background: #1f2937;
+        }
+
+        .sidebar-item.highlighted {
+            background: #1e3a5f;
+            border-left: 3px solid #2596be;
+        }
+
+        .sidebar-item .item-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-item-name {
+            flex: 1;
+            color: #d1d5db;
+            word-break: break-word;
+        }
+
+        .shop-map-container {
+            flex: 1;
+            position: relative;
+            background: #1a1a1a;
+            border-radius: 0 0.5rem 0.5rem 0;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .shop-map-container:active {
+            cursor: grabbing;
+        }
+
+        .shop-map-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .shop-tile-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .shop-tile-layer img {
+            position: absolute;
+            opacity: 0.45;
+            image-rendering: pixelated;
+        }
+
+        .map-city-toggle {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 30;
+            display: flex;
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .map-city-toggle button {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #9ca3af;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .map-city-toggle button.active {
+            background: #2596be;
+            color: white;
+        }
+
+        .map-city-toggle button:hover:not(.active) {
+            background: #374151;
+        }
+
+        .map-controls-shop {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 30;
+        }
+
+        .map-ctrl-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid #374151;
+            border-radius: 0.375rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 1.1rem;
+        }
+
+        .map-ctrl-btn:hover {
+            background: #374151;
+        }
+
+        .map-coords-display {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid #374151;
+            border-radius: 0.375rem;
+            padding: 6px 10px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: white;
+            z-index: 30;
+            pointer-events: none;
+        }
+
+        /* Map exchange tooltip */
+        .map-exchange-tooltip {
+            position: fixed;
+            background: rgba(17, 24, 39, 0.97);
+            border: 1px solid #4b5563;
+            border-radius: 0.5rem;
+            padding: 0;
+            z-index: 1000;
+            pointer-events: none;
+            min-width: 200px;
+            max-width: 420px;
+            max-height: 260px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .map-exchange-tooltip.pinned {
+            pointer-events: auto;
+        }
+
+        /* Sidebar lore popover */
+        .sidebar-lore-icon {
+            color: #6b7280;
+            flex-shrink: 0;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .sidebar-lore-icon:hover {
+            color: #2596be;
+        }
+
+        .lore-popover {
+            position: fixed;
+            z-index: 1100;
+            background: #1f2937;
+            border: 1px solid #4b5563;
+            border-radius: 0.5rem;
+            padding: 10px 14px;
+            max-width: 320px;
+            min-width: 180px;
+            max-height: 220px;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            font-size: 0.8rem;
+            color: #d1d5db;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            pointer-events: auto;
+        }
+
+        .lore-popover::-webkit-scrollbar { width: 4px; }
+        .lore-popover::-webkit-scrollbar-track { background: transparent; }
+        .lore-popover::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 2px; }
+
+        .lore-popover .lore-popover-header {
+            font-size: 0.65rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #374151;
+        }
+
+        .lore-popover .lore-section {
+            margin-bottom: 8px;
+        }
+
+        .lore-popover .lore-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .lore-popover .lore-section-label {
+            font-size: 0.65rem;
+            color: #2596be;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .map-exchange-tooltip .tooltip-header {
+            padding: 5px 8px;
+            border-bottom: 1px solid #374151;
+            font-size: 0.65rem;
+            color: #9ca3af;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .map-exchange-tooltip .tooltip-body {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 4px 0;
+            overscroll-behavior: contain;
+        }
+
+        .map-exchange-tooltip .tooltip-body::-webkit-scrollbar { width: 5px; }
+        .map-exchange-tooltip .tooltip-body::-webkit-scrollbar-track { background: #1f2937; border-radius: 3px; }
+        .map-exchange-tooltip .tooltip-body::-webkit-scrollbar-thumb { background: #6b7280; border-radius: 3px; }
+        .map-exchange-tooltip .tooltip-body::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        .tooltip-exchange-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-bottom: 1px solid #1f2937;
+            font-size: 0.7rem;
+        }
+
+        .tooltip-exchange-row:last-child { border-bottom: none; }
+
+        .tooltip-exchange-row img {
+            width: 16px;
+            height: 16px;
+            image-rendering: pixelated;
+            flex-shrink: 0;
+        }
+
+        .tooltip-exchange-row .arrow {
+            color: #6b7280;
+            flex-shrink: 0;
+            font-size: 0.75rem;
+        }
+
+        .tooltip-exchange-row .exchange-coords {
+            color: #6b7280;
+            font-size: 0.6rem;
+            font-family: monospace;
+            flex-shrink: 0;
+            min-width: 65px;
+        }
+
+        .tooltip-exchange-row .exchange-text {
+            color: #d1d5db;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tooltip-scroll-hint {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            text-align: center;
+            padding: 4px 0 6px;
+            border-top: 1px solid #374151;
+            background: linear-gradient(transparent, rgba(17, 24, 39, 0.95));
+        }
+
+        .view-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #374151;
+            background: #1f2937;
+            color: #d1d5db;
+        }
+
+        .view-toggle-btn:hover {
+            border-color: #2596be;
+            color: white;
+        }
+
+        .view-toggle-btn.active {
+            background: #2596be;
+            border-color: #2596be;
+            color: white;
+        }
+
+        .sidebar-item-subtext {
+            font-size: 0.6rem;
+            color: #6b7280;
+            margin-top: 1px;
+        }
+
+        .sidebar-item-content {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .sidebar-item-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sidebar-pinned-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #1e3a5f;
+            border-bottom: 1px solid #2596be;
+        }
+
+        .sidebar-pinned-header span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #93c5fd;
+        }
+
+        .sidebar-clear-btn {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            background: none;
+            border: 1px solid #4b5563;
+            border-radius: 0.25rem;
+            padding: 2px 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .sidebar-clear-btn:hover {
+            color: white;
+            border-color: #2596be;
+        }
+
+        .search-hint-tooltip {
+            position: fixed;
+            z-index: 1000;
+            pointer-events: none;
+            display: flex;
+            animation: searchHintFade 0.5s ease-out;
+        }
+
+        .search-hint-tooltip .hint-text {
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            text-shadow: 0 0 8px rgba(255,255,255,0.3);
+        }
+
+        @keyframes searchHintFade {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .map-view-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .map-sidebar {
+                width: 100%;
+                max-width: 100%;
+                max-height: 200px;
+                border-radius: 0.5rem 0.5rem 0 0;
+            }
+            .shop-map-container {
+                min-height: 400px;
+                border-radius: 0 0 0.5rem 0.5rem;
+            }
+        }
     </style>
     
 <script src="../components/analytics.js"></script>
@@ -237,27 +667,6 @@
                         <button id="orakuru-btn" class="city-filter-btn active px-4 py-2 rounded-full border border-nara-red bg-nara-red text-white transition-colors font-bold">
                             Orakuru
                         </button>
-                    </div>
-
-                    <!-- Search Bar with Field Selector -->
-                    <div class="w-1/2 relative bg-gray-900 border border-gray-700 rounded-full focus-within:border-nara-red transition-colors h-12">
-                        <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
-                        <input type="text" id="search-input" placeholder="Search shops..." 
-                               class="w-full h-full pl-10 pr-32 bg-transparent text-white placeholder-gray-400 focus:outline-none rounded-full">
-                        <details class="absolute right-0 top-0 h-full group" id="field-selector-dropdown">
-                            <summary class="h-full px-3 py-1 bg-gray-900 border-0 rounded-full text-white text-sm cursor-pointer hover:text-nara-red transition-colors flex items-center justify-center">
-                                <i data-feather="chevron-down" class="chevron-icon w-7 h-4 ml-1 transition-transform" id="field-selector-chevron"></i>
-                                <span id="selected-field"> All Fields</span>
-                            </summary>
-                            <div class="absolute right-0 top-full mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-lg z-10 min-w-full">
-                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="all">All Fields</button>
-                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="input">Input</button>
-                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="output">Output</button>
-                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="coords">Coords</button>
-                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="contact">Contact (IGN)</button>
-                                <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="city">City</button>
-                            </div>
-                        </details>
                     </div>
                 </div>
 
@@ -302,8 +711,39 @@
   </div>
   
 
+            <!-- View Toggle + Search Bar -->
+            <div class="flex items-center gap-3 mb-6">
+                <button id="table-view-btn" class="view-toggle-btn active" onclick="switchView('table')">
+                    <i data-feather="list" class="w-4 h-4"></i> Table
+                </button>
+                <button id="map-view-btn" class="view-toggle-btn" onclick="switchView('map')">
+                    <i data-feather="map" class="w-4 h-4"></i> Map
+                </button>
+
+                <!-- Search Bar with Field Selector -->
+                <div class="w-1/2 ml-auto relative bg-gray-900 border border-gray-700 rounded-full focus-within:border-nara-red transition-colors h-10">
+                    <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></i>
+                    <input type="text" id="search-input" placeholder="Search shops..." 
+                           class="w-full h-full pl-9 pr-32 bg-transparent text-white text-sm placeholder-gray-400 focus:outline-none rounded-full">
+                    <details class="absolute right-0 top-0 h-full group" id="field-selector-dropdown">
+                        <summary class="h-full px-3 py-1 bg-gray-900 border-0 rounded-full text-white text-sm cursor-pointer hover:text-nara-red transition-colors flex items-center justify-center">
+                            <i data-feather="chevron-down" class="chevron-icon w-7 h-4 ml-1 transition-transform" id="field-selector-chevron"></i>
+                            <span id="selected-field"> All Fields</span>
+                        </summary>
+                        <div class="absolute right-0 top-full mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-lg min-w-full" style="z-index:1200; opacity:1;">
+                            <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="all">All Fields</button>
+                            <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="input">Input</button>
+                            <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="output">Output</button>
+                            <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="coords">Coords</button>
+                            <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="contact">Contact (IGN)</button>
+                            <button class="field-option w-full text-left px-3 py-2 text-white hover:bg-gray-800 transition-colors text-sm" data-value="city">City</button>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
             <!-- Data Table -->
-            <div class="w-[100%] bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
+            <div id="table-view" class="w-[100%] bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full table-fixed">
                         <thead class="bg-gray-800">
@@ -346,6 +786,41 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Map View -->
+            <div id="map-view" class="hidden">
+                <div class="map-view-container">
+                    <!-- Sidebar -->
+                    <div class="map-sidebar" id="map-sidebar">
+                        <div class="p-3 border-b border-gray-700 sticky top-0 bg-gray-900 z-10">
+                            <div class="text-sm font-semibold text-white">Shops · <span id="sidebar-count">0</span></div>
+                            <div class="sidebar-item-subtext" style="margin-top:2px">Click to show on map</div>
+                        </div>
+                        <div id="sidebar-list"></div>
+                    </div>
+                    <!-- Map -->
+                    <div class="shop-map-container" id="shop-map-container">
+                        <div class="shop-tile-layer" id="shop-tile-layer"></div>
+                        <canvas class="shop-map-canvas" id="shop-map-canvas"></canvas>
+                        <!-- City Toggle -->
+                        <div class="map-city-toggle">
+                            <button id="map-shiroyama-btn" class="active" onclick="mapGoToCity('shiroyama')">Shiroyama</button>
+                            <button id="map-orakuru-btn" onclick="mapGoToCity('orakuru')">Orakuru</button>
+                        </div>
+                        <!-- Zoom Controls -->
+                        <div class="map-controls-shop">
+                            <button class="map-ctrl-btn" onclick="mapZoom(1)" title="Zoom in">+</button>
+                            <button class="map-ctrl-btn" onclick="mapZoom(-1)" title="Zoom out">−</button>
+                        </div>
+                        <!-- Coords -->
+                        <div class="map-coords-display" id="map-coords-display">0, 0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exchange Tooltip (shared, appended to body) -->
+            <div class="map-exchange-tooltip" id="map-exchange-tooltip" style="display:none;"></div>
+
         </div>
     </main>
 
@@ -429,6 +904,13 @@
                 currentSortColumn = parseInt(sortCol);
                 sortDirection = sortDir || 'asc';
             }
+            
+            // Load view type
+            const viewType = params.get('type');
+            if (viewType === 'map') {
+                // Defer to after init renders, so DOM is ready
+                setTimeout(() => switchView('map'), 0);
+            }
         }
         
         // Update URL with current filters
@@ -471,6 +953,11 @@
             if (currentSortColumn !== null) {
                 params.set('sort_col', currentSortColumn);
                 params.set('sort_dir', sortDirection);
+            }
+            
+            // Add view type
+            if (currentView === 'map') {
+                params.set('type', 'map');
             }
             
             // Update URL without reloading
@@ -772,6 +1259,9 @@
                 return 'ender_eye';
             }
             
+            // Lapis Lazuli -> lapis (Minecraft uses lapis_ore, lapis_block, not lapis_lazuli_ore)
+            itemName = itemName.replace('lapis lazuli', 'lapis');
+            
             // Bucket of X -> X_bucket (e.g., "bucket of axolotl" -> "axolotl_bucket")
             const bucketOfMatch = itemName.match(/^bucket of\s+(.+)$/);
             if (bucketOfMatch) {
@@ -966,6 +1456,9 @@
             
             // Replace feather icons after rendering
             feather.replace();
+            
+            // Update map view if active
+            if (typeof onFilterChange === 'function') onFilterChange();
         }
         
         // Modified sortTable function
@@ -1040,6 +1533,1023 @@
             });
         }
 
+        // ==================== MAP VIEW ====================
+        let currentView = 'table'; // 'table' or 'map'
+        let mapCanvas, mapCtx, mapTileLayer, mapContainer2;
+        let mapInitialized = false;
+        
+        // Map state
+        const TILE_SIZE = 256;
+        
+        // ---- Zoom config (edit these) ----
+        const MAP_DEFAULT_ZOOM = 1;    // zoom when page first loads
+        const MAP_CITY_ZOOM    = 1;    // zoom when switching cities
+        const MAP_MIN_CLICK_ZOOM = 1;  // minimum zoom when clicking a sidebar item
+        const MAP_MIN_ZOOM     = -6;   // furthest out
+        const MAP_MAX_ZOOM     = 2.6;    // closest in
+        // ----------------------------------
+        
+        let mapZoomLevel = MAP_DEFAULT_ZOOM;
+        let mapViewX = 3313; // Start at Shiroyama
+        let mapViewZ = 4913;
+        let mapIsPanning = false;
+        let mapPanStartX, mapPanStartY, mapPanStartViewX, mapPanStartViewZ;
+        const mapTileElements = new Map();
+        let mapCurrentCity = 'shiroyama';
+        let mapHoveredCluster = null;
+        let highlightedShopIdx = -1; // index in filteredData of highlighted shop
+        
+        const CITY_COORDS = {
+            shiroyama: { x: 3313, z: 4913 },
+            orakuru: { x: 3614, z: 6985 }
+        };
+        
+        // Image cache for exchange icons on canvas
+        const iconImageCache = new Map();
+        let pinnedCluster = null; // cluster pinned to sidebar
+        
+        function switchView(view) {
+            currentView = view;
+            const tableView = document.getElementById('table-view');
+            const mapView = document.getElementById('map-view');
+            const tableBtn = document.getElementById('table-view-btn');
+            const mapBtn = document.getElementById('map-view-btn');
+            
+            if (view === 'table') {
+                tableView.classList.remove('hidden');
+                mapView.classList.add('hidden');
+                tableBtn.classList.add('active');
+                mapBtn.classList.remove('active');
+            } else {
+                tableView.classList.add('hidden');
+                mapView.classList.remove('hidden');
+                tableBtn.classList.remove('active');
+                mapBtn.classList.add('active');
+                if (!mapInitialized) {
+                    initMap();
+                    mapInitialized = true;
+                }
+                renderMapSidebar();
+                requestAnimationFrame(() => {
+                    resizeMapCanvas();
+                    renderMap();
+                });
+                // Show search hint on first map view
+                initSearchHint();
+            }
+            updateURL();
+            feather.replace();
+        }
+        
+        function initMap() {
+            mapContainer2 = document.getElementById('shop-map-container');
+            mapTileLayer = document.getElementById('shop-tile-layer');
+            mapCanvas = document.getElementById('shop-map-canvas');
+            mapCtx = mapCanvas.getContext('2d');
+            
+            resizeMapCanvas();
+            setupMapEvents();
+            renderMap();
+            
+            window.addEventListener('resize', () => {
+                if (currentView === 'map') {
+                    resizeMapCanvas();
+                    renderMap();
+                }
+            });
+        }
+        
+        function resizeMapCanvas() {
+            if (!mapContainer2) return;
+            const rect = mapContainer2.getBoundingClientRect();
+            mapCanvas.width = rect.width;
+            mapCanvas.height = rect.height;
+        }
+        
+        function mapGetScale() {
+            return 1 / Math.pow(2, -mapZoomLevel);
+        }
+        
+        function mapWorldToScreen(wx, wz) {
+            const s = mapGetScale();
+            return {
+                x: (wx - mapViewX) * s + mapCanvas.width / 2,
+                y: (wz - mapViewZ) * s + mapCanvas.height / 2
+            };
+        }
+        
+        function mapScreenToWorld(sx, sy) {
+            const s = mapGetScale();
+            return {
+                x: (sx - mapCanvas.width / 2) / s + mapViewX,
+                z: (sy - mapCanvas.height / 2) / s + mapViewZ
+            };
+        }
+        
+        function mapGetTileCoords(wx, wz) {
+            const bpt = TILE_SIZE * Math.pow(2, -mapZoomLevel);
+            return { x: Math.floor(wx / bpt), z: Math.floor(wz / bpt) };
+        }
+        
+        function mapGetTileWorldPos(tx, tz) {
+            const bpt = TILE_SIZE * Math.pow(2, -mapZoomLevel);
+            return { x: tx * bpt, z: tz * bpt };
+        }
+        
+        function mapGetTileUrl(tx, tz, zoom) {
+            return `https://civmc-map.duckdns.org/tiles/terrain/z${zoom}/${tx},${tz}.png`;
+        }
+        
+        function renderMap() {
+            renderMapTiles();
+            preloadAndRender();
+        }
+        
+        // Clamp tile zoom to the max available on the server (z0)
+        function getClampedTileZoom() {
+            return Math.min(0, mapZoomLevel);
+        }
+        
+        function renderMapTiles() {
+            if (!mapContainer2) return;
+            const rect = mapContainer2.getBoundingClientRect();
+            const w = rect.width, h = rect.height;
+            const scale = mapGetScale();
+            // Use clamped zoom for tile fetching - tiles only go up to z0
+            const tileZoom = getClampedTileZoom();
+            const bpt = TILE_SIZE * Math.pow(2, -tileZoom); // blocks per tile at tile zoom
+            
+            const topLeft = mapScreenToWorld(0, 0);
+            const bottomRight = mapScreenToWorld(w, h);
+            
+            const startTileX = Math.floor(topLeft.x / bpt) - 1;
+            const startTileZ = Math.floor(topLeft.z / bpt) - 1;
+            const endTileX = Math.floor(bottomRight.x / bpt) + 1;
+            const endTileZ = Math.floor(bottomRight.z / bpt) + 1;
+            
+            const visibleKeys = new Set();
+            // Screen size of each tile (blocks-per-tile * pixels-per-block)
+            const tileScreenSize = bpt * scale;
+            
+            for (let tz = startTileZ; tz <= endTileZ; tz++) {
+                for (let tx = startTileX; tx <= endTileX; tx++) {
+                    const key = `${tileZoom}/${tx},${tz}`;
+                    visibleKeys.add(key);
+                    
+                    const worldX = tx * bpt;
+                    const worldZ = tz * bpt;
+                    const screen = mapWorldToScreen(worldX, worldZ);
+                    
+                    let img = mapTileElements.get(key);
+                    if (!img) {
+                        img = document.createElement('img');
+                        img.src = mapGetTileUrl(tx, tz, tileZoom);
+                        img.style.position = 'absolute';
+                        img.style.imageRendering = 'pixelated';
+                        img.style.opacity = '0.45';
+                        img.onerror = () => { img.style.display = 'none'; };
+                        img.onload = () => { img.style.display = 'block'; };
+                        mapTileLayer.appendChild(img);
+                        mapTileElements.set(key, img);
+                    }
+                    
+                    img.style.left = Math.round(screen.x) + 'px';
+                    img.style.top = Math.round(screen.y) + 'px';
+                    img.style.width = Math.ceil(tileScreenSize + 1) + 'px';
+                    img.style.height = Math.ceil(tileScreenSize + 1) + 'px';
+                }
+            }
+            
+            for (const [key, img] of mapTileElements) {
+                if (!visibleKeys.has(key)) {
+                    img.remove();
+                    mapTileElements.delete(key);
+                }
+            }
+        }
+        
+        // Build clusters from filteredData based on coords
+        function buildClusters() {
+            const scale = mapGetScale();
+            const points = [];
+            
+            // Compute cluster radius from actual rendered box size so boxes never overlap
+            const iconSize = Math.max(8, Math.min(14, 8 + (mapZoomLevel + 6) * 0.75));
+            const arrowWidth = Math.max(4, iconSize * 0.3);
+            const boxWidth = iconSize * 2 + arrowWidth + 8 + 6; // includes padding
+            const rowHeight = iconSize + 2;
+            const clusterRadius = Math.max(boxWidth * 0.85, rowHeight * 2, 36);
+            
+            filteredData.forEach((row, idx) => {
+                const originalIndex = processedData.indexOf(row);
+                const originalRow = shopData[originalIndex];
+                const coordStr = row[5] || '';
+                const parts = coordStr.split(',').map(c => parseFloat(c.trim()));
+                if (parts.length < 3 || isNaN(parts[0]) || isNaN(parts[2])) return;
+                
+                const wx = parts[0], wz = parts[2];
+                const screen = mapWorldToScreen(wx, wz);
+                
+                points.push({
+                    wx, wz,
+                    sx: screen.x, sy: screen.y,
+                    row, originalRow, originalIndex, filteredIdx: idx,
+                    input: row[1], output: row[3],
+                    inputLore: originalRow[2] || '',
+                    outputLore: originalRow[4] || '',
+                    inputRaw: originalRow[1],
+                    outputRaw: originalRow[3],
+                    contact: row[9] || '',
+                    city: row[7] || ''
+                });
+            });
+            
+            // Multi-pass clustering to catch chains of nearby points
+            const clusters = [];
+            const assigned = new Set();
+            
+            for (let i = 0; i < points.length; i++) {
+                if (assigned.has(i)) continue;
+                const cluster = { items: [points[i]], cx: points[i].sx, cy: points[i].sy, wx: points[i].wx, wz: points[i].wz };
+                assigned.add(i);
+                
+                // Multiple passes: keep scanning until no new points are absorbed
+                let changed = true;
+                while (changed) {
+                    changed = false;
+                    for (let j = 0; j < points.length; j++) {
+                        if (assigned.has(j)) continue;
+                        const dx = points[j].sx - cluster.cx;
+                        const dy = points[j].sy - cluster.cy;
+                        if (Math.sqrt(dx*dx + dy*dy) < clusterRadius) {
+                            cluster.items.push(points[j]);
+                            assigned.add(j);
+                            // Recompute center
+                            cluster.cx = cluster.items.reduce((s,p) => s+p.sx, 0) / cluster.items.length;
+                            cluster.cy = cluster.items.reduce((s,p) => s+p.sy, 0) / cluster.items.length;
+                            changed = true;
+                        }
+                    }
+                }
+                clusters.push(cluster);
+            }
+            
+            return clusters;
+        }
+        
+        function loadIconImage(url) {
+            if (iconImageCache.has(url)) return iconImageCache.get(url);
+            const img = new Image();
+            img.src = url;
+            const promise = new Promise(resolve => {
+                img.onload = () => resolve(img);
+                img.onerror = () => resolve(null);
+            });
+            iconImageCache.set(url, promise);
+            return promise;
+        }
+        
+        let clustersCache = [];
+        
+        // Resolved icon image cache for canvas drawing
+        const resolvedIcons = new Map();
+        
+        function preloadAndRender() {
+            const promises = [];
+            filteredData.forEach((row, idx) => {
+                const origIdx = processedData.indexOf(row);
+                const origRow = shopData[origIdx];
+                const inUrl = getItemIconUrl(origRow[1], origRow[2] || '');
+                const outUrl = getItemIconUrl(origRow[3], origRow[4] || '');
+                if (inUrl) {
+                    const p = loadIconImage(inUrl).then(img => { if(img) resolvedIcons.set(inUrl, img); });
+                    promises.push(p);
+                }
+                if (outUrl) {
+                    const p = loadIconImage(outUrl).then(img => { if(img) resolvedIcons.set(outUrl, img); });
+                    promises.push(p);
+                }
+            });
+            Promise.all(promises).then(() => renderMapPointsFinal());
+        }
+        
+        function renderMapPointsFinal() {
+            if (!mapCtx) return;
+            const w = mapCanvas.width, h = mapCanvas.height;
+            mapCtx.clearRect(0, 0, w, h);
+            
+            const clusters = buildClusters();
+            clustersCache = clusters;
+            const scale = mapGetScale();
+            const iconSize = Math.max(8, Math.min(14, 8 + (mapZoomLevel + 6) * 0.75));
+            const arrowWidth = Math.max(4, iconSize * 0.3);
+            
+            clusters.forEach(cluster => {
+                const cx = cluster.cx, cy = cluster.cy;
+                if (cx < -60 || cx > w + 60 || cy < -60 || cy > h + 60) return;
+                
+                const itemCount = cluster.items.length;
+                const maxVisible = Math.min(itemCount, 4);
+                const rowHeight = iconSize + 2;
+                const totalHeight = maxVisible * rowHeight;
+                const boxWidth = iconSize * 2 + arrowWidth + 8;
+                const boxX = cx - boxWidth / 2;
+                const boxY = cy - totalHeight / 2;
+                
+                // Background pill
+                mapCtx.fillStyle = 'rgba(17, 24, 39, 0.88)';
+                mapCtx.strokeStyle = itemCount > 1 ? '#2596be' : '#4b5563';
+                mapCtx.lineWidth = 1;
+                const br = 5;
+                mapCtx.beginPath();
+                mapCtx.roundRect(boxX - 3, boxY - 3, boxWidth + 6, totalHeight + 6, br);
+                mapCtx.fill();
+                mapCtx.stroke();
+                
+                // Store hitbox for hover detection
+                cluster.hitBox = {
+                    x: boxX - 3, y: boxY - 3,
+                    w: boxWidth + 6, h: totalHeight + 6
+                };
+                
+                // Badge
+                if (itemCount > 1) {
+                    const badgeX = boxX + boxWidth + 2;
+                    const badgeY = boxY - 4;
+                    const txt = String(itemCount);
+                    mapCtx.font = 'bold 8px sans-serif';
+                    const tw = mapCtx.measureText(txt).width;
+                    const bw = Math.max(14, tw + 6);
+                    mapCtx.fillStyle = '#2596be';
+                    mapCtx.beginPath();
+                    mapCtx.roundRect(badgeX, badgeY, bw, 13, 7);
+                    mapCtx.fill();
+                    mapCtx.fillStyle = 'white';
+                    mapCtx.textAlign = 'center';
+                    mapCtx.textBaseline = 'middle';
+                    mapCtx.fillText(txt, badgeX + bw/2, badgeY + 6.5);
+                }
+                
+                for (let vi = 0; vi < maxVisible; vi++) {
+                    const item = cluster.items[vi];
+                    const ry = boxY + vi * rowHeight;
+                    
+                    const inUrl = getItemIconUrl(item.inputRaw, item.inputLore);
+                    const outUrl = getItemIconUrl(item.outputRaw, item.outputLore);
+                    
+                    // Input icon
+                    const inImg = resolvedIcons.get(inUrl);
+                    if (inImg) {
+                        mapCtx.imageSmoothingEnabled = false;
+                        mapCtx.drawImage(inImg, boxX, ry, iconSize, iconSize);
+                    } else {
+                        mapCtx.fillStyle = '#374151';
+                        mapCtx.fillRect(boxX, ry, iconSize, iconSize);
+                    }
+                    
+                    // Arrow
+                    const arrowX = boxX + iconSize + 2;
+                    const arrowY = ry + iconSize / 2;
+                    mapCtx.strokeStyle = '#9ca3af';
+                    mapCtx.lineWidth = 1.5;
+                    mapCtx.beginPath();
+                    mapCtx.moveTo(arrowX, arrowY);
+                    mapCtx.lineTo(arrowX + arrowWidth, arrowY);
+                    mapCtx.stroke();
+                    mapCtx.fillStyle = '#9ca3af';
+                    mapCtx.beginPath();
+                    mapCtx.moveTo(arrowX + arrowWidth, arrowY);
+                    mapCtx.lineTo(arrowX + arrowWidth - 4, arrowY - 3);
+                    mapCtx.lineTo(arrowX + arrowWidth - 4, arrowY + 3);
+                    mapCtx.fill();
+                    
+                    // Output icon
+                    const outImg = resolvedIcons.get(outUrl);
+                    if (outImg) {
+                        mapCtx.imageSmoothingEnabled = false;
+                        mapCtx.drawImage(outImg, boxX + iconSize + arrowWidth + 6, ry, iconSize, iconSize);
+                    } else {
+                        mapCtx.fillStyle = '#374151';
+                        mapCtx.fillRect(boxX + iconSize + arrowWidth + 6, ry, iconSize, iconSize);
+                    }
+                }
+                
+                // Highlight ring if this cluster contains the highlighted shop
+                if (highlightedShopIdx >= 0) {
+                    const isHighlighted = cluster.items.some(item => item.filteredIdx === highlightedShopIdx);
+                    if (isHighlighted) {
+                        mapCtx.save();
+                        mapCtx.strokeStyle = '#2596be';
+                        mapCtx.lineWidth = 2.5;
+                        mapCtx.shadowColor = '#2596be';
+                        mapCtx.shadowBlur = 12;
+                        mapCtx.beginPath();
+                        mapCtx.roundRect(boxX - 6, boxY - 6, boxWidth + 12, totalHeight + 12, br + 3);
+                        mapCtx.stroke();
+                        mapCtx.restore();
+                    }
+                }
+                
+                // Overflow indicator
+                if (itemCount > maxVisible) {
+                    mapCtx.fillStyle = '#9ca3af';
+                    mapCtx.font = '8px sans-serif';
+                    mapCtx.textAlign = 'center';
+                    mapCtx.textBaseline = 'top';
+                    mapCtx.fillText(`+${itemCount - maxVisible} more`, cx, boxY + totalHeight + 4);
+                }
+            });
+        }
+        
+        function setupMapEvents() {
+            // Panning
+            let mapMouseDownX, mapMouseDownY;
+            mapCanvas.addEventListener('mousedown', e => {
+                mapIsPanning = true;
+                mapPanStartX = e.clientX;
+                mapPanStartY = e.clientY;
+                mapMouseDownX = e.clientX;
+                mapMouseDownY = e.clientY;
+                mapPanStartViewX = mapViewX;
+                mapPanStartViewZ = mapViewZ;
+                mapCanvas.style.cursor = 'grabbing';
+            });
+            
+            window.addEventListener('mousemove', e => {
+                if (mapIsPanning) {
+                    const dx = e.clientX - mapPanStartX;
+                    const dy = e.clientY - mapPanStartY;
+                    const s = mapGetScale();
+                    mapViewX = mapPanStartViewX - dx / s;
+                    mapViewZ = mapPanStartViewZ - dy / s;
+                    renderMap();
+                }
+                
+                // Coords display
+                if (currentView === 'map' && mapCanvas) {
+                    const rect = mapCanvas.getBoundingClientRect();
+                    const sx = e.clientX - rect.left;
+                    const sy = e.clientY - rect.top;
+                    if (sx >= 0 && sx <= rect.width && sy >= 0 && sy <= rect.height) {
+                        const world = mapScreenToWorld(sx, sy);
+                        document.getElementById('map-coords-display').textContent = `${Math.round(world.x)}, ${Math.round(world.z)}`;
+                        
+                        // Check hover on clusters
+                        if (!mapIsPanning) {
+                            checkMapHover(sx, sy, e.clientX, e.clientY);
+                        }
+                    }
+                }
+            });
+            
+            window.addEventListener('mouseup', e => {
+                if (mapIsPanning) {
+                    const dragDist = Math.hypot(e.clientX - mapMouseDownX, e.clientY - mapMouseDownY);
+                    mapIsPanning = false;
+                    mapCanvas.style.cursor = 'grab';
+                    // If it was a click (not a drag), check for cluster pin
+                    if (dragDist < 5) {
+                        const rect = mapCanvas.getBoundingClientRect();
+                        const sx = e.clientX - rect.left;
+                        const sy = e.clientY - rect.top;
+                        let clicked = null;
+                        for (const cluster of clustersCache) {
+                            if (!cluster.hitBox) continue;
+                            const hb = cluster.hitBox;
+                            if (sx >= hb.x && sx <= hb.x + hb.w && sy >= hb.y && sy <= hb.y + hb.h) {
+                                clicked = cluster;
+                                break;
+                            }
+                        }
+                        if (clicked) {
+                            pinClusterToSidebar(clicked);
+                        }
+                    }
+                }
+            });
+            
+            // Zooming
+            mapCanvas.addEventListener('wheel', e => {
+                e.preventDefault();
+                const rect = mapCanvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+                const worldBefore = mapScreenToWorld(mx, my);
+                
+                const delta = e.deltaY > 0 ? -1 : 1;
+                mapZoomLevel = Math.max(MAP_MIN_ZOOM, Math.min(MAP_MAX_ZOOM, mapZoomLevel + delta));
+                
+                const worldAfter = mapScreenToWorld(mx, my);
+                mapViewX -= (worldAfter.x - worldBefore.x);
+                mapViewZ -= (worldAfter.z - worldBefore.z);
+                
+                renderMap();
+            }, { passive: false });
+            
+            // Touch events for mobile
+            let lastTouchDist = 0;
+            mapCanvas.addEventListener('touchstart', e => {
+                if (e.touches.length === 1) {
+                    mapIsPanning = true;
+                    mapPanStartX = e.touches[0].clientX;
+                    mapPanStartY = e.touches[0].clientY;
+                    mapPanStartViewX = mapViewX;
+                    mapPanStartViewZ = mapViewZ;
+                } else if (e.touches.length === 2) {
+                    lastTouchDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                }
+            }, { passive: true });
+            
+            mapCanvas.addEventListener('touchmove', e => {
+                e.preventDefault();
+                if (e.touches.length === 1 && mapIsPanning) {
+                    const dx = e.touches[0].clientX - mapPanStartX;
+                    const dy = e.touches[0].clientY - mapPanStartY;
+                    const s = mapGetScale();
+                    mapViewX = mapPanStartViewX - dx / s;
+                    mapViewZ = mapPanStartViewZ - dy / s;
+                    renderMap();
+                } else if (e.touches.length === 2) {
+                    const dist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    if (lastTouchDist > 0) {
+                        const delta = dist > lastTouchDist ? 1 : -1;
+                        if (Math.abs(dist - lastTouchDist) > 30) {
+                            mapZoomLevel = Math.max(MAP_MIN_ZOOM, Math.min(MAP_MAX_ZOOM, mapZoomLevel + delta));
+                            lastTouchDist = dist;
+                            renderMap();
+                        }
+                    }
+                }
+            }, { passive: false });
+            
+            mapCanvas.addEventListener('touchend', () => {
+                mapIsPanning = false;
+                lastTouchDist = 0;
+            });
+            
+            // Hide tooltip on mouse leave (with delay for hover transition)
+            mapCanvas.addEventListener('mouseleave', () => {
+                const tooltip = document.getElementById('map-exchange-tooltip');
+                if (!tooltip.classList.contains('pinned')) {
+                    clearTimeout(tooltipHideTimer);
+                    tooltipHideTimer = setTimeout(() => {
+                        if (!tooltip.classList.contains('pinned')) {
+                            tooltip.style.display = 'none';
+                            mapHoveredCluster = null;
+                        }
+                    }, 200);
+                }
+            });
+            
+            // Tooltip hover handlers for seamless scrolling
+            const tooltipEl = document.getElementById('map-exchange-tooltip');
+            tooltipEl.addEventListener('mouseenter', () => {
+                clearTimeout(tooltipHideTimer);
+                tooltipEl.classList.add('pinned');
+            });
+            tooltipEl.addEventListener('mouseleave', () => {
+                tooltipEl.classList.remove('pinned');
+                clearTimeout(tooltipHideTimer);
+                tooltipHideTimer = setTimeout(() => {
+                    tooltipEl.style.display = 'none';
+                    mapHoveredCluster = null;
+                }, 200);
+            });
+            
+            // Keyboard scroll for tooltip (W/Up = scroll up, S/Down = scroll down)
+            window.addEventListener('keydown', e => {
+                const tt = document.getElementById('map-exchange-tooltip');
+                if (!tt || tt.style.display === 'none') return;
+                const body = tt.querySelector('.tooltip-body');
+                if (!body) return;
+                const key = e.key;
+                const scrollAmt = 40;
+                if (key === 'w' || key === 'W' || key === 'ArrowUp') {
+                    e.preventDefault();
+                    body.scrollTop -= scrollAmt;
+                } else if (key === 's' || key === 'S' || key === 'ArrowDown') {
+                    e.preventDefault();
+                    body.scrollTop += scrollAmt;
+                }
+            });
+        }
+        
+        let tooltipHideTimer = null;
+        
+        function checkMapHover(sx, sy, clientX, clientY) {
+            const tooltip = document.getElementById('map-exchange-tooltip');
+            if (tooltip.classList.contains('pinned')) return; // Don't change while hovering tooltip
+            
+            let found = null;
+            
+            for (const cluster of clustersCache) {
+                if (!cluster.hitBox) continue;
+                const hb = cluster.hitBox;
+                if (sx >= hb.x && sx <= hb.x + hb.w && sy >= hb.y && sy <= hb.y + hb.h) {
+                    found = cluster;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                clearTimeout(tooltipHideTimer);
+                tooltipHideTimer = setTimeout(() => {
+                    if (!tooltip.classList.contains('pinned')) {
+                        tooltip.style.display = 'none';
+                        mapHoveredCluster = null;
+                    }
+                }, 200);
+                return;
+            }
+            
+            clearTimeout(tooltipHideTimer);
+            
+            if (mapHoveredCluster === found) {
+                positionTooltip(tooltip, clientX, clientY);
+                return;
+            }
+            
+            mapHoveredCluster = found;
+            const items = found.items;
+            const needsScroll = items.length > 4;
+            
+            let html = `<div class="tooltip-header">`;
+            html += `<span>${items.length} exchange${items.length > 1 ? 's' : ''} <span style="color:#6b7280;font-size:0.6rem">· Click to pin on left side</span></span>`;
+            html += `</div>`;
+            html += `<div class="tooltip-body">`;
+            
+            items.forEach(item => {
+                const inUrl = getItemIconUrl(item.inputRaw, item.inputLore) || '';
+                const outUrl = getItemIconUrl(item.outputRaw, item.outputLore) || '';
+                const itemCoords = `${Math.round(item.wx)}, ${Math.round(item.wz)}`;
+                html += `<div class="tooltip-exchange-row">`;
+                html += `<span class="exchange-coords">${itemCoords}</span>`;
+                if (inUrl) html += `<img src="${inUrl}" onerror="this.style.display='none'">`;
+                html += `<span class="exchange-text">${escapeHtml(item.input)}</span>`;
+                html += `<span class="arrow">→</span>`;
+                if (outUrl) html += `<img src="${outUrl}" onerror="this.style.display='none'">`;
+                html += `<span class="exchange-text">${escapeHtml(item.output)}</span>`;
+                html += `</div>`;
+            });
+            
+            html += `</div>`;
+            if (needsScroll) {
+                html += `<div class="tooltip-scroll-hint">Scroll ↑ (W / Up Arrow) &nbsp;·&nbsp; Scroll ↓ (S / Down Arrow)</div>`;
+            }
+            
+            tooltip.innerHTML = html;
+            tooltip.style.display = 'block';
+            tooltip.classList.remove('pinned');
+            positionTooltip(tooltip, clientX, clientY);
+        }
+        
+        // Dismiss tooltip on click outside
+        document.addEventListener('click', e => {
+            const tooltip = document.getElementById('map-exchange-tooltip');
+            if (!tooltip || tooltip.style.display === 'none') return;
+            if (tooltip.contains(e.target)) return;
+            tooltip.classList.remove('pinned');
+            tooltip.style.display = 'none';
+            mapHoveredCluster = null;
+        });
+        
+        function positionTooltip(tooltip, cx, cy) {
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            let left = cx + 16;
+            let top = cy - 20;
+            
+            // Ensure it doesn't go off-screen
+            const rect = tooltip.getBoundingClientRect();
+            if (left + 300 > vw) left = cx - 300 - 16;
+            if (top + 280 > vh) top = vh - 290;
+            if (top < 10) top = 10;
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+        
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        function mapGoToCity(city) {
+            mapCurrentCity = city;
+            const coords = CITY_COORDS[city];
+            mapViewX = coords.x;
+            mapViewZ = coords.z;
+            mapZoomLevel = MAP_CITY_ZOOM;
+            
+            // Update toggle buttons
+            document.getElementById('map-shiroyama-btn').classList.toggle('active', city === 'shiroyama');
+            document.getElementById('map-orakuru-btn').classList.toggle('active', city === 'orakuru');
+            
+            renderMap();
+        }
+        
+        function mapZoom(delta) {
+            mapZoomLevel = Math.max(MAP_MIN_ZOOM, Math.min(MAP_MAX_ZOOM, mapZoomLevel + delta));
+            renderMap();
+        }
+        
+        function renderMapSidebar() {
+            const list = document.getElementById('sidebar-list');
+            const count = document.getElementById('sidebar-count');
+            list.innerHTML = '';
+            
+            // If a cluster is pinned, show pinned view
+            if (pinnedCluster) {
+                const items = pinnedCluster.items;
+                count.textContent = items.length + ' pinned';
+                
+                // Pinned header with clear button
+                const header = document.createElement('div');
+                header.className = 'sidebar-pinned-header';
+                header.innerHTML = `<span>📌 ${items.length} Pinned Exchange${items.length > 1 ? 's' : ''}</span>`;
+                const clearBtn = document.createElement('button');
+                clearBtn.className = 'sidebar-clear-btn';
+                clearBtn.textContent = '✕ Clear';
+                clearBtn.addEventListener('click', () => {
+                    pinnedCluster = null;
+                    renderMapSidebar();
+                });
+                header.appendChild(clearBtn);
+                list.appendChild(header);
+                
+                items.forEach(item => {
+                    const filtIdx = filteredData.indexOf(item.row);
+                    const div = buildSidebarItem(item.row, item.originalRow, item.originalIndex, true, filtIdx);
+                    list.appendChild(div);
+                });
+                
+                feather.replace();
+                return;
+            }
+            
+            count.textContent = filteredData.length;
+            
+            filteredData.forEach((row, idx) => {
+                const origIdx = processedData.indexOf(row);
+                const origRow = shopData[origIdx];
+                const div = buildSidebarItem(row, origRow, origIdx, false, idx);
+                list.appendChild(div);
+            });
+            
+            feather.replace();
+        }
+        
+        function buildSidebarItem(row, origRow, origIdx, isPinned, filteredIdx) {
+            const inputLore = origRow[2] || '';
+            const outputLore = origRow[4] || '';
+            const { loreContent: inLore } = processItemWithLore(origRow[1], inputLore);
+            const { loreContent: outLore } = processItemWithLore(origRow[3], outputLore);
+            
+            const div = document.createElement('div');
+            div.className = 'sidebar-item';
+            div.style.flexDirection = 'column';
+            div.style.alignItems = 'stretch';
+            div.style.gap = '2px';
+            
+            // Top row with icons and names
+            const topRow = document.createElement('div');
+            topRow.className = 'sidebar-item-row';
+            
+            // Input icon
+            const inUrl = getItemIconUrl(origRow[1], inputLore);
+            if (inUrl) {
+                const img = document.createElement('img');
+                img.src = inUrl;
+                img.className = 'item-icon';
+                img.style.imageRendering = 'pixelated';
+                img.onerror = function() { this.style.display = 'none'; };
+                topRow.appendChild(img);
+            }
+            
+            // Input name
+            const inName = document.createElement('span');
+            inName.className = 'sidebar-item-name';
+            inName.textContent = row[1];
+            inName.style.flex = '0 1 auto';
+            topRow.appendChild(inName);
+            
+            // Input lore icon (right next to input name)
+            if (inLore && inLore.trim()) {
+                const inBook = document.createElement('span');
+                inBook.className = 'sidebar-lore-icon';
+                inBook.innerHTML = '<i data-feather="book-open" class="w-3 h-3"></i>';
+                inBook.addEventListener('mouseenter', (e) => {
+                    showLorePopover(e, inLore, '', row[1], '');
+                });
+                inBook.addEventListener('mouseleave', () => { hideLorePopover(); });
+                topRow.appendChild(inBook);
+            }
+            
+            // Arrow
+            const arrow = document.createElement('span');
+            arrow.textContent = '→';
+            arrow.style.color = '#6b7280';
+            arrow.style.flexShrink = '0';
+            topRow.appendChild(arrow);
+            
+            // Output icon
+            const outUrl = getItemIconUrl(origRow[3], outputLore);
+            if (outUrl) {
+                const img = document.createElement('img');
+                img.src = outUrl;
+                img.className = 'item-icon';
+                img.style.imageRendering = 'pixelated';
+                img.onerror = function() { this.style.display = 'none'; };
+                topRow.appendChild(img);
+            }
+            
+            // Output name
+            const outName = document.createElement('span');
+            outName.className = 'sidebar-item-name';
+            outName.textContent = row[3];
+            outName.style.flex = '1';
+            topRow.appendChild(outName);
+            
+            // Output lore icon (right next to output name)
+            if (outLore && outLore.trim()) {
+                const outBook = document.createElement('span');
+                outBook.className = 'sidebar-lore-icon';
+                outBook.innerHTML = '<i data-feather="book-open" class="w-3 h-3"></i>';
+                outBook.addEventListener('mouseenter', (e) => {
+                    showLorePopover(e, '', outLore, '', row[3]);
+                });
+                outBook.addEventListener('mouseleave', () => { hideLorePopover(); });
+                topRow.appendChild(outBook);
+            }
+            
+            div.appendChild(topRow);
+            
+            const coordStr = row[5] || '';
+            const parts = coordStr.split(',').map(c => parseFloat(c.trim()));
+            
+            // Show coords as subtext for pinned items
+            if (isPinned && parts.length >= 3 && !isNaN(parts[0])) {
+                const subtext = document.createElement('div');
+                subtext.className = 'sidebar-item-subtext';
+                subtext.textContent = `${Math.round(parts[0])}, ${Math.round(parts[2])}`;
+                div.appendChild(subtext);
+            }
+            
+            // Click to pan + highlight
+            div.addEventListener('click', () => {
+                if (parts.length >= 3 && !isNaN(parts[0]) && !isNaN(parts[2])) {
+                    mapViewX = parts[0];
+                    mapViewZ = parts[2];
+                    mapZoomLevel = MAP_MAX_ZOOM;
+                    highlightedShopIdx = filteredIdx >= 0 ? filteredIdx : -1;
+                    renderMap();
+                }
+                document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('highlighted'));
+                div.classList.add('highlighted');
+            });
+            
+            return div;
+        }
+        
+        function pinClusterToSidebar(cluster) {
+            pinnedCluster = cluster;
+            renderMapSidebar();
+        }
+        
+        // Lore popover management
+        let lorePopoverEl = null;
+        
+        function showLorePopover(event, inLore, outLore, inputName, outputName) {
+            hideLorePopover();
+            
+            const popover = document.createElement('div');
+            popover.className = 'lore-popover';
+            
+            let html = '<div class="lore-popover-header">Item Details</div>';
+            
+            if (inLore && inLore.trim()) {
+                html += `<div class="lore-section">`;
+                html += `<div class="lore-section-label">${escapeHtml(inputName)}</div>`;
+                html += `<div>${escapeHtml(inLore.trim())}</div>`;
+                html += `</div>`;
+            }
+            if (outLore && outLore.trim()) {
+                html += `<div class="lore-section">`;
+                html += `<div class="lore-section-label">${escapeHtml(outputName)}</div>`;
+                html += `<div>${escapeHtml(outLore.trim())}</div>`;
+                html += `</div>`;
+            }
+            
+            popover.innerHTML = html;
+            document.body.appendChild(popover);
+            lorePopoverEl = popover;
+            
+            // Position near the book icon
+            const rect = event.target.closest('.sidebar-lore-icon').getBoundingClientRect();
+            let left = rect.right + 8;
+            let top = rect.top - 10;
+            
+            // If it would go off-screen right, show on left
+            if (left + 320 > window.innerWidth) {
+                left = rect.left - 328;
+            }
+            if (top + 220 > window.innerHeight) {
+                top = window.innerHeight - 230;
+            }
+            if (top < 10) top = 10;
+            
+            popover.style.left = left + 'px';
+            popover.style.top = top + 'px';
+        }
+        
+        function hideLorePopover() {
+            if (lorePopoverEl) {
+                lorePopoverEl.remove();
+                lorePopoverEl = null;
+            }
+        }
+        
+        // Re-render map when filters change
+        function onFilterChange() {
+            if (currentView === 'map' && mapInitialized) {
+                pinnedCluster = null; // clear pinned on filter change
+                renderMapSidebar();
+                preloadAndRender();
+            }
+        }
+        
+        // ==================== SEARCH HINT TOOLTIP ====================
+        function initSearchHint() {
+            if (localStorage.getItem('shopSearchHintDismissed')) return;
+            if (document.getElementById('search-hint')) return; // already showing
+            
+            const searchInput = document.getElementById('search-input');
+            if (!searchInput) return;
+            
+            const searchBar = searchInput.closest('.relative');
+            if (!searchBar) return;
+            
+            // Curved arrow SVG (bends from text on right, curves up-left to point at search bar)
+            const arrowW = 60;
+            const arrowH = 62;
+            const arrowSvg = `<svg class="onboarding-arrow-svg" width="${arrowW}" height="${arrowH}" viewBox="0 0 ${arrowW} ${arrowH}" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M${arrowW - 5} ${arrowH - 8} C${arrowW * 0.4} ${arrowH - 8}, ${arrowW * 0.15} ${arrowH * 0.55}, ${arrowW * 0.15} 8" stroke="white" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.9"/>
+                <path d="M${arrowW * 0.15 - 5} 17 L${arrowW * 0.15} 5 L${arrowW * 0.15 + 5} 17" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+            </svg>`;
+            
+            // Create the hint element
+            const hint = document.createElement('div');
+            hint.className = 'search-hint-tooltip';
+            hint.id = 'search-hint';
+            hint.style.flexDirection = 'row';
+            hint.style.alignItems = 'flex-end';
+            hint.innerHTML = `
+                <div style="display:flex;align-items:flex-start;">
+                    ${arrowSvg}
+                    <span class="hint-text" style="margin-top:auto;margin-bottom:2px;">Search to filter map results</span>
+                </div>
+            `;
+            
+            document.body.appendChild(hint);
+            
+            // Position the tooltip below the search bar with arrow pointing up at it
+            function repositionHint() {
+                const rect = searchBar.getBoundingClientRect();
+                const arrowTipX = arrowW * 0.15;
+                const left = rect.left + rect.width * 0.10 - arrowTipX;
+                hint.style.top = (rect.bottom + 6) + 'px';
+                hint.style.left = Math.max(4, left) + 'px';
+            }
+            repositionHint();
+            
+            window.addEventListener('scroll', repositionHint, { passive: true });
+            window.addEventListener('resize', repositionHint, { passive: true });
+            
+            // Dismiss on first input
+            const dismissHint = () => {
+                const el = document.getElementById('search-hint');
+                if (el) {
+                    el.style.transition = 'opacity 0.3s';
+                    el.style.opacity = '0';
+                    setTimeout(() => {
+                        el.remove();
+                        window.removeEventListener('scroll', repositionHint);
+                        window.removeEventListener('resize', repositionHint);
+                    }, 300);
+                }
+                localStorage.setItem('shopSearchHintDismissed', '1');
+                searchInput.removeEventListener('input', dismissHint);
+            };
+            searchInput.addEventListener('input', dismissHint);
+        }
+        
         // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             feather.replace();
