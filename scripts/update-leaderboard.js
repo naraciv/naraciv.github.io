@@ -12,13 +12,38 @@ async function main() {
     try {
         console.log('Fetching active player list...');
         // Step 1: Get list of players from the mc-accounts endpoint
-        const response = await fetch('https://api.civinfo.net/mc-accounts/all?limit=50000', fetchOptions);
+        const response = await fetch('https://api.civinfo.net/mc-accounts/all?limit=100000', fetchOptions);
         if (!response.ok) throw new Error(`Failed to fetch player list: ${response.status}`);
         
         const data = await response.json();
         
         // API format: parallel arrays with account info
         const names = data.mcNames || [];
+
+        // Save all player names + UUIDs for case-sensitivity spell checking
+        const uuids = data.uuids || [];
+        const seenNames = new Map(); // lowercase -> { name, uuid }
+        for (let i = 0; i < names.length; i++) {
+            const name = names[i];
+            if (name) {
+                const lower = name.toLowerCase();
+                if (!seenNames.has(lower)) {
+                    seenNames.set(lower, { name, uuid: uuids[i] || null });
+                }
+            }
+        }
+        // Build sorted object: { "PlayerName": "uuid", ... }
+        const sortedEntries = Array.from(seenNames.values())
+            .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+        const playerNamesObj = {};
+        for (const entry of sortedEntries) {
+            playerNamesObj[entry.name] = entry.uuid;
+        }
+        const dataDir = path.join(__dirname, '../data');
+
+        if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+        fs.writeFileSync(path.join(dataDir, 'player_names.json'), JSON.stringify(playerNamesObj, null, 2));
+        console.log(`Saved ${sortedEntries.length} unique player names + UUIDs to data/player_names.json`);
         const lastLogins = data.lastLoginTimestamps || [];
         const lastLogouts = data.lastLogoutTimestamps || [];
         
@@ -197,11 +222,6 @@ async function main() {
         csvData.sort((a, b) => parseFloat(b.Weekly) - parseFloat(a.Weekly));
 
         const csv = Papa.unparse(csvData);
-        
-        const dataDir = path.join(__dirname, '../data');
-        if (!fs.existsSync(dataDir)){
-            fs.mkdirSync(dataDir, { recursive: true });
-        }
 
         fs.writeFileSync(path.join(dataDir, 'leaderboard.csv'), csv);
         console.log(`Leaderboard updated successfully with ${csvData.length} players.`);

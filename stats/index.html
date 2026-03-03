@@ -157,6 +157,152 @@
         .heatmap-hour-label {
             font-size: 10px; color: #6b7280; text-align: center;
         }
+
+        /* Daily Activity Chart Styles */
+        .activity-chart-container {
+            position: relative;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .activity-chart-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+        }
+        .activity-week-nav {
+            display: flex; align-items: center; gap: 6px;
+        }
+        .activity-week-nav button {
+            padding: 6px 12px; border-radius: 6px; font-size: 13px;
+            background: #1f2937; color: #9ca3af; border: 1px solid #374151;
+            cursor: pointer; transition: all 0.15s;
+            min-width: 36px; min-height: 36px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .activity-week-nav button:hover { background: #374151; color: #fff; }
+        .activity-week-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .activity-week-label {
+            font-size: 14px; font-weight: 600; color: #e5e7eb;
+            cursor: pointer; padding: 6px 12px; border-radius: 6px;
+            transition: background 0.15s; text-align: center;
+        }
+        .activity-week-label:hover { background: #1f2937; }
+        .activity-grid {
+            display: grid; gap: 0;
+        }
+        .activity-session-block {
+            position: absolute; left: 0; right: 0;
+            background: rgba(239, 68, 68, 0.6);
+            border-radius: 2px; min-height: 1px;
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+        .activity-session-block:hover {
+            background: rgba(239, 68, 68, 0.9);
+        }
+        .activity-online-now {
+            position: absolute; left: 0; right: 0; height: 3px;
+            background: #10b981; z-index: 5;
+            box-shadow: 0 0 6px #10b981;
+        }
+        .activity-online-label {
+            position: absolute; right: 4px; top: -16px;
+            font-size: 10px; color: #6b7280; white-space: nowrap;
+        }
+        .activity-day-col {
+            position: relative; border-right: 1px solid #1f2937;
+        }
+        .activity-day-col:last-child { border-right: none; }
+        .activity-hour-line {
+            position: absolute; left: 0; right: 0;
+            border-top: 1px solid rgba(55, 65, 81, 0.5);
+            pointer-events: none;
+        }
+        .activity-tooltip {
+            position: absolute; background: #1f2937; border: 1px solid #374151;
+            color: #fff; padding: 6px 10px; border-radius: 6px;
+            font-size: 12px; pointer-events: none; z-index: 50;
+            white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            opacity: 0; transition: opacity 0.12s;
+        }
+
+        /* Mobile tap tooltip */
+        .activity-tap-tooltip {
+            position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+            background: #1f2937; border: 1px solid #374151;
+            color: #fff; padding: 10px 16px; border-radius: 8px;
+            font-size: 13px; z-index: 60; text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            opacity: 0; transition: opacity 0.2s; pointer-events: none;
+            max-width: 90vw;
+        }
+        .activity-tap-tooltip.visible {
+            opacity: 1;
+        }
+
+        /* Mobile responsive for activity chart */
+        @media (max-width: 640px) {
+            .activity-chart-header {
+                flex-direction: column; align-items: flex-start;
+            }
+            .activity-week-label {
+                font-size: 12px; padding: 4px 8px;
+            }
+            .activity-week-nav {
+                width: 100%; justify-content: space-between;
+            }
+            .activity-online-label {
+                font-size: 8px; right: 1px; top: -13px;
+            }
+            .week-picker-dialog {
+                padding: 16px; max-height: 85vh; width: 95%;
+            }
+            .week-picker-item {
+                padding: 10px 10px; font-size: 14px;
+            }
+        }
+
+        /* Week Picker Dialog */
+        .week-picker-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        .week-picker-overlay.open {
+            opacity: 1; pointer-events: all;
+        }
+        .week-picker-dialog {
+            background: #111827; border: 1px solid #374151; border-radius: 12px;
+            padding: 24px; max-width: 420px; width: 90%; max-height: 80vh;
+            overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            transform: scale(0.95); transition: transform 0.2s;
+        }
+        .week-picker-overlay.open .week-picker-dialog {
+            transform: scale(1);
+        }
+        .week-picker-dialog h3 {
+            font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px;
+        }
+        .week-picker-month-group {
+            margin-bottom: 12px;
+        }
+        .week-picker-month-label {
+            font-size: 12px; font-weight: 600; color: #6b7280;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        .week-picker-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; border-radius: 6px; cursor: pointer;
+            transition: background 0.12s; font-size: 13px; color: #d1d5db;
+        }
+        .week-picker-item:hover { background: #1f2937; }
+        .week-picker-item.active {
+            background: rgba(239, 68, 68, 0.15); color: #ef4444; font-weight: 600;
+        }
+        .week-picker-item .wp-hours {
+            font-size: 12px; color: #6b7280; font-variant-numeric: tabular-nums;
+        }
+        .week-picker-item.active .wp-hours { color: #ef4444; }
     </style>
     
 <script src="../components/analytics.js" defer></script>
@@ -309,10 +455,10 @@
                     <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
                         
                         <!-- Tabs (Left) -->
-                        <div class="flex bg-gray-800 rounded-lg p-1">
-                            <button onclick="switchChart('heatmap')" id="chart-tab-heatmap" class="px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold">Heatmap</button>
+                        <div class="flex flex-wrap bg-gray-800 rounded-lg p-1 gap-1">
+                            <button onclick="switchChart('activity')" id="chart-tab-activity" class="px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold">Hourly Activity</button>
+                            <button onclick="switchChart('heatmap')" id="chart-tab-heatmap" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Heatmap</button>
                             <button onclick="switchChart('calendar')" id="chart-tab-calendar" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Calendar</button>
-                            <button onclick="switchChart('line')" id="chart-tab-line" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Line</button>
                             <button onclick="switchChart('bar')" id="chart-tab-bar" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Bar</button>
                         </div>
 
@@ -324,6 +470,16 @@
                                 <button onclick="setGranularity('weekly')" id="granularity-weekly" class="px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold">Weekly</button>
                             </div>
                         </div>
+
+                        <!-- Heatmap Display Mode (Right) - Only shown for heatmap -->
+                        <div id="heatmap-controls" class="hidden flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Display:</span>
+                            <div class="flex bg-gray-800 rounded-lg p-1">
+                                <button onclick="setHeatmapMode('percent')" id="heatmap-mode-percent" class="px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold">% Playtime</button>
+                                <button onclick="setHeatmapMode('total')" id="heatmap-mode-total" class="px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white">Total Time</button>
+                                <button onclick="setHeatmapMode('chance')" id="heatmap-mode-chance" class="px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white">% Log On Chance</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- D3 Chart Wrapper -->
@@ -332,6 +488,18 @@
                         <div id="chart-d3-main" class="w-full h-[350px] hidden chart-container"></div>
                         <div id="chart-d3-brush" class="w-full h-[60px] hidden mt-2 chart-container"></div>
                         <div id="chart-heatmap" class="w-full min-h-[300px] hidden"></div>
+                        <div id="chart-activity" class="w-full min-h-[400px] hidden"></div>
+                    </div>
+
+                    <!-- Week Picker Dialog -->
+                    <div id="week-picker-overlay" class="week-picker-overlay">
+                        <div class="week-picker-dialog">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="!mb-0">Pick a Week</h3>
+                                <button onclick="closeWeekPicker()" class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+                            </div>
+                            <div id="week-picker-list"></div>
+                        </div>
                     </div>
                     
                     <div class="text-xs text-gray-500 mt-2 text-center">
@@ -721,11 +889,15 @@
         });
 
         window.addEventListener('popstate', handleRouting);
-        window.addEventListener('resize', async () => {
-            if (currentChartType !== 'calendar' && profileData) {
-                await ensureD3();
-                renderD3Chart(currentChartType);
-            }
+        let resizeDebounceTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeDebounceTimer);
+            resizeDebounceTimer = setTimeout(async () => {
+                if (currentChartType !== 'calendar' && profileData) {
+                    await ensureD3();
+                    renderD3Chart(currentChartType);
+                }
+            }, 150);
         });
 
         let wasOnProfileView = false;
@@ -767,9 +939,41 @@
             if (scrollToTop) window.scrollTo(0, 0);
         }
 
-        // Resolve correct-case username and UUID via Mojang API (case-insensitive)
+        // --- Player Names Cache (for case-sensitivity spell checking + UUID lookup) ---
+        let playerNamesMap = null; // Map<lowercaseName, { name, uuid }>
+
+        async function loadPlayerNamesCache() {
+            if (playerNamesMap) return playerNamesMap;
+            try {
+                const resp = await fetch('../data/player_names.json');
+                if (resp.ok) {
+                    const data = await resp.json();
+                    playerNamesMap = new Map();
+                    // Format: { "PlayerName": "uuid", ... }
+                    for (const [name, uuid] of Object.entries(data)) {
+                        playerNamesMap.set(name.toLowerCase(), { name, uuid });
+                    }
+                } else {
+                    playerNamesMap = new Map();
+                }
+            } catch (e) {
+                console.warn('Failed to load player_names.json:', e);
+                playerNamesMap = new Map();
+            }
+            return playerNamesMap;
+        }
+
+        // Resolve correct-case username and UUID via local cache first, then Mojang API
         async function resolveCorrectUsername(inputName) {
-            // Try Ashcon Mojang proxy (CORS-friendly, case-insensitive)
+            // Step 1: Check local player_names.json cache (fast, includes UUID)
+            const cache = await loadPlayerNamesCache();
+            const cached = cache.get(inputName.toLowerCase());
+            if (cached) {
+                // Player exists in our cache — use correct case + UUID, skip Mojang entirely
+                return { username: cached.name, uuid: cached.uuid || null };
+            }
+
+            // Step 2: Not in cache — try Ashcon Mojang proxy (CORS-friendly, case-insensitive)
             try {
                 const resp = await fetch(`https://api.ashcon.app/mojang/v2/user/${encodeURIComponent(inputName)}`);
                 if (resp.ok) {
@@ -782,7 +986,7 @@
                 console.warn('Ashcon lookup failed, trying fallbacks:', e);
             }
 
-            // Fallback: PlayerDB (another CORS-friendly Mojang proxy)
+            // Step 3: Fallback — PlayerDB (another CORS-friendly Mojang proxy)
             try {
                 const resp = await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(inputName)}`);
                 if (resp.ok) {
@@ -815,6 +1019,7 @@
             document.getElementById('profile-online-dot').className = 'online-dot is-offline';
             document.getElementById('profile-online-dot').setAttribute('data-tooltip', 'Offline');
             heatmapSliderState = null;
+            activityCurrentWeekStart = null;
             
             // Resolve correct-case username via Mojang API (case-insensitive lookup)
             const resolved = await resolveCorrectUsername(username);
@@ -858,15 +1063,24 @@
             if (skinViewer) { skinViewer.dispose(); skinViewer = null; }
             const canvas = document.getElementById("skin-canvas");
             if (viewerAvailable && window.skinview3d) {
-                // Use UUID for skin if available, otherwise fall back to username
-                const skinUrl = playerUuid 
-                    ? `https://mc-heads.net/skin/${playerUuid}` 
-                    : `https://mc-heads.net/skin/${username}`;
+                // Try UUID skin first, fall back to username if it fails
+                const primarySkinUrl = playerUuid ? `https://mc-heads.net/skin/${playerUuid}` : null;
+                const fallbackSkinUrl = `https://mc-heads.net/skin/${username}`;
+                const skinUrl = primarySkinUrl || fallbackSkinUrl;
+
                 skinViewer = new skinview3d.SkinViewer({ canvas: canvas, width: 250, height: 350, skin: skinUrl });
                 skinViewer.controls.enableZoom = true; skinViewer.controls.enableRotate = true;
                 skinViewer.animation = new skinview3d.WalkingAnimation(); skinViewer.animation.speed = 0.5;
+
+                // If using UUID skin, set up fallback to username on load failure
+                if (primarySkinUrl) {
+                    skinViewer.loadSkin(primarySkinUrl).catch(() => {
+                        console.warn(`UUID skin failed for ${playerUuid}, falling back to username`);
+                        skinViewer.loadSkin(fallbackSkinUrl).catch(() => {});
+                    });
+                }
             }
-            document.getElementById('profile-namemc').href = `https://namemc.com/profile/${playerUuid || username}`;
+            document.getElementById('profile-namemc').href = `https://namemc.com/profile/${playerUuid ? playerUuid.replace(/-/g, '') : username}`;
 
             try {
                 const response = await fetchAPI(`https://api.civinfo.net/mc-sessions/all?mcName=${encodeURIComponent(username)}`);
@@ -1044,23 +1258,24 @@
             const logins = data.loginTimestamps || [];
             const logouts = data.logoutTimestamps || [];
 
-            // Build daily playtime from completed sessions for calendar/chart views
+            // Build daily playtime + raw sessions in a single pass
             const dailyPlaytime = {};
+            const rawSessions = [];
             const pairs = Math.min(logins.length, logouts.length);
             for (let i = 0; i < pairs; i++) {
                 const li = logins[i];
                 const lo = logouts[i];
-                if (!li || lo === null) continue;
-                if (isNaN(new Date(li)) || isNaN(new Date(lo)) || lo <= li) continue;
+                if (!li || lo == null || lo <= li) continue;
+
+                rawSessions.push({ login: li, logout: lo });
 
                 let currentTime = li;
                 while (currentTime < lo) {
                     const d = new Date(currentTime);
                     const dayStart = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-                    const dayEnd = dayStart + (24 * 60 * 60 * 1000);
+                    const dayEnd = dayStart + 86400000;
                     const sessionEndOnThisDay = Math.min(lo, dayEnd);
-                    const durationOnThisDay = sessionEndOnThisDay - currentTime;
-                    dailyPlaytime[dayStart] = (dailyPlaytime[dayStart] || 0) + durationOnThisDay;
+                    dailyPlaytime[dayStart] = (dailyPlaytime[dayStart] || 0) + (sessionEndOnThisDay - currentTime);
                     currentTime = dayEnd;
                 }
             }
@@ -1069,36 +1284,6 @@
             const monthlyPlaytime = {};
             for (const [key, hours] of Object.entries(stats.monthly)) {
                 monthlyPlaytime[key] = hours * 3600000;
-            }
-
-            // Build heatmap data: accumulate minutes per [dayOfWeek][hourOfDay] in LOCAL time
-            const heatmapGrid = Array.from({ length: 7 }, () => new Float64Array(24));
-            for (let i = 0; i < pairs; i++) {
-                const li = logins[i];
-                const lo = logouts[i];
-                if (!li || lo === null) continue;
-                if (isNaN(new Date(li)) || isNaN(new Date(lo)) || lo <= li) continue;
-                // Walk through each minute of the session in local time
-                let cursor = li;
-                while (cursor < lo) {
-                    const d = new Date(cursor);
-                    const dow = d.getDay(); // 0=Sun
-                    const hour = d.getHours();
-                    const nextHourBoundary = new Date(d.getFullYear(), d.getMonth(), d.getDate(), hour + 1, 0, 0).getTime();
-                    const chunkEnd = Math.min(lo, nextHourBoundary);
-                    heatmapGrid[dow][hour] += (chunkEnd - cursor) / 60000; // minutes
-                    cursor = chunkEnd;
-                }
-            }
-
-            // Store raw session pairs for heatmap range filtering
-            const rawSessions = [];
-            for (let i = 0; i < pairs; i++) {
-                const li = logins[i];
-                const lo = logouts[i];
-                if (!li || lo === null) continue;
-                if (isNaN(new Date(li)) || isNaN(new Date(lo)) || lo <= li) continue;
-                rawSessions.push({ login: li, logout: lo });
             }
 
             // Prepare D3 Data (capped at 24h)
@@ -1129,7 +1314,13 @@
             const firstJoin = stats.firstSeen ? stats.firstSeen.getTime() : 0;
             const lastJoin = stats.lastSeen ? stats.lastSeen.getTime() : 0;
 
-            profileData = { totalMs, firstJoin, lastJoin, dailyPlaytime, monthlyPlaytime, dailyData, weeklyData, heatmapGrid, rawSessions, isOnline: stats.isOnline };
+            // Find the ongoing session login time if player is online
+            let ongoingLoginTime = null;
+            if (stats.isOnline && stats.onlineSince) {
+                ongoingLoginTime = stats.onlineSince.getTime();
+            }
+
+            profileData = { totalMs, firstJoin, lastJoin, dailyPlaytime, monthlyPlaytime, dailyData, weeklyData, rawSessions, isOnline: stats.isOnline, ongoingLoginTime };
 
             document.getElementById('profile-playtime').textContent = stats.totalHours.toFixed(1) + 'h';
 
@@ -1172,8 +1363,8 @@
             }
             renderMonthlyList();
             const urlGraphType = new URLSearchParams(window.location.search).get('graph_type');
-            const validTypes = ['calendar', 'line', 'bar', 'heatmap'];
-            switchChart(validTypes.includes(urlGraphType) ? urlGraphType : 'heatmap');
+            const validTypes = ['calendar', 'bar', 'heatmap', 'activity'];
+            switchChart(validTypes.includes(urlGraphType) ? urlGraphType : 'activity');
         }
 
         function renderMonthlyList() {
@@ -1209,7 +1400,7 @@
             const url = new URL(window.location);
             url.searchParams.set('graph_type', type);
             window.history.replaceState({}, '', url);
-            ['calendar', 'line', 'bar', 'heatmap'].forEach(t => {
+            ['calendar', 'bar', 'heatmap', 'activity'].forEach(t => {
                 const btn = document.getElementById(`chart-tab-${t}`);
                 if (btn) btn.className = t === type ? 'px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold' : 'px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white';
             });
@@ -1218,19 +1409,29 @@
             const mainDiv = document.getElementById('chart-d3-main');
             const brushDiv = document.getElementById('chart-d3-brush');
             const heatmapDiv = document.getElementById('chart-heatmap');
+            const activityDiv = document.getElementById('chart-activity');
             const hint = document.getElementById('chart-hint-zoom');
             const granularityControls = document.getElementById('granularity-controls');
+            const heatmapControls = document.getElementById('heatmap-controls');
 
             // Hide all first
             calDiv.classList.add('hidden'); mainDiv.classList.add('hidden'); brushDiv.classList.add('hidden');
-            heatmapDiv.classList.add('hidden'); hint.classList.add('hidden'); granularityControls.classList.add('hidden');
+            heatmapDiv.classList.add('hidden'); activityDiv.classList.add('hidden');
+            hint.classList.add('hidden'); granularityControls.classList.add('hidden');
+            heatmapControls.classList.add('hidden');
 
             if (type === 'calendar') {
                 calDiv.classList.remove('hidden');
                 renderCalendarChart();
             } else if (type === 'heatmap') {
                 heatmapDiv.classList.remove('hidden');
+                heatmapControls.classList.remove('hidden');
+                heatmapControls.classList.add('flex');
+                updateHeatmapModeButtons();
                 renderPlaytimeHeatmap();
+            } else if (type === 'activity') {
+                activityDiv.classList.remove('hidden');
+                renderActivityChart();
             } else {
                 await ensureD3();
                 mainDiv.classList.remove('hidden'); brushDiv.classList.remove('hidden'); hint.classList.remove('hidden');
@@ -1264,6 +1465,18 @@
         function renderCalendarChart() {
             const container = document.getElementById('chart-calendar');
             container.innerHTML = '';
+
+            // Legend at top center
+            const legend = document.createElement('div');
+            legend.className = 'flex items-center justify-center gap-2 mb-4 text-xs text-gray-500';
+            legend.innerHTML = '<span>Less</span>';
+            for (let i = 0; i < 5; i++) {
+                const op = i === 0 ? 0.1 : (0.2 + 0.8 * i / 4);
+                legend.innerHTML += `<div style="width:14px;height:14px;border-radius:2px;background:rgba(239,68,68,${op})"></div>`;
+            }
+            legend.innerHTML += '<span>More</span>';
+            container.appendChild(legend);
+
             const months = {};
             Object.entries(profileData.dailyPlaytime).forEach(([ts, ms]) => {
                 const d = new Date(parseInt(ts));
@@ -1302,7 +1515,7 @@
                     const hours = Math.min(24, ms / 3600000).toFixed(1);
                     let opacity = 0.1;
                     if (mData.max > 0) opacity = 0.2 + (0.8 * (ms / mData.max));
-                    const bg = ms > 0 ? `rgba(16, 185, 129, ${opacity})` : 'rgba(55, 65, 81, 0.3)';
+                    const bg = ms > 0 ? `rgba(239, 68, 68, ${opacity})` : 'rgba(55, 65, 81, 0.3)';
                     
                     // Use UTC for consistent date display
                     const dateObj = new Date(Date.UTC(y, m, d));
@@ -1508,7 +1721,9 @@
                     const d = new Date(cursor);
                     const dow = d.getDay();
                     const hour = d.getHours();
-                    const nextHourBoundary = new Date(d.getFullYear(), d.getMonth(), d.getDate(), hour + 1, 0, 0).getTime();
+                    // Compute next hour boundary arithmetically (avoids extra Date allocation)
+                    const msPastHour = d.getMinutes() * 60000 + d.getSeconds() * 1000 + d.getMilliseconds();
+                    const nextHourBoundary = cursor - msPastHour + 3600000;
                     const chunkEnd = Math.min(s.logout, nextHourBoundary);
                     grid[dow][hour] += (chunkEnd - cursor) / 60000;
                     cursor = chunkEnd;
@@ -1537,7 +1752,27 @@
         }
 
         let heatmapSliderState = null;
-        let heatmapDisplayMode = 'percent'; // 'percent' or 'total'
+        let heatmapDisplayMode = 'percent'; // 'percent', 'total', or 'chance'
+
+        function updateHeatmapModeButtons() {
+            const active = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
+            const inactive = 'px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white';
+            const btnPct = document.getElementById('heatmap-mode-percent');
+            const btnTotal = document.getElementById('heatmap-mode-total');
+            const btnChance = document.getElementById('heatmap-mode-chance');
+            if (btnPct) btnPct.className = heatmapDisplayMode === 'percent' ? active : inactive;
+            if (btnTotal) btnTotal.className = heatmapDisplayMode === 'total' ? active : inactive;
+            if (btnChance) btnChance.className = heatmapDisplayMode === 'chance' ? active : inactive;
+        }
+
+        function setHeatmapMode(mode) {
+            heatmapDisplayMode = mode;
+            updateHeatmapModeButtons();
+            if (heatmapSliderState) {
+                renderHeatmapGrid(heatmapSliderState.curMin, heatmapSliderState.curMax);
+            }
+            updateChanceExplanation();
+        }
 
         function renderPlaytimeHeatmap() {
             const container = document.getElementById('chart-heatmap');
@@ -1620,34 +1855,16 @@
                 sliderSection.appendChild(tickRow);
             }
 
-            // --- Heatmap Display Mode Toggle ---
-            const toggleRow = document.createElement('div');
-            toggleRow.className = 'flex items-center justify-end gap-2 mb-3';
-            const toggleLabel = document.createElement('span');
-            toggleLabel.className = 'text-xs text-gray-500';
-            toggleLabel.textContent = 'Display:';
-            toggleRow.appendChild(toggleLabel);
-            const toggleBtnGroup = document.createElement('div');
-            toggleBtnGroup.className = 'flex bg-gray-800 rounded-lg p-1';
-            const btnPct = document.createElement('button');
-            btnPct.textContent = '% Playtime';
-            btnPct.id = 'heatmap-mode-percent';
-            const btnAvg = document.createElement('button');
-            btnAvg.textContent = 'Total Time';
-            btnAvg.id = 'heatmap-mode-total';
-            function applyModeStyles() {
-                const active = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
-                const inactive = 'px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white';
-                btnPct.className = heatmapDisplayMode === 'percent' ? active : inactive;
-                btnAvg.className = heatmapDisplayMode === 'total' ? active : inactive;
+            // --- Heatmap Legend ---
+            const legendEl = document.createElement('div');
+            legendEl.className = 'flex items-center justify-center gap-1.5 text-xs text-gray-500 mb-3';
+            legendEl.innerHTML = '<span>Less</span>';
+            for (let li = 0; li < 5; li++) {
+                const op = 0.15 + (0.85 * li / 4);
+                legendEl.innerHTML += `<div style="width:12px;height:12px;border-radius:2px;background:rgba(239,68,68,${li === 0 ? 0.05 : op})"></div>`;
             }
-            applyModeStyles();
-            btnPct.addEventListener('click', () => { heatmapDisplayMode = 'percent'; applyModeStyles(); renderHeatmapGrid(heatmapSliderState.curMin, heatmapSliderState.curMax); });
-            btnAvg.addEventListener('click', () => { heatmapDisplayMode = 'total'; applyModeStyles(); renderHeatmapGrid(heatmapSliderState.curMin, heatmapSliderState.curMax); });
-            toggleBtnGroup.appendChild(btnPct);
-            toggleBtnGroup.appendChild(btnAvg);
-            toggleRow.appendChild(toggleBtnGroup);
-            wrapper.appendChild(toggleRow);
+            legendEl.innerHTML += '<span>More</span>';
+            wrapper.appendChild(legendEl);
 
             // --- Heatmap Grid ---
             const gridContainer = document.createElement('div');
@@ -1656,6 +1873,11 @@
 
             // --- Range Slider (below heatmap) ---
             wrapper.appendChild(sliderSection);
+
+            // --- Chance mode explanation (below slider, full width) ---
+            const chanceExplanation = document.createElement('div');
+            chanceExplanation.id = 'heatmap-chance-explanation';
+            wrapper.appendChild(chanceExplanation);
 
             container.appendChild(wrapper);
 
@@ -1681,13 +1903,125 @@
                 sliderLabelTo.textContent = formatSliderDate(hi);
                 updateHighlight();
                 clearTimeout(heatmapDebounceTimer);
-                heatmapDebounceTimer = setTimeout(() => renderHeatmapGrid(lo, hi), 200);
+                heatmapDebounceTimer = setTimeout(() => { renderHeatmapGrid(lo, hi); updateChanceExplanation(); }, 200);
             }
 
             rangeMin.addEventListener('input', onSliderChange);
             rangeMax.addEventListener('input', onSliderChange);
 
             renderHeatmapGrid(heatmapSliderState.curMin, heatmapSliderState.curMax);
+            updateChanceExplanation();
+        }
+
+        function updateChanceExplanation() {
+            const el = document.getElementById('heatmap-chance-explanation');
+            if (!el) return;
+            if (heatmapDisplayMode === 'chance') {
+                const gridInner = document.getElementById('heatmap-grid-inner');
+                const totalWeeks = gridInner ? parseInt(gridInner.dataset.totalWeeks || '0') : 0;
+                el.className = 'text-xs text-gray-600 mt-4 leading-relaxed';
+                el.innerHTML = `<strong class="text-gray-500">How this is calculated:</strong> Only weeks from the last 3 months where the player logged at least 5 hours are included (${totalWeeks} qualifying week${totalWeeks !== 1 ? 's' : ''}). For each time slot, the chance is: <em>weeks played during this hour ÷ total qualifying weeks × 100</em>.`;
+            } else {
+                el.className = '';
+                el.innerHTML = '';
+            }
+        }
+
+        // Build a log-on chance grid: for each [day][hour], count how many distinct
+        // weeks the player was online during that slot vs how many weeks they could have been.
+        // Only weeks where the player played >= 5 hours AND within the last 3 months are counted.
+        function buildChanceGrid(sessions) {
+            const now = Date.now();
+            const threeMonthsAgo = now - (90 * 24 * 60 * 60 * 1000);
+
+            // Filter to last 3 months
+            const recent = sessions.filter(s => s.logout >= threeMonthsAgo);
+
+            // Group sessions by ISO week (Mon-Sun)
+            const weekMap = new Map(); // weekKey -> { totalMs, sessions[] }
+            for (const s of recent) {
+                // Get the Monday of the week for the session start
+                const d = new Date(s.login);
+                const day = d.getDay();
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
+                const monday = new Date(d.getFullYear(), d.getMonth(), diff);
+                monday.setHours(0, 0, 0, 0);
+                const weekKey = monday.getTime();
+                if (!weekMap.has(weekKey)) weekMap.set(weekKey, { totalMs: 0, sessions: [] });
+                const w = weekMap.get(weekKey);
+                w.totalMs += (s.logout - s.login);
+                w.sessions.push(s);
+            }
+
+            // Only keep weeks with >= 5 hours of playtime
+            const FIVE_HOURS_MS = 5 * 60 * 60 * 1000;
+            const qualifyingWeeks = [];
+            for (const [weekKey, w] of weekMap) {
+                if (w.totalMs >= FIVE_HOURS_MS) qualifyingWeeks.push(w);
+            }
+
+            const totalWeeks = qualifyingWeeks.length;
+
+            // For each [day][hour], count how many qualifying weeks had activity
+            const hitGrid = Array.from({ length: 7 }, () => new Float64Array(24));
+            for (const w of qualifyingWeeks) {
+                // Track which day/hour slots were hit in this week (dedupe per week)
+                const seen = Array.from({ length: 7 }, () => new Uint8Array(24));
+                for (const s of w.sessions) {
+                    // Walk through each hour the session overlaps
+                    let cursor = new Date(s.login);
+                    cursor.setMinutes(0, 0, 0);
+                    const end = s.logout;
+                    while (cursor.getTime() < end) {
+                        const dow = cursor.getDay(); // 0=Sun
+                        const hr = cursor.getHours();
+                        seen[dow][hr] = 1;
+                        cursor = new Date(cursor.getTime() + 3600000);
+                    }
+                }
+                for (let d = 0; d < 7; d++) {
+                    for (let h = 0; h < 24; h++) {
+                        hitGrid[d][h] += seen[d][h];
+                    }
+                }
+            }
+
+            // Convert to percentages
+            const chanceGrid = Array.from({ length: 7 }, () => new Float64Array(24));
+            if (totalWeeks > 0) {
+                for (let d = 0; d < 7; d++) {
+                    for (let h = 0; h < 24; h++) {
+                        chanceGrid[d][h] = (hitGrid[d][h] / totalWeeks) * 100;
+                    }
+                }
+            }
+            return { chanceGrid, totalWeeks };
+        }
+
+        // Cached locale helpers (computed once, reused across renders)
+        let _cachedLocale = null;
+        function getCachedLocale() {
+            if (!_cachedLocale) {
+                const use12h = new Date(2000, 0, 1, 13, 0).toLocaleTimeString(undefined, { hour: 'numeric' }).match(/[APap]/);
+                const dayNames = [];
+                for (let i = 0; i < 7; i++) dayNames.push(new Date(2000, 0, 2 + i).toLocaleDateString(undefined, { weekday: 'short' }));
+                const hourLabels = [];
+                for (let h = 0; h < 24; h++) hourLabels.push(new Date(2000, 0, 1, h, 0).toLocaleTimeString(undefined, { hour: 'numeric', hour12: !!use12h }));
+                const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || 'local';
+                _cachedLocale = { use12h, dayNames, hourLabels, tzName };
+            }
+            return _cachedLocale;
+        }
+
+        // Cached chance grid (only recomputed when rawSessions reference changes)
+        let _cachedChanceResult = null;
+        let _cachedChanceSessionsRef = null;
+        function getCachedChanceGrid() {
+            if (_cachedChanceSessionsRef !== profileData.rawSessions) {
+                _cachedChanceResult = buildChanceGrid(profileData.rawSessions);
+                _cachedChanceSessionsRef = profileData.rawSessions;
+            }
+            return _cachedChanceResult;
         }
 
         function renderHeatmapGrid(filterMin, filterMax) {
@@ -1701,6 +2035,9 @@
 
             const grid = buildHeatmapGrid(filtered);
 
+            // Build chance grid from raw sessions (cached, only recomputed per profile)
+            const { chanceGrid, totalWeeks } = getCachedChanceGrid();
+
             // Total minutes across all cells (for percentage)
             let totalMinutes = 0;
             for (let d = 0; d < 7; d++) {
@@ -1709,65 +2046,587 @@
 
             // Max value for color scaling
             let maxVal = 0;
-            for (let d = 0; d < 7; d++) {
-                for (let h = 0; h < 24; h++) if (grid[d][h] > maxVal) maxVal = grid[d][h];
+            if (heatmapDisplayMode === 'chance') {
+                for (let d = 0; d < 7; d++) {
+                    for (let h = 0; h < 24; h++) if (chanceGrid[d][h] > maxVal) maxVal = chanceGrid[d][h];
+                }
+            } else {
+                for (let d = 0; d < 7; d++) {
+                    for (let h = 0; h < 24; h++) if (grid[d][h] > maxVal) maxVal = grid[d][h];
+                }
             }
 
-            // Locale helpers
-            const use12h = new Date(2000, 0, 1, 13, 0).toLocaleTimeString(undefined, { hour: 'numeric' }).match(/[APap]/);
-            const dayNames = [];
-            for (let i = 0; i < 7; i++) dayNames.push(new Date(2000, 0, 2 + i).toLocaleDateString(undefined, { weekday: 'short' }));
-            const hourLabels = [];
-            for (let h = 0; h < 24; h++) hourLabels.push(new Date(2000, 0, 1, h, 0).toLocaleTimeString(undefined, { hour: 'numeric', hour12: !!use12h }));
+            const { use12h, dayNames, hourLabels, tzName } = getCachedLocale();
 
-            const gridEl = document.createElement('div');
-            gridEl.className = 'heatmap-grid';
-            gridEl.style.gridTemplateColumns = '60px repeat(24, 1fr)';
+            // Build grid HTML as string array, then assign once (avoids 200× innerHTML re-parse)
+            const parts = ['<div></div>'];
+            for (let h = 0; h < 24; h++) parts.push(`<div class="heatmap-hour-label">${hourLabels[h]}</div>`);
 
-            // Header row
-            gridEl.innerHTML += '<div></div>';
-            for (let h = 0; h < 24; h++) gridEl.innerHTML += `<div class="heatmap-hour-label">${hourLabels[h]}</div>`;
-
-            // Data rows
             for (let d = 0; d < 7; d++) {
-                gridEl.innerHTML += `<div class="heatmap-label">${dayNames[d]}</div>`;
+                parts.push(`<div class="heatmap-label">${dayNames[d]}</div>`);
                 for (let h = 0; h < 24; h++) {
-                    const val = grid[d][h];
-                    let title;
-                    if (heatmapDisplayMode === 'total') {
+                    let val, title, colorVal;
+                    if (heatmapDisplayMode === 'chance') {
+                        val = chanceGrid[d][h];
+                        colorVal = val;
+                        const chancePct = Math.round(val);
+                        const chanceStr = chancePct < 1 ? '<1' : String(chancePct);
+                        title = `${dayNames[d]} ${hourLabels[h]}: ${chanceStr}% chance`;
+                    } else if (heatmapDisplayMode === 'total') {
+                        val = grid[d][h];
+                        colorVal = val;
                         const totalHours = val / 60;
                         title = `${dayNames[d]} ${hourLabels[h]}: ${totalHours < 0.01 && val > 0 ? '<0.01' : totalHours.toFixed(1)}h total`;
                     } else {
+                        val = grid[d][h];
+                        colorVal = val;
                         const pct = totalMinutes > 0 ? ((val / totalMinutes) * 100) : 0;
                         title = `${dayNames[d]} ${hourLabels[h]}: ${pct.toFixed(1)}% of total playtime`;
                     }
                     let opacity = 0.05;
-                    if (maxVal > 0 && val > 0) opacity = 0.15 + 0.85 * (val / maxVal);
-                    const bg = val > 0 ? `rgba(239, 68, 68, ${opacity})` : 'rgba(55, 65, 81, 0.3)';
-                    gridEl.innerHTML += `<div class="heatmap-cell" style="background-color: ${bg}" onmouseenter="showTooltip(event, '${title}')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
+                    if (maxVal > 0 && colorVal > 0) opacity = 0.15 + 0.85 * (colorVal / maxVal);
+                    const bg = colorVal > 0 ? `rgba(239, 68, 68, ${opacity})` : 'rgba(55, 65, 81, 0.3)';
+                    const cellText = (heatmapDisplayMode === 'chance' && val > 0 && Math.round(val) < 1) ? '<span style="font-size:9px;color:#f87171">&lt;1%</span>' : '';
+                    parts.push(`<div class="heatmap-cell" style="background-color: ${bg};display:flex;align-items:center;justify-content:center" onmouseenter="showTooltip(event, '${title}')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">${cellText}</div>`);
                 }
             }
 
+            const gridEl = document.createElement('div');
+            gridEl.className = 'heatmap-grid';
+            gridEl.style.gridTemplateColumns = '60px repeat(24, 1fr)';
+            gridEl.innerHTML = parts.join('');
             gridContainer.appendChild(gridEl);
 
-            // Legend
-            const legend = document.createElement('div');
-            legend.className = 'flex items-center justify-center gap-2 mt-3 text-xs text-gray-500';
-            legend.innerHTML = '<span>Less</span>';
-            for (let i = 0; i < 5; i++) {
-                const op = 0.15 + (0.85 * i / 4);
-                legend.innerHTML += `<div style="width:14px;height:14px;border-radius:2px;background:rgba(239,68,68,${i === 0 ? 0.05 : op})"></div>`;
+            // Timezone note
+            const tzNote = document.createElement('div');
+            tzNote.className = 'text-center text-xs text-gray-600 mt-2';
+            tzNote.textContent = `Times shown in your local timezone (${tzName})`;
+            gridContainer.appendChild(tzNote);
+
+            // Store totalWeeks on the container for the explanation text
+            gridContainer.dataset.totalWeeks = totalWeeks;
+        }
+
+        // --- Daily Activity Chart ---
+        let activityCurrentWeekStart = null; // timestamp of week-start day 00:00 local
+        let activityAllWeeks = []; // sorted array of { weekStart, weekEnd, totalMs, sessions[] }
+
+        // Detect if locale uses Sunday-start weeks (US, Canada, Japan, etc.)
+        let _sundayStartCache = null;
+        function activityWeekStartsOnSunday() {
+            if (_sundayStartCache !== null) return _sundayStartCache;
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            // US timezones start with America/ and are in the US, plus Pacific/Honolulu
+            const usTzPrefixes = ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+                'America/Phoenix', 'America/Anchorage', 'America/Adak', 'America/Boise', 'America/Detroit',
+                'America/Indiana', 'America/Kentucky', 'America/Menominee', 'America/Nome', 'America/North_Dakota',
+                'America/Sitka', 'America/Yakutat', 'America/Juneau', 'America/Metlakatla',
+                'Pacific/Honolulu', 'America/Puerto_Rico', 'America/Virgin'];
+            _sundayStartCache = usTzPrefixes.some(p => tz.startsWith(p));
+            return _sundayStartCache;
+        }
+
+        function getLocalWeekStart(ts) {
+            const d = new Date(ts);
+            const day = d.getDay(); // 0=Sun
+            let diff;
+            if (activityWeekStartsOnSunday()) {
+                // Sunday = 0, so diff = -day
+                diff = -day;
+            } else {
+                // Monday start: diff to get back to Monday
+                diff = day === 0 ? -6 : 1 - day;
             }
-            legend.innerHTML += '<span>More</span>';
-            gridContainer.appendChild(legend);
+            const weekStart = new Date(d.getFullYear(), d.getMonth(), d.getDate() + diff, 0, 0, 0, 0);
+            return weekStart.getTime();
+        }
+
+        function buildActivityWeeks() {
+            if (!profileData || !profileData.rawSessions || profileData.rawSessions.length === 0) return [];
+            const weekMap = new Map();
+            // Include completed sessions
+            for (const s of profileData.rawSessions) {
+                const wsTs = getLocalWeekStart(s.login);
+                if (!weekMap.has(wsTs)) weekMap.set(wsTs, { weekStart: wsTs, weekEnd: wsTs + 7 * 86400000, totalMs: 0, sessions: [] });
+                const w = weekMap.get(wsTs);
+                w.totalMs += (s.logout - s.login);
+                w.sessions.push(s);
+            }
+            // If player is currently online, ensure the current week exists in the map
+            if (profileData.isOnline && profileData.ongoingLoginTime) {
+                const onlineLogin = profileData.ongoingLoginTime;
+                const wsTs = getLocalWeekStart(onlineLogin);
+                if (!weekMap.has(wsTs)) {
+                    weekMap.set(wsTs, { weekStart: wsTs, weekEnd: wsTs + 7 * 86400000, totalMs: 0, sessions: [] });
+                }
+                // Add the ongoing playtime to the total for display
+                const w = weekMap.get(wsTs);
+                w.totalMs += (Date.now() - onlineLogin);
+            }
+            const weeks = Array.from(weekMap.values()).sort((a, b) => a.weekStart - b.weekStart);
+            return weeks;
+        }
+
+        function renderActivityChart(targetWeekStart) {
+            const container = document.getElementById('chart-activity');
+            container.innerHTML = '';
+            if (!profileData || !profileData.rawSessions || profileData.rawSessions.length === 0) {
+                container.innerHTML = '<div class="text-center py-20 text-gray-500">No activity data available.</div>';
+                return;
+            }
+
+            activityAllWeeks = buildActivityWeeks();
+            if (activityAllWeeks.length === 0) {
+                container.innerHTML = '<div class="text-center py-20 text-gray-500">No activity data available.</div>';
+                return;
+            }
+
+            // Determine which week to show
+            if (targetWeekStart !== undefined && targetWeekStart !== null) {
+                activityCurrentWeekStart = targetWeekStart;
+            } else if (!activityCurrentWeekStart) {
+                // Default to the most recent week
+                activityCurrentWeekStart = activityAllWeeks[activityAllWeeks.length - 1].weekStart;
+            }
+
+            const currentWeekIdx = activityAllWeeks.findIndex(w => w.weekStart === activityCurrentWeekStart);
+            const weekData = currentWeekIdx >= 0 ? activityAllWeeks[currentWeekIdx] : activityAllWeeks[activityAllWeeks.length - 1];
+            if (currentWeekIdx < 0) activityCurrentWeekStart = weekData.weekStart;
+
+            const weekStart = weekData.weekStart;
+            const weekEnd = weekData.weekEnd;
+            const now = Date.now();
+
+            // --- Header with navigation ---
+            const header = document.createElement('div');
+            header.className = 'activity-chart-header';
+
+            const nav = document.createElement('div');
+            nav.className = 'activity-week-nav';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.innerHTML = '&#8249;';
+            prevBtn.title = 'Previous week';
+            prevBtn.disabled = currentWeekIdx <= 0;
+            prevBtn.onclick = () => {
+                if (currentWeekIdx > 0) renderActivityChart(activityAllWeeks[currentWeekIdx - 1].weekStart);
+            };
+
+            const weekLabel = document.createElement('span');
+            weekLabel.className = 'activity-week-label';
+            const wStart = new Date(weekStart);
+            const wEnd = new Date(weekEnd - 1);
+            const fmtOpts = { month: 'short', day: 'numeric' };
+            const yearOpts = { year: 'numeric' };
+            weekLabel.textContent = `${wStart.toLocaleDateString(undefined, fmtOpts)} – ${wEnd.toLocaleDateString(undefined, fmtOpts)}, ${wEnd.toLocaleDateString(undefined, yearOpts)}`;
+            weekLabel.title = 'Pick a week';
+            weekLabel.onclick = () => openWeekPicker();
+
+            const nextBtn = document.createElement('button');
+            nextBtn.innerHTML = '&#8250;';
+            nextBtn.title = 'Next week';
+            nextBtn.disabled = currentWeekIdx >= activityAllWeeks.length - 1;
+            nextBtn.onclick = () => {
+                if (currentWeekIdx < activityAllWeeks.length - 1) renderActivityChart(activityAllWeeks[currentWeekIdx + 1].weekStart);
+            };
+
+            // Today button
+            const todayWeekStart = getLocalWeekStart(Date.now());
+            const todayBtn = document.createElement('button');
+            todayBtn.textContent = 'Today';
+            todayBtn.title = 'Jump to current week';
+            todayBtn.style.cssText = 'padding:4px 12px;border-radius:6px;font-size:12px;background:#1f2937;color:#9ca3af;border:1px solid #374151;cursor:pointer;transition:all 0.15s;font-weight:500;';
+            todayBtn.addEventListener('mouseenter', () => { todayBtn.style.background = '#374151'; todayBtn.style.color = '#fff'; });
+            todayBtn.addEventListener('mouseleave', () => { todayBtn.style.background = '#1f2937'; todayBtn.style.color = '#9ca3af'; });
+            // Find the actual today week or closest to it
+            const todayWeekExists = activityAllWeeks.some(w => w.weekStart === todayWeekStart);
+            const todayTarget = todayWeekExists ? todayWeekStart : activityAllWeeks[activityAllWeeks.length - 1].weekStart;
+            // Disable if already on the today/latest week
+            if (activityCurrentWeekStart === todayTarget) {
+                todayBtn.style.opacity = '0.3';
+                todayBtn.style.cursor = 'not-allowed';
+            } else {
+                todayBtn.onclick = () => renderActivityChart(todayTarget);
+            }
+
+            nav.appendChild(prevBtn);
+            nav.appendChild(weekLabel);
+            nav.appendChild(nextBtn);
+            nav.appendChild(todayBtn);
+            header.appendChild(nav);
+
+            // Total hours for the week
+            const weekHours = document.createElement('span');
+            weekHours.className = 'text-sm text-gray-400';
+            const totalH = weekData.totalMs / 3600000;
+            weekHours.textContent = `${totalH.toFixed(1)}h this week`;
+            header.appendChild(weekHours);
+
+            container.appendChild(header);
+
+            // --- Chart Area ---
+            const isMobile = window.innerWidth < 640;
+            const CHART_HEIGHT = isMobile ? 340 : 400;
+            const HOUR_HEIGHT = CHART_HEIGHT / 24;
+            const LABEL_WIDTH = isMobile ? 36 : 55;
+            const MIN_COL_WIDTH = isMobile ? 44 : 0; // minimum px per day column on mobile
+
+            const chartWrapper = document.createElement('div');
+            chartWrapper.className = 'activity-chart-container';
+            chartWrapper.style.position = 'relative';
+
+            // Create grid: y-axis labels + 7 day columns
+            const chartGrid = document.createElement('div');
+            chartGrid.style.display = 'grid';
+            // On mobile, enforce a minimum width so columns aren't too tiny
+            if (isMobile) {
+                const totalMinWidth = LABEL_WIDTH + (MIN_COL_WIDTH * 7);
+                chartGrid.style.minWidth = totalMinWidth + 'px';
+            }
+            chartGrid.style.gridTemplateColumns = `${LABEL_WIDTH}px repeat(7, 1fr)`;
+            chartGrid.style.position = 'relative';
+
+            // Day headers
+            const dayHeaderSpacer = document.createElement('div');
+            dayHeaderSpacer.style.height = isMobile ? '32px' : '36px';
+            chartGrid.appendChild(dayHeaderSpacer);
+
+            const dayNames = [];
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(weekStart + i * 86400000);
+                const dayHeader = document.createElement('div');
+                dayHeader.style.textAlign = 'center';
+                dayHeader.style.fontSize = isMobile ? '9px' : '11px';
+                dayHeader.style.fontWeight = '600';
+                dayHeader.style.color = '#9ca3af';
+                dayHeader.style.height = isMobile ? '32px' : '36px';
+                dayHeader.style.lineHeight = isMobile ? '16px' : '18px';
+                dayHeader.style.overflow = 'hidden';
+                dayHeader.style.display = 'flex';
+                dayHeader.style.flexDirection = 'column';
+                dayHeader.style.alignItems = 'center';
+                dayHeader.style.justifyContent = 'center';
+                const dayName = dayDate.toLocaleDateString(undefined, { weekday: 'short' });
+                const monthDay = dayDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                if (isMobile) {
+                    dayHeader.innerHTML = `<span>${dayName}</span><span style="font-size:8px;color:#6b7280">${monthDay}</span>`;
+                } else {
+                    dayHeader.innerHTML = `<span>${dayName}</span><span style="font-size:10px;color:#6b7280;font-weight:400">${monthDay}</span>`;
+                }
+                dayNames.push(dayName);
+                chartGrid.appendChild(dayHeader);
+            }
+
+            // Y-axis (hours) + day columns
+            const use12h = new Date(2000, 0, 1, 13, 0).toLocaleTimeString(undefined, { hour: 'numeric' }).match(/[APap]/);
+
+            // Y-axis labels column
+            const yAxis = document.createElement('div');
+            yAxis.style.position = 'relative';
+            yAxis.style.height = CHART_HEIGHT + 'px';
+
+            // Show fewer labels on mobile (every 3 hours), desktop every 2 hours for smaller chart
+            const hourStep = isMobile ? 3 : 2;
+            for (let h = 0; h <= 24; h += hourStep) {
+                const label = document.createElement('div');
+                label.style.position = 'absolute';
+                label.style.top = (h * HOUR_HEIGHT - 6) + 'px';
+                label.style.right = isMobile ? '4px' : '4px';
+                label.style.fontSize = isMobile ? '8px' : '10px';
+                label.style.color = '#6b7280';
+                label.style.lineHeight = '12px';
+                label.style.whiteSpace = 'nowrap';
+                if (h === 24) {
+                    // Bottom label: show full 12:00 AM
+                    label.textContent = use12h ? '12:00 AM' : '0:00';
+                } else if (h === 0) {
+                    // Top label: also 12:00 AM
+                    label.textContent = use12h ? '12:00 AM' : '0:00';
+                } else if (isMobile) {
+                    // Short format on mobile
+                    if (use12h) {
+                        const hr = h > 12 ? h - 12 : h;
+                        const suffix = h < 12 ? 'AM' : 'PM';
+                        label.textContent = `${hr} ${suffix}`;
+                    } else {
+                        label.textContent = `${h}:00`;
+                    }
+                } else {
+                    const timeDate = new Date(2000, 0, 1, h, 0);
+                    label.textContent = timeDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: !!use12h });
+                }
+                yAxis.appendChild(label);
+            }
+            // Always add the h=24 bottom label if not already included by step
+            if (24 % hourStep !== 0) {
+                const bottomLabel = document.createElement('div');
+                bottomLabel.style.position = 'absolute';
+                bottomLabel.style.top = (24 * HOUR_HEIGHT - 6) + 'px';
+                bottomLabel.style.right = isMobile ? '4px' : '4px';
+                bottomLabel.style.fontSize = isMobile ? '8px' : '10px';
+                bottomLabel.style.color = '#6b7280';
+                bottomLabel.style.lineHeight = '12px';
+                bottomLabel.style.whiteSpace = 'nowrap';
+                bottomLabel.textContent = use12h ? '12:00 AM' : '0:00';
+                yAxis.appendChild(bottomLabel);
+            }
+            chartGrid.appendChild(yAxis);
+
+            // Tooltip element (desktop hover)
+            const tooltip = document.createElement('div');
+            tooltip.className = 'activity-tooltip';
+            chartWrapper.appendChild(tooltip);
+
+            // Mobile tap tooltip (fixed bottom bar)
+            const mobileTooltip = document.createElement('div');
+            mobileTooltip.className = 'activity-tap-tooltip';
+            let mobileTooltipTimer = null;
+
+            function showMobileTooltip(html) {
+                clearTimeout(mobileTooltipTimer);
+                mobileTooltip.innerHTML = html;
+                mobileTooltip.classList.add('visible');
+                mobileTooltipTimer = setTimeout(() => {
+                    mobileTooltip.classList.remove('visible');
+                }, 3000);
+            }
+
+            const timeOpts = { hour: 'numeric', minute: '2-digit', hour12: !!use12h };
+
+            // Day columns with session blocks
+            for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
+                const dayStart = weekStart + dayIdx * 86400000;
+                const dayEnd = dayStart + 86400000;
+
+                const col = document.createElement('div');
+                col.className = 'activity-day-col';
+                col.style.position = 'relative';
+                col.style.height = CHART_HEIGHT + 'px';
+                col.style.background = dayIdx % 2 === 0 ? 'rgba(17, 24, 39, 0.5)' : 'rgba(31, 41, 55, 0.3)';
+
+                // Hour grid lines
+                for (let h = 0; h < 24; h++) {
+                    const line = document.createElement('div');
+                    line.className = 'activity-hour-line';
+                    line.style.top = (h * HOUR_HEIGHT) + 'px';
+                    if (h % 6 === 0) line.style.borderTopColor = 'rgba(75, 85, 99, 0.6)';
+                    col.appendChild(line);
+                }
+
+                // Session blocks for this day
+                const daySessions = weekData.sessions.filter(s => s.login < dayEnd && s.logout > dayStart);
+                for (const session of daySessions) {
+                    const sStart = Math.max(session.login, dayStart);
+                    const sEnd = Math.min(session.logout, dayEnd);
+
+                    const startOffsetMs = sStart - dayStart;
+                    const endOffsetMs = sEnd - dayStart;
+                    const topPx = (startOffsetMs / 86400000) * CHART_HEIGHT;
+                    const heightPx = Math.max(2, ((endOffsetMs - startOffsetMs) / 86400000) * CHART_HEIGHT);
+
+                    const block = document.createElement('div');
+                    block.className = 'activity-session-block';
+                    block.style.top = topPx + 'px';
+                    block.style.height = heightPx + 'px';
+                    block.style.left = '2px';
+                    block.style.right = '2px';
+
+                    // Tooltip on hover
+                    const loginTime = new Date(session.login);
+                    const logoutTime = new Date(session.logout);
+                    const durationMin = Math.round((session.logout - session.login) / 60000);
+                    const durH = Math.floor(durationMin / 60);
+                    const durM = durationMin % 60;
+
+                    block.addEventListener('mouseenter', (e) => {
+                        tooltip.innerHTML = `<strong>${loginTime.toLocaleTimeString(undefined, timeOpts)} – ${logoutTime.toLocaleTimeString(undefined, timeOpts)}</strong><br><span style="color:#9ca3af">${durH}h ${durM}m</span>`;
+                        tooltip.style.opacity = '1';
+                    });
+                    block.addEventListener('mousemove', (e) => {
+                        const rect = chartWrapper.getBoundingClientRect();
+                        tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
+                        tooltip.style.top = (e.clientY - rect.top - 10) + 'px';
+                    });
+                    block.addEventListener('mouseleave', () => {
+                        tooltip.style.opacity = '0';
+                    });
+                    // Touch support for mobile
+                    block.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        showMobileTooltip(`<strong>${loginTime.toLocaleTimeString(undefined, timeOpts)} – ${logoutTime.toLocaleTimeString(undefined, timeOpts)}</strong><br><span style="color:#9ca3af">${durH}h ${durM}m</span>`);
+                    }, { passive: false });
+
+                    col.appendChild(block);
+                }
+
+                // If player is currently online, draw up to now with green indicator
+                if (profileData.isOnline && profileData.ongoingLoginTime) {
+                    const onlineLoginTime = profileData.ongoingLoginTime;
+                    if (onlineLoginTime) {
+                        const onlineStart = onlineLoginTime;
+                        const onlineNow = Math.min(now, dayEnd);
+                        if (onlineStart < dayEnd && onlineNow > dayStart) {
+                            const sStart = Math.max(onlineStart, dayStart);
+                            const sEnd = Math.min(onlineNow, dayEnd);
+                            const topPx = ((sStart - dayStart) / 86400000) * CHART_HEIGHT;
+                            const heightPx = Math.max(2, ((sEnd - sStart) / 86400000) * CHART_HEIGHT);
+
+                            // Check if this ongoing block overlaps an existing completed session block
+                            const alreadyRendered = daySessions.some(s => s.login <= onlineStart && s.logout >= onlineNow);
+                            if (!alreadyRendered) {
+                                const onlineBlock = document.createElement('div');
+                                onlineBlock.className = 'activity-session-block';
+                                onlineBlock.style.top = topPx + 'px';
+                                onlineBlock.style.height = heightPx + 'px';
+                                onlineBlock.style.left = '2px';
+                                onlineBlock.style.right = '2px';
+                                onlineBlock.style.background = 'rgba(16, 185, 129, 0.4)';
+                                onlineBlock.style.border = '1px solid rgba(16, 185, 129, 0.6)';
+
+                                const onlineLoginDate = new Date(onlineStart);
+                                const onlineNowDate = new Date(onlineNow);
+                                const onlineDurMin = Math.round((onlineNow - onlineStart) / 60000);
+                                const onlineDurH = Math.floor(onlineDurMin / 60);
+                                const onlineDurM = onlineDurMin % 60;
+
+                                onlineBlock.addEventListener('mouseenter', () => {
+                                    tooltip.innerHTML = `<strong style="color:#10b981">Online since ${onlineLoginDate.toLocaleTimeString(undefined, timeOpts)}</strong><br><span style="color:#9ca3af">${onlineDurH}h ${onlineDurM}m so far</span>`;
+                                    tooltip.style.opacity = '1';
+                                });
+                                onlineBlock.addEventListener('mousemove', (e) => {
+                                    const rect = chartWrapper.getBoundingClientRect();
+                                    tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
+                                    tooltip.style.top = (e.clientY - rect.top - 10) + 'px';
+                                });
+                                onlineBlock.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; });
+                                // Touch support for mobile
+                                onlineBlock.addEventListener('touchstart', (e) => {
+                                    e.preventDefault();
+                                    showMobileTooltip(`<strong style="color:#10b981">Online since ${onlineLoginDate.toLocaleTimeString(undefined, timeOpts)}</strong><br><span style="color:#9ca3af">${onlineDurH}h ${onlineDurM}m so far</span>`);
+                                }, { passive: false });
+                                col.appendChild(onlineBlock);
+                            }
+
+                            // Green line at the current time position
+                            if (sEnd === onlineNow && now >= dayStart && now < dayEnd) {
+                                const lineTop = ((onlineNow - dayStart) / 86400000) * CHART_HEIGHT;
+                                const greenLine = document.createElement('div');
+                                greenLine.className = 'activity-online-now';
+                                greenLine.style.top = lineTop + 'px';
+
+                                const onlineLabel = document.createElement('span');
+                                onlineLabel.className = 'activity-online-label';
+                                onlineLabel.textContent = 'currently online';
+                                greenLine.appendChild(onlineLabel);
+
+                                col.appendChild(greenLine);
+                            }
+                        }
+                    }
+                }
+
+                chartGrid.appendChild(col);
+            }
+
+            chartWrapper.appendChild(chartGrid);
+            container.appendChild(chartWrapper);
+
+            // Append mobile tooltip to body (fixed position needs to be outside scrollable container)
+            document.body.appendChild(mobileTooltip);
+            // Clean up mobile tooltip when chart is re-rendered
+            const existingMobileTooltips = document.querySelectorAll('.activity-tap-tooltip');
+            existingMobileTooltips.forEach((el, i) => {
+                if (i < existingMobileTooltips.length - 1) el.remove();
+            });
 
             // Timezone note
             const tzNote = document.createElement('div');
             const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || 'local';
-            tzNote.className = 'text-center text-xs text-gray-600 mt-2';
+            tzNote.className = 'text-center text-xs text-gray-600 mt-3';
             tzNote.textContent = `Times shown in your local timezone (${tzName})`;
-            gridContainer.appendChild(tzNote);
+            container.appendChild(tzNote);
         }
+
+        function openWeekPicker() {
+            const overlay = document.getElementById('week-picker-overlay');
+            const list = document.getElementById('week-picker-list');
+            list.innerHTML = '';
+
+            if (!activityAllWeeks || activityAllWeeks.length === 0) return;
+
+            // Group weeks by month (use week start date's month)
+            const monthGroups = new Map();
+            for (const week of activityAllWeeks) {
+                const d = new Date(week.weekStart);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const label = d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+                if (!monthGroups.has(key)) monthGroups.set(key, { label, weeks: [] });
+                monthGroups.get(key).weeks.push(week);
+            }
+
+            // Render in reverse chronological order
+            const sortedMonths = Array.from(monthGroups.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+            for (const [, group] of sortedMonths) {
+                const monthDiv = document.createElement('div');
+                monthDiv.className = 'week-picker-month-group';
+
+                const monthLabel = document.createElement('div');
+                monthLabel.className = 'week-picker-month-label';
+                monthLabel.textContent = group.label;
+                monthDiv.appendChild(monthLabel);
+
+                // Weeks in reverse order within month
+                const reversedWeeks = [...group.weeks].reverse();
+                for (const week of reversedWeeks) {
+                    const item = document.createElement('div');
+                    item.className = 'week-picker-item' + (week.weekStart === activityCurrentWeekStart ? ' active' : '');
+
+                    const wStart = new Date(week.weekStart);
+                    const wEnd = new Date(week.weekEnd - 1);
+                    const fmtOpts = { weekday: 'short', month: 'short', day: 'numeric' };
+
+                    const label = document.createElement('span');
+                    label.textContent = `${wStart.toLocaleDateString(undefined, fmtOpts)} – ${wEnd.toLocaleDateString(undefined, fmtOpts)}`;
+
+                    const hours = document.createElement('span');
+                    hours.className = 'wp-hours';
+                    hours.textContent = `${(week.totalMs / 3600000).toFixed(1)}h`;
+
+                    item.appendChild(label);
+                    item.appendChild(hours);
+                    item.onclick = () => {
+                        closeWeekPicker();
+                        renderActivityChart(week.weekStart);
+                    };
+                    monthDiv.appendChild(item);
+                }
+
+                list.appendChild(monthDiv);
+            }
+
+            overlay.classList.add('open');
+
+            // Scroll to the active week
+            requestAnimationFrame(() => {
+                const active = list.querySelector('.week-picker-item.active');
+                if (active) active.scrollIntoView({ block: 'center', behavior: 'instant' });
+            });
+        }
+
+        function closeWeekPicker() {
+            document.getElementById('week-picker-overlay').classList.remove('open');
+        }
+
+        // Close week picker on overlay click
+        document.addEventListener('click', (e) => {
+            const overlay = document.getElementById('week-picker-overlay');
+            if (e.target === overlay) closeWeekPicker();
+        });
+
+        // Close week picker on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeWeekPicker();
+        });
 
         // --- Rank Badge Logic ---
         function getPlayerRank(username) {

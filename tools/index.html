@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tools | Nara</title>
+    <link rel="icon" href="../images/nara_flag_white_border.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2596be',
+                        secondary: '#2596be',
+                        nara: {
+                            red: '#2596be',
+                            blue: '#2596be'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../components/analytics.js"></script>
+    <style>
+        .tool-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            background: none;
+            border: none;
+        }
+        .tool-card:hover {
+            transform: translateY(-4px);
+        }
+        .tool-card:hover .tool-icon-box {
+            box-shadow: 0 12px 40px rgba(37, 150, 190, 0.15);
+            border-color: #2596be;
+        }
+        .tool-icon-box {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 16px;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col">
+    <script src="../components/navbar.js"></script>
+    <custom-navbar></custom-navbar>
+
+    <div class="h-[100px]"></div>
+
+    <main class="flex-grow py-16 px-4">
+        <div class="max-w-xl mx-auto">
+
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-3">Tools</h1>
+                <p class="text-gray-400 text-lg">Community tools and utilities for Civ Players</p>
+            </div>
+
+            <!-- Tool Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-0">
+
+                <!-- Snitch Viewer -->
+                <a href="/snitches" class="tool-card rounded-xl p-6 block text-center">
+                    <h2 class="text-3xl font-bold mb-4">Snitch Viewer</h2>
+                    <div class="tool-icon-box mx-auto">
+                        <img src="/images/note_block.webp" alt="Snitch" style="width:160px;height:160px;image-rendering:pixelated">
+                    </div>
+                </a>
+
+                <!-- Playtime Statistics -->
+                <a href="/stats" class="tool-card rounded-xl p-6 block text-center">
+                    <h2 class="text-2xl font-bold mb-4">Playtime Statistics</h2>
+                    <div class="tool-icon-box mx-auto">
+                        <i data-feather="bar-chart-2" style="width:170px;height:170px;color:#2596be"></i>
+                    </div>
+                </a>
+
+            </div>
+
+        </div>
+    </main>
+
+    <custom-footer></custom-footer>
+    <script src="../components/footer.js"></script>
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>

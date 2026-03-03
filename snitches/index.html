@@ -1834,6 +1834,7 @@
         
         function showTooltip(snitch, clientX, clientY) {
             const status = getSnitchStatus(snitch);
+            
             let statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
             if (status === 'will-dormant') {
                 statusLabel = 'Will be Dormant';
@@ -1857,9 +1858,10 @@
                 html += `<div class="mb-1"><span class="label">Becomes Dormant</span><div class="value">${formatTimestamp(snitch.dormant_ts)}</div></div>`;
             }
             
-            // Show cull date for dormant and culled snitches (or any snitch with a cull date)
-            if (snitch.cull_ts && snitch.cull_ts > 0) {
-                html += `<div class="mb-1"><span class="label">Cull Date</span><div class="value">${formatTimestamp(snitch.cull_ts)}</div></div>`;
+            // Show cull date for dormant and culled snitches (computed as dormant_ts + 2 months)
+            const cullTs = getCullTs(snitch);
+            if (cullTs && (status === 'dormant' || status === 'culled')) {
+                html += `<div class="mb-1"><span class="label">Cull Date</span><div class="value">${formatTimestamp(cullTs)}</div></div>`;
             }
             
             // Show "Dormant in X days" for will-dormant snitches
@@ -1869,6 +1871,7 @@
                     html += `<div class="mt-2 pt-2 border-t border-gray-600"><span class="text-yellow-400 font-medium">Dormant in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}</span></div>`;
                 }
             }
+            
             
             tooltip.innerHTML = html;
             tooltip.classList.remove('hidden');
@@ -1909,7 +1912,7 @@
                 // Query snitches
                 const result = db.exec(`
                     SELECT world, x, y, z, group_name, type, name, 
-                           dormant_ts, cull_ts, first_seen_ts, last_seen_ts, 
+                           dormant_ts, first_seen_ts, last_seen_ts, 
                            created_ts, created_by_uuid
                     FROM snitches_v2
                 `);
@@ -1957,12 +1960,21 @@
             updateStats();
         }
         
+        // Compute cull timestamp as dormant_ts + 2 months
+        function getCullTs(snitch) {
+            if (!snitch.dormant_ts || snitch.dormant_ts <= 0) return null;
+            const dormantDate = new Date(snitch.dormant_ts);
+            dormantDate.setMonth(dormantDate.getMonth() + 2);
+            return dormantDate.getTime();
+        }
+        
         function getSnitchStatus(snitch) {
             const now = Date.now();
             const warningMs = dormantWarningDays * 24 * 60 * 60 * 1000;
             
-            // If cull_ts is set and in the past, it's culled
-            if (snitch.cull_ts && snitch.cull_ts > 0 && snitch.cull_ts < now) {
+            // If cull time (dormant + 2 months) is in the past, it's culled
+            const cullTs = getCullTs(snitch);
+            if (cullTs && cullTs < now) {
                 return 'culled';
             }
             
@@ -1985,6 +1997,16 @@
             if (!snitch.dormant_ts || snitch.dormant_ts <= 0) return null;
             const now = Date.now();
             const diff = snitch.dormant_ts - now;
+            if (diff <= 0) return null;
+            return Math.ceil(diff / (24 * 60 * 60 * 1000));
+        }
+        
+        // Get days until cull for dormant snitches (cull = dormant + 2 months)
+        function getDaysUntilCull(snitch) {
+            const cullTs = getCullTs(snitch);
+            if (!cullTs) return null;
+            const now = Date.now();
+            const diff = cullTs - now;
             if (diff <= 0) return null;
             return Math.ceil(diff / (24 * 60 * 60 * 1000));
         }
