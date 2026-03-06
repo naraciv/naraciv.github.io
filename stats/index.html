@@ -386,9 +386,9 @@
         <div id="view-profile" class="hidden max-w-[95%] mx-auto w-full flex flex-col lg:flex-row gap-8">
             
             <!-- Left Sidebar: Profile Info (25%) -->
-            <div class="w-full lg:w-1/4 flex flex-col gap-6">
+            <div class="w-full lg:w-1/4 flex flex-col gap-6 lg:sticky lg:top-24 lg:self-start">
                 <!-- Added Box Container -->
-                <div class="bg-gray-900 border border-gray-800 rounded-lg p-6 h-fit sticky top-24 flex flex-col items-center text-center">
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-6 h-fit flex flex-col items-center text-center">
                     
                     <!-- 3D Skin Viewer Container -->
                     <div class="relative mb-4 w-full flex justify-center">
@@ -509,7 +509,17 @@
 
                 <!-- Monthly Data List -->
                 <div class="bg-gray-900 rounded-lg border border-gray-800 p-6">
-                    <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Monthly Playdata</h3>
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-2">
+                        <h3 class="text-xl font-bold text-white">Monthly Playdata</h3>
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <span class="text-xs text-gray-400">Show Empty Months</span>
+                            <div class="relative inline-flex items-center">
+                                <input type="checkbox" id="toggle-empty-months" class="sr-only peer" onchange="toggleShowEmptyMonths()">
+                                <div class="w-9 h-5 bg-gray-700 rounded-full peer-checked:bg-red-500 transition-colors"></div>
+                                <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                            </div>
+                        </label>
+                    </div>
                     <div id="monthly-data-container" class="flex flex-wrap gap-6"></div>
                 </div>
 
@@ -532,6 +542,7 @@
         let currentGranularity = 'weekly'; 
         let userGranularityPreference = 'weekly'; // User's preferred granularity (daily or weekly)
         let durationIntervalId = null;
+        let showEmptyMonths = false;
         const INITIAL_OFFLINE_LIMIT = 50; // Only render what fits on screen initially
         const OFFLINE_BATCH_SIZE = 30;
         const PREFETCH_AHEAD = 100;
@@ -1378,6 +1389,7 @@
                 const year = current.getFullYear(); const month = current.getMonth() + 1;
                 const key = `${year}-${String(month).padStart(2, '0')}`;
                 const ms = profileData.monthlyPlaytime[key] || 0;
+                if (!showEmptyMonths && ms === 0) { current.setMonth(current.getMonth() + 1); continue; }
                 const hours = (ms / 3600000).toFixed(1);
                 const monthName = current.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
                 monthBuffer.push(`<div class="flex justify-between text-sm"><span class="text-gray-400">${monthName}:</span> <span class="font-mono text-white">${hours}h</span></div>`);
@@ -1391,6 +1403,12 @@
                 const col = document.createElement('div'); col.className = 'flex flex-col gap-1 min-w-[160px]';
                 col.innerHTML = monthBuffer.join(''); container.appendChild(col);
             }
+        }
+
+        function toggleShowEmptyMonths() {
+            showEmptyMonths = document.getElementById('toggle-empty-months').checked;
+            renderMonthlyList();
+            if (currentChartType === 'calendar') renderCalendarChart();
         }
 
         // --- D3 Charting Logic ---
@@ -1487,16 +1505,37 @@
                 months[key].days[day] = ms;
                 if (ms > months[key].max) months[key].max = ms;
             });
+
+            // When showEmptyMonths is on, fill in all months from firstJoin to now
+            if (showEmptyMonths && profileData.firstJoin > 0) {
+                const startDate = new Date(profileData.firstJoin);
+                const now = new Date();
+                let cur = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), 1));
+                while (cur <= now) {
+                    const key = `${cur.getUTCFullYear()}-${cur.getUTCMonth()}`;
+                    if (!months[key]) {
+                        months[key] = { name: cur.toLocaleDateString(undefined, {month:'long', year:'numeric', timeZone: 'UTC'}), days: {}, max: 0 };
+                    }
+                    cur.setUTCMonth(cur.getUTCMonth() + 1);
+                }
+            }
+
             const sortedKeys = Object.keys(months).sort((a,b) => {
                 const [y1, m1] = a.split('-'); const [y2, m2] = b.split('-');
                 return (parseInt(y1)*12 + parseInt(m1)) - (parseInt(y2)*12 + parseInt(m2));
+            });
+
+            // When showEmptyMonths is off, filter out months with no playtime data
+            const filteredKeys = showEmptyMonths ? sortedKeys : sortedKeys.filter(key => {
+                const mData = months[key];
+                return Object.keys(mData.days).length > 0;
             });
             
             // Made grid much denser for smaller calendars
             const gridWrapper = document.createElement('div');
             gridWrapper.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2';
             
-            sortedKeys.forEach(key => {
+            filteredKeys.forEach(key => {
                 const mData = months[key];
                 const [y, m] = key.split('-').map(Number);
                 // Use UTC for consistent calendar rendering
