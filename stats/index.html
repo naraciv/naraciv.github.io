@@ -39,10 +39,11 @@
 
         .time-tooltip {
             visibility: hidden; opacity: 0; position: absolute; bottom: 100%; left: 50%;
-            transform: translateX(-50%); margin-bottom: 8px; padding: 6px 10px;
-            background-color: #1f2937; border: 1px solid #374151; color: #fff;
-            font-size: 0.75rem; border-radius: 4px; white-space: nowrap; z-index: 20;
-            transition: opacity 0.2s; pointer-events: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateX(-50%); margin-bottom: 8px; padding: 6px 12px;
+            background: rgba(31, 41, 55, 0.95); border: 1px solid #374151; color: #f9fafb;
+            font-size: 0.85rem; font-weight: 500; border-radius: 6px; white-space: nowrap; z-index: 99999;
+            transition: opacity 0.2s; pointer-events: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
         }
         .group:hover .time-tooltip { visibility: visible; opacity: 1; }
 
@@ -51,9 +52,10 @@
         .calendar-day { aspect-ratio: 1; border-radius: 2px; cursor: pointer; }
         
         #calendar-tooltip {
-            display: none; position: absolute; background-color: #1f2937; border: 1px solid #374151;
-            color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;
-            pointer-events: none; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: none; position: absolute; background: rgba(31, 41, 55, 0.95); border: 1px solid #374151;
+            color: #f9fafb; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500;
+            pointer-events: none; z-index: 99999; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px); transform: translate(-50%, -100%); margin-top: -10px; white-space: nowrap;
         }
 
         /* D3 Chart Styles */
@@ -69,9 +71,11 @@
 
         /* D3 Tooltip */
         #d3-tooltip {
-            position: absolute; opacity: 0; background: #1f2937; border: 1px solid #374151;
-            color: white; padding: 8px; border-radius: 4px; pointer-events: none; font-size: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 50;
+            position: absolute; opacity: 0; background: rgba(31, 41, 55, 0.95); border: 1px solid #374151;
+            color: #f9fafb; padding: 6px 12px; border-radius: 6px; pointer-events: none; font-size: 0.85rem; font-weight: 500;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3); z-index: 99999;
+            backdrop-filter: blur(4px); transform: translate(-50%, -100%); margin-top: -10px; white-space: nowrap;
+            transition: opacity 0.15s ease;
         }
 
         /* Rank Badge on Skin Viewer */
@@ -218,20 +222,21 @@
             pointer-events: none;
         }
         .activity-tooltip {
-            position: absolute; background: #1f2937; border: 1px solid #374151;
-            color: #fff; padding: 6px 10px; border-radius: 6px;
-            font-size: 12px; pointer-events: none; z-index: 50;
-            white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            opacity: 0; transition: opacity 0.12s;
+            position: fixed; background: rgba(31, 41, 55, 0.95); border: 1px solid #374151;
+            color: #f9fafb; padding: 6px 12px; border-radius: 6px;
+            font-size: 0.85rem; font-weight: 500; pointer-events: none; z-index: 99999;
+            white-space: nowrap; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            opacity: 0; transition: opacity 0.12s; backdrop-filter: blur(4px);
+            transform: translate(-50%, -100%); margin-top: -10px;
         }
 
         /* Mobile tap tooltip */
         .activity-tap-tooltip {
             position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-            background: #1f2937; border: 1px solid #374151;
-            color: #fff; padding: 10px 16px; border-radius: 8px;
-            font-size: 13px; z-index: 60; text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            background: rgba(31, 41, 55, 0.95); border: 1px solid #374151;
+            color: #f9fafb; padding: 10px 16px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 500; z-index: 99999; text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); backdrop-filter: blur(4px);
             opacity: 0; transition: opacity 0.2s; pointer-events: none;
             max-width: 90vw;
         }
@@ -1559,7 +1564,7 @@
                     // Use UTC for consistent date display
                     const dateObj = new Date(Date.UTC(y, m, d));
                     const dateStr = dateObj.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-                    const title = `${dateStr}: ${hours}h`;
+                    const title = `<strong>${dateStr}</strong><br/>${hours}h`;
                     
                     html += `<div class="calendar-day" style="background-color: ${bg}" onmouseenter="showTooltip(event, '${title}')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
                 }
@@ -1733,8 +1738,18 @@
 
             tooltip.innerHTML = `<strong>${dateStr}</strong><br>${d.value.toFixed(2)} hours`;
             tooltip.style.opacity = 1;
-            tooltip.style.left = (event.pageX + 10) + 'px';
-            tooltip.style.top = (event.pageY - 20) + 'px';
+            tooltip.style.left = event.pageX + 'px';
+            
+            // Prevent tooltip from clipping off the top
+            if (event.clientY < 60) {
+                tooltip.style.transform = 'translate(-50%, 0)';
+                tooltip.style.marginTop = '15px';
+            } else {
+                tooltip.style.transform = '';
+                tooltip.style.marginTop = '';
+            }
+            
+            tooltip.style.top = event.pageY + 'px';
         }
         function hideD3Tooltip() {
             document.getElementById('d3-tooltip').style.opacity = 0;
@@ -1743,11 +1758,22 @@
         // Calendar Tooltip
         function showTooltip(e, text) {
             const el = document.getElementById('calendar-tooltip');
-            el.textContent = text; el.style.display = 'block'; moveTooltip(e);
+            el.innerHTML = text; el.style.display = 'block'; moveTooltip(e);
         }
         function moveTooltip(e) {
             const el = document.getElementById('calendar-tooltip');
-            el.style.left = (e.pageX + 10) + 'px'; el.style.top = (e.pageY + 10) + 'px';
+            el.style.left = e.pageX + 'px';
+            
+            // Prevent tooltip from clipping off the top of the viewport
+            if (e.clientY < 60) {
+                el.style.transform = 'translate(-50%, 0)';
+                el.style.marginTop = '15px';
+            } else {
+                el.style.transform = '';
+                el.style.marginTop = '';
+            }
+            
+            el.style.top = e.pageY + 'px';
         }
         function hideTooltip() { document.getElementById('calendar-tooltip').style.display = 'none'; }
 
@@ -1792,6 +1818,7 @@
 
         let heatmapSliderState = null;
         let heatmapDisplayMode = 'percent'; // 'percent', 'total', or 'chance'
+        let heatmapUserModifiedSlider = false;
 
         function updateHeatmapModeButtons() {
             const active = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
@@ -1807,10 +1834,7 @@
         function setHeatmapMode(mode) {
             heatmapDisplayMode = mode;
             updateHeatmapModeButtons();
-            if (heatmapSliderState) {
-                renderHeatmapGrid(heatmapSliderState.curMin, heatmapSliderState.curMax);
-            }
-            updateChanceExplanation();
+            renderPlaytimeHeatmap();
         }
 
         function renderPlaytimeHeatmap() {
@@ -1825,9 +1849,21 @@
             const allMinTime = sessions[0].login;
             const allMaxTime = sessions[sessions.length - 1].logout;
 
-            // Initialize slider state to full range
+            // Initialize slider state
             if (!heatmapSliderState || heatmapSliderState.allMin !== allMinTime) {
                 heatmapSliderState = { allMin: allMinTime, allMax: allMaxTime, curMin: allMinTime, curMax: allMaxTime };
+                heatmapUserModifiedSlider = false;
+            }
+
+            // Adjust default unmodified state based on mode
+            if (!heatmapUserModifiedSlider) {
+                if (heatmapDisplayMode === 'chance') {
+                    const twoMonthsMs = 60 * 24 * 60 * 60 * 1000;
+                    heatmapSliderState.curMin = Math.max(allMinTime, allMaxTime - twoMonthsMs);
+                } else {
+                    heatmapSliderState.curMin = allMinTime;
+                }
+                heatmapSliderState.curMax = allMaxTime;
             }
 
             const wrapper = document.createElement('div');
@@ -1898,9 +1934,16 @@
             const legendEl = document.createElement('div');
             legendEl.className = 'flex items-center justify-center gap-1.5 text-xs text-gray-500 mb-3';
             legendEl.innerHTML = '<span>Less</span>';
-            for (let li = 0; li < 5; li++) {
-                const op = 0.15 + (0.85 * li / 4);
-                legendEl.innerHTML += `<div style="width:12px;height:12px;border-radius:2px;background:rgba(239,68,68,${li === 0 ? 0.05 : op})"></div>`;
+            // Start with a zero-value grey color cell
+            legendEl.innerHTML += `<div style="width:12px;height:12px;border-radius:2px;background:rgba(55, 65, 81, 0.3)"></div>`;
+            // Add 6 colored intensity steps representing >0 values
+            for (let li = 1; li <= 6; li++) {
+                const ratio = li / 6;
+                const intensity = Math.pow(ratio, 0.5);
+                // Shift hue from 220 (blue) to 360 (red) for a cool-to-warm gradient that's less neon
+                const hue = Math.round(220 + 140 * intensity);
+                const bg = `hsla(${hue > 360 ? hue - 360 : hue}, 75%, 60%, ${0.25 + 0.75 * intensity})`;
+                legendEl.innerHTML += `<div style="width:12px;height:12px;border-radius:2px;background:${bg}"></div>`;
             }
             legendEl.innerHTML += '<span>More</span>';
             wrapper.appendChild(legendEl);
@@ -1933,6 +1976,7 @@
 
             let heatmapDebounceTimer = null;
             function onSliderChange() {
+                heatmapUserModifiedSlider = true;
                 let lo = parseInt(rangeMin.value);
                 let hi = parseInt(rangeMax.value);
                 if (lo > hi) { const tmp = lo; lo = hi; hi = tmp; }
@@ -1948,6 +1992,19 @@
             rangeMin.addEventListener('input', onSliderChange);
             rangeMax.addEventListener('input', onSliderChange);
 
+            // Custom tooltip for slider handles
+            function updateSliderTooltip(e, isMin) {
+                const val = isMin ? heatmapSliderState.curMin : heatmapSliderState.curMax;
+                showTooltip(e, '<strong>' + formatSliderDate(val) + '</strong>');
+            }
+            rangeMin.addEventListener('mouseenter', (e) => updateSliderTooltip(e, true));
+            rangeMin.addEventListener('mousemove', (e) => updateSliderTooltip(e, true));
+            rangeMin.addEventListener('mouseleave', hideTooltip);
+
+            rangeMax.addEventListener('mouseenter', (e) => updateSliderTooltip(e, false));
+            rangeMax.addEventListener('mousemove', (e) => updateSliderTooltip(e, false));
+            rangeMax.addEventListener('mouseleave', hideTooltip);
+
             renderHeatmapGrid(heatmapSliderState.curMin, heatmapSliderState.curMax);
             updateChanceExplanation();
         }
@@ -1959,7 +2016,7 @@
                 const gridInner = document.getElementById('heatmap-grid-inner');
                 const totalWeeks = gridInner ? parseInt(gridInner.dataset.totalWeeks || '0') : 0;
                 el.className = 'text-xs text-gray-600 mt-4 leading-relaxed';
-                el.innerHTML = `<strong class="text-gray-500">How this is calculated:</strong> Only weeks from the last 3 months where the player logged at least 5 hours are included (${totalWeeks} qualifying week${totalWeeks !== 1 ? 's' : ''}). For each time slot, the chance is: <em>weeks played during this hour ÷ total qualifying weeks × 100</em>.`;
+                el.innerHTML = `<strong class="text-gray-500">How this is calculated:</strong> Only weeks within the selected range where the player logged at least 5 hours are included (${totalWeeks} qualifying week${totalWeeks !== 1 ? 's' : ''}). For each time slot, the chance is: <em>weeks played during this hour ÷ total qualifying weeks × 100</em>.`;
             } else {
                 el.className = '';
                 el.innerHTML = '';
@@ -1968,14 +2025,7 @@
 
         // Build a log-on chance grid: for each [day][hour], count how many distinct
         // weeks the player was online during that slot vs how many weeks they could have been.
-        // Only weeks where the player played >= 5 hours AND within the last 3 months are counted.
-        function buildChanceGrid(sessions) {
-            const now = Date.now();
-            const threeMonthsAgo = now - (90 * 24 * 60 * 60 * 1000);
-
-            // Filter to last 3 months
-            const recent = sessions.filter(s => s.logout >= threeMonthsAgo);
-
+        function buildChanceGrid(recent) {
             // Group sessions by ISO week (Mon-Sun)
             const weekMap = new Map(); // weekKey -> { totalMs, sessions[] }
             for (const s of recent) {
@@ -2052,17 +2102,6 @@
             return _cachedLocale;
         }
 
-        // Cached chance grid (only recomputed when rawSessions reference changes)
-        let _cachedChanceResult = null;
-        let _cachedChanceSessionsRef = null;
-        function getCachedChanceGrid() {
-            if (_cachedChanceSessionsRef !== profileData.rawSessions) {
-                _cachedChanceResult = buildChanceGrid(profileData.rawSessions);
-                _cachedChanceSessionsRef = profileData.rawSessions;
-            }
-            return _cachedChanceResult;
-        }
-
         function renderHeatmapGrid(filterMin, filterMax) {
             const gridContainer = document.getElementById('heatmap-grid-inner');
             if (!gridContainer) return;
@@ -2074,8 +2113,8 @@
 
             const grid = buildHeatmapGrid(filtered);
 
-            // Build chance grid from raw sessions (cached, only recomputed per profile)
-            const { chanceGrid, totalWeeks } = getCachedChanceGrid();
+            // Build chance grid dynamically based on selected range
+            const { chanceGrid, totalWeeks } = buildChanceGrid(filtered);
 
             // Total minutes across all cells (for percentage)
             let totalMinutes = 0;
@@ -2110,30 +2149,27 @@
                         colorVal = val;
                         const chancePct = Math.round(val);
                         const chanceStr = chancePct < 1 ? '<1' : String(chancePct);
-                        title = `${dayNames[d]} ${hourLabels[h]}: ${chanceStr}% chance`;
+                        title = `<strong>${dayNames[d]} ${hourLabels[h]}</strong><br/>${chanceStr}% chance`;
                     } else if (heatmapDisplayMode === 'total') {
                         val = grid[d][h];
                         colorVal = val;
                         const totalHours = val / 60;
-                        title = `${dayNames[d]} ${hourLabels[h]}: ${totalHours < 0.01 && val > 0 ? '<0.01' : totalHours.toFixed(1)}h total`;
+                        title = `<strong>${dayNames[d]} ${hourLabels[h]}</strong><br/>${totalHours < 0.01 && val > 0 ? '&lt;0.01' : totalHours.toFixed(1)}h total`;
                     } else {
                         val = grid[d][h];
                         colorVal = val;
                         const pct = totalMinutes > 0 ? ((val / totalMinutes) * 100) : 0;
-                        title = `${dayNames[d]} ${hourLabels[h]}: ${pct.toFixed(1)}% of total playtime`;
+                        const pctStr = pct > 0 && pct < 0.1 ? '&lt;0.1' : pct.toFixed(1);
+                        title = `<strong>${dayNames[d]} ${hourLabels[h]}</strong><br/>${pctStr}% of total playtime`;
                     }
                     let bg = 'rgba(55, 65, 81, 0.3)';
                     if (maxVal > 0 && colorVal > 0) {
                         const ratio = colorVal / maxVal;
-                        // Use root scale to amplify small differences visually
-                        const intensity = Math.pow(ratio, 0.4);
-                        // Hue shifts from 60 (yellow) for low to 0 (red) for high
-                        const hue = Math.round(60 * (1 - intensity));
-                        // Lightness decreases slightly as intensity increases for deeper reds
-                        const lightness = Math.round(60 - 15 * intensity);
-                        // Opacity scales up for higher values
-                        const opacity = 0.25 + 0.75 * intensity;
-                        bg = `hsla(${hue}, 90%, ${lightness}%, ${opacity})`;
+                        // Root scale to spread values
+                        const intensity = Math.pow(ratio, 0.5);
+                        const hue = Math.round(220 + 140 * intensity);
+                        // Multi-color spread from blue to red, using lower saturation to avoid neon clash
+                        bg = `hsla(${hue > 360 ? hue - 360 : hue}, 75%, 60%, ${0.25 + 0.75 * intensity})`;
                     }
                     const cellText = (heatmapDisplayMode === 'chance' && val > 0 && Math.round(val) < 1) ? '<span style="font-size:9px;color:#f87171">&lt;1%</span>' : '';
                     parts.push(`<div class="heatmap-cell" style="background-color: ${bg};display:flex;align-items:center;justify-content:center" onmouseenter="showTooltip(event, '${title}')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">${cellText}</div>`);
@@ -2424,7 +2460,7 @@
             // Tooltip element (desktop hover)
             const tooltip = document.createElement('div');
             tooltip.className = 'activity-tooltip';
-            chartWrapper.appendChild(tooltip);
+            container.appendChild(tooltip);
 
             // Mobile tap tooltip (fixed bottom bar)
             const mobileTooltip = document.createElement('div');
@@ -2492,9 +2528,15 @@
                         tooltip.style.opacity = '1';
                     });
                     block.addEventListener('mousemove', (e) => {
-                        const rect = chartWrapper.getBoundingClientRect();
-                        tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
-                        tooltip.style.top = (e.clientY - rect.top - 10) + 'px';
+                        tooltip.style.left = e.clientX + 'px';
+                        if (e.clientY < 100) {
+                            tooltip.style.transform = 'translate(-50%, 0)';
+                            tooltip.style.marginTop = '15px';
+                        } else {
+                            tooltip.style.transform = '';
+                            tooltip.style.marginTop = '';
+                        }
+                        tooltip.style.top = e.clientY + 'px';
                     });
                     block.addEventListener('mouseleave', () => {
                         tooltip.style.opacity = '0';
@@ -2543,9 +2585,15 @@
                                     tooltip.style.opacity = '1';
                                 });
                                 onlineBlock.addEventListener('mousemove', (e) => {
-                                    const rect = chartWrapper.getBoundingClientRect();
-                                    tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
-                                    tooltip.style.top = (e.clientY - rect.top - 10) + 'px';
+                                    tooltip.style.left = e.clientX + 'px';
+                                    if (e.clientY < 100) {
+                                        tooltip.style.transform = 'translate(-50%, 0)';
+                                        tooltip.style.marginTop = '15px';
+                                    } else {
+                                        tooltip.style.transform = '';
+                                        tooltip.style.marginTop = '';
+                                    }
+                                    tooltip.style.top = e.clientY + 'px';
                                 });
                                 onlineBlock.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; });
                                 // Touch support for mobile
