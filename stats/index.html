@@ -2122,9 +2122,19 @@
                         const pct = totalMinutes > 0 ? ((val / totalMinutes) * 100) : 0;
                         title = `${dayNames[d]} ${hourLabels[h]}: ${pct.toFixed(1)}% of total playtime`;
                     }
-                    let opacity = 0.05;
-                    if (maxVal > 0 && colorVal > 0) opacity = 0.15 + 0.85 * (colorVal / maxVal);
-                    const bg = colorVal > 0 ? `rgba(239, 68, 68, ${opacity})` : 'rgba(55, 65, 81, 0.3)';
+                    let bg = 'rgba(55, 65, 81, 0.3)';
+                    if (maxVal > 0 && colorVal > 0) {
+                        const ratio = colorVal / maxVal;
+                        // Use root scale to amplify small differences visually
+                        const intensity = Math.pow(ratio, 0.4);
+                        // Hue shifts from 60 (yellow) for low to 0 (red) for high
+                        const hue = Math.round(60 * (1 - intensity));
+                        // Lightness decreases slightly as intensity increases for deeper reds
+                        const lightness = Math.round(60 - 15 * intensity);
+                        // Opacity scales up for higher values
+                        const opacity = 0.25 + 0.75 * intensity;
+                        bg = `hsla(${hue}, 90%, ${lightness}%, ${opacity})`;
+                    }
                     const cellText = (heatmapDisplayMode === 'chance' && val > 0 && Math.round(val) < 1) ? '<span style="font-size:9px;color:#f87171">&lt;1%</span>' : '';
                     parts.push(`<div class="heatmap-cell" style="background-color: ${bg};display:flex;align-items:center;justify-content:center" onmouseenter="showTooltip(event, '${title}')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">${cellText}</div>`);
                 }
