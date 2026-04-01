@@ -173,6 +173,14 @@ class CustomFooter extends HTMLElement {
                             <a href="/snitches">Snitch Viewer</a>
                         </div>
                     </div>
+
+                    <div class="footer-section">
+                        <h3>Tools</h3>
+                        <div class="footer-links">
+                            <a href="/stats">Playtime Statistics</a>
+                            <a href="/snitches">Snitch Viewer</a>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="copyright">

@@ -12,20 +12,44 @@ async function main() {
     try {
         console.log('Fetching active player list...');
         // Step 1: Get list of players from the mc-accounts endpoint
-        const response = await fetch('https://api.civinfo.net/mc-accounts/all?limit=50000', fetchOptions);
+        const response = await fetch('https://api.civinfo.net/mc-accounts/all?limit=100000', fetchOptions);
         if (!response.ok) throw new Error(`Failed to fetch player list: ${response.status}`);
         
         const data = await response.json();
         
         // API format: parallel arrays with account info
         const names = data.mcNames || [];
+
+        // Save all player names + UUIDs for case-sensitivity spell checking
+        const uuids = data.uuids || [];
+        const seenNames = new Map(); // lowercase -> { name, uuid }
+        for (let i = 0; i < names.length; i++) {
+            const name = names[i];
+            if (name) {
+                const lower = name.toLowerCase();
+                if (!seenNames.has(lower)) {
+                    seenNames.set(lower, { name, uuid: uuids[i] || null });
+                }
+            }
+        }
+        // Build sorted object: { "PlayerName": "uuid", ... }
+        const sortedEntries = Array.from(seenNames.values())
+            .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+        const playerNamesObj = {};
+        for (const entry of sortedEntries) {
+            playerNamesObj[entry.name] = entry.uuid;
+        }
+        const dataDir = path.join(__dirname, '../data');
+
+        if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+        fs.writeFileSync(path.join(dataDir, 'player_names.json'), JSON.stringify(playerNamesObj, null, 2));
+        console.log(`Saved ${sortedEntries.length} unique player names + UUIDs to data/player_names.json`);
         const lastLogins = data.lastLoginTimestamps || [];
         const lastLogouts = data.lastLogoutTimestamps || [];
         
         const now = Date.now();
         const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
         const oneMonthAgo = now - (30 * 24 * 60 * 60 * 1000);
-        const oneDayMs = 24 * 60 * 60 * 1000;
 
         // Extract unique usernames who have been active in the past week
         const uniqueUsers = new Set();
@@ -68,6 +92,8 @@ async function main() {
         const failedUsers = [];
 
         // Worker function to process a single user
+        // Follows the same logic as computeStats on the frontend:
+        // only count completed sessions (non-null logout), no capping/merging
         const processUser = async (username) => {
             try {
                 const historyRes = await fetch(`https://api.civinfo.net/mc-sessions/all?mcName=${username}`, fetchOptions);
@@ -122,30 +148,35 @@ async function main() {
                 let weekly = 0;
                 let monthly = 0;
                 let allTime = 0;
-                
-                // Accumulate durations from merged sessions (use overlaps with week/month windows)
-                for (const s of merged) {
-                    const start = s.start;
-                    const end = s.end;
+
+                // Aggregate completed sessions only (skip ongoing/null logout)
+                const pairs = Math.min(logins.length, logouts.length);
+                for (let i = 0; i < pairs; i++) {
+                    const li = logins[i];
+                    const lo = logouts[i];
+                    if (!li || lo === null) continue; // skip ongoing sessions
+
+                    const start = li;
+                    const end = lo;
+                    if (end <= start) continue;
+
                     const duration = end - start;
                     allTime += duration;
-                    
+
+                    // Weekly overlap
                     const weekStart = Math.max(start, oneWeekAgo);
                     const weekEnd = Math.min(end, now);
                     if (weekEnd > weekStart) {
                         weekly += (weekEnd - weekStart);
                     }
-                    
+
+                    // Monthly overlap
                     const monthStart = Math.max(start, oneMonthAgo);
                     const monthEnd = Math.min(end, now);
                     if (monthEnd > monthStart) {
                         monthly += (monthEnd - monthStart);
                     }
                 }
-
-                // Clamp weekly to max 23.8 hours/day * 7 days to avoid impossible weekly totals
-                const WEEKLY_MAX_MS = 23.8 * 7 * 3600 * 1000;
-                weekly = Math.min(weekly, WEEKLY_MAX_MS);
 
                 if (allTime > 0) {
                     return { success: true, username, weekly, monthly, allTime };
@@ -230,11 +261,6 @@ async function main() {
         csvData.sort((a, b) => parseFloat(b.Weekly) - parseFloat(a.Weekly));
 
         const csv = Papa.unparse(csvData);
-        
-        const dataDir = path.join(__dirname, '../data');
-        if (!fs.existsSync(dataDir)){
-            fs.mkdirSync(dataDir, { recursive: true });
-        }
 
         fs.writeFileSync(path.join(dataDir, 'leaderboard.csv'), csv);
         console.log(`Leaderboard updated successfully with ${csvData.length} players.`);

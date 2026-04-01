@@ -29,7 +29,7 @@ class CustomNavbar extends HTMLElement {
           font-size: 1.5rem;
           font-weight: 900;
           text-decoration: none;
-          z-index: 1001;
+          z-index: 9001;
           position: relative;
           background: linear-gradient(90deg, #FF6B35, #E040FB, #00BCD4, #FF6B35);
           background-size: 300% 100%;
@@ -161,7 +161,7 @@ class CustomNavbar extends HTMLElement {
           display: none;
           flex-direction: column;
           cursor: pointer;
-          z-index: 1001;
+          z-index: 9001;
           background: none;
           border: none;
           padding: 0.5rem;
@@ -345,6 +345,24 @@ class CustomNavbar extends HTMLElement {
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
+          }
+          
+          /* Mobile dropdown */
+          .nav-dropdown-menu {
+            position: static;
+            transform: none;
+            opacity: 1;
+            visibility: visible;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            margin-top: 0;
+            padding: 0.5rem 0 0 1rem;
+          }
+          .nav-dropdown-item {
+            font-size: 1rem;
+            padding: 0.25rem 0.5rem;
+            color: #aaa;
           }
           
           /* Mobile dropdown */

@@ -74,6 +74,71 @@
             color: white; padding: 8px; border-radius: 4px; pointer-events: none; font-size: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 50;
         }
+
+        /* Mobile responsive for activity chart */
+        @media (max-width: 640px) {
+            .activity-chart-header {
+                flex-direction: column; align-items: flex-start;
+            }
+            .activity-week-label {
+                font-size: 12px; padding: 4px 8px;
+            }
+            .activity-week-nav {
+                width: 100%; justify-content: space-between;
+            }
+            .activity-online-label {
+                font-size: 8px; right: 1px; top: -13px;
+            }
+            .week-picker-dialog {
+                padding: 16px; max-height: 85vh; width: 95%;
+            }
+            .week-picker-item {
+                padding: 10px 10px; font-size: 14px;
+            }
+        }
+
+        /* Week Picker Dialog */
+        .week-picker-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        .week-picker-overlay.open {
+            opacity: 1; pointer-events: all;
+        }
+        .week-picker-dialog {
+            background: #111827; border: 1px solid #374151; border-radius: 12px;
+            padding: 24px; max-width: 420px; width: 90%; max-height: 80vh;
+            overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            transform: scale(0.95); transition: transform 0.2s;
+        }
+        .week-picker-overlay.open .week-picker-dialog {
+            transform: scale(1);
+        }
+        .week-picker-dialog h3 {
+            font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px;
+        }
+        .week-picker-month-group {
+            margin-bottom: 12px;
+        }
+        .week-picker-month-label {
+            font-size: 12px; font-weight: 600; color: #6b7280;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        .week-picker-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; border-radius: 6px; cursor: pointer;
+            transition: background 0.12s; font-size: 13px; color: #d1d5db;
+        }
+        .week-picker-item:hover { background: #1f2937; }
+        .week-picker-item.active {
+            background: rgba(239, 68, 68, 0.15); color: #ef4444; font-weight: 600;
+        }
+        .week-picker-item .wp-hours {
+            font-size: 12px; color: #6b7280; font-variant-numeric: tabular-nums;
+        }
+        .week-picker-item.active .wp-hours { color: #ef4444; }
     </style>
     
 <script src="../components/analytics.js" defer></script>
