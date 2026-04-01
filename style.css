@@ -20,8 +20,9 @@
   --glow-blue: rgba(0,188,212,0.3);
 }
 
+
 body {
-  font-family: 'Rajdhani', 'Noto Sans JP', sans-serif;
+  font-family: 'Noto Sans JP', sans-serif;
   scroll-behavior: smooth;
   background: var(--bg-dark);
   color: var(--text-body);
@@ -58,6 +59,7 @@ body::after {
 @keyframes starDrift {
   to { background-position: 200px 200px, -300px 300px, 250px -250px, -350px 350px; }
 }
+
 
 /* ─── Gacha glow text ─────────────────────────────────── */
 .text-primary { color: #0284C7; }

@@ -10,6 +10,7 @@
   (function() {
     const saved = localStorage.getItem('nara_theme');
     if (saved === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
   })();
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -101,6 +102,49 @@
     }
     @media (max-width: 520px) {
       .gacha-machine { transform: scale(0.78); margin-bottom: 2rem; }
+    }
+
+    /* Dark mode overrides */
+    html.dark body {
+      background: #020617 !important;
+      color: #e2e8f0 !important;
+    }
+
+    html.dark .hero-gacha::before {
+      background:
+        radial-gradient(ellipse at 50% 30%, rgba(224,64,251,0.14) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(255,107,53,0.10) 0%, transparent 50%);
+    }
+
+    html.dark #nara-title,
+    html.dark .text-slate-800 { color: #f8fafc !important; }
+    html.dark .text-slate-700 { color: #e2e8f0 !important; }
+    html.dark .text-slate-500 { color: #94a3b8 !important; }
+    html.dark .text-slate-400 { color: #64748b !important; }
+
+    html.dark .gacha-card,
+    html.dark .gacha-banner {
+      background: #0f172a !important;
+      border-color: #334155 !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    }
+
+    html.dark #quiz-question { color: #f1f5f9 !important; }
+    html.dark #quiz-short-answer-input,
+    html.dark #quiz-date-answer,
+    html.dark #quiz-options button {
+      background: #111827 !important;
+      color: #e2e8f0 !important;
+      border-color: #334155 !important;
+    }
+
+    html.dark section[style*="linear-gradient(180deg,rgba(243,229,245,0.5),rgba(240,244,255,1))"] {
+      background: linear-gradient(180deg, rgba(30,41,59,0.45), rgba(2,6,23,1)) !important;
+    }
+
+    html.dark a[href="/joining"] {
+      color: #cbd5e1 !important;
+      border-color: var(--purple) !important;
     }
 </style>
 </head>
