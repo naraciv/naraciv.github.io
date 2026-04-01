@@ -583,7 +583,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadQuizQuestion(difficulty) {
     try {
-      const res = await fetch(`/api/gacha/question?difficulty=${difficulty}`);
+      const res = await fetch(`/api/gacha/question?difficulty=${difficulty}`, { credentials: 'include' });
       if (res.ok) {
         return await res.json();
       }
@@ -644,6 +644,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const difficulty = G.getNextQuizDifficulty();
     const q = await loadQuizQuestion(difficulty);
+    
     if (!q) { document.getElementById('quiz-section').style.display = 'none'; return; }
     currentQuestion = q;
 
@@ -734,6 +735,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const res = await fetch(`/api/gacha/answer`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ id: q.id, answer: finalAnswer })
         });
         const data = await res.json();

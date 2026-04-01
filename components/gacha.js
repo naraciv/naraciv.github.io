@@ -28,7 +28,7 @@ let NARANS = [];
 async function loadNarans() {
   if (NARANS.length > 0) return NARANS;
   try {
-    const res = await fetch(`${BACKEND_URL}/narans`);
+    const res = await fetch(`${BACKEND_URL}/narans`, { credentials: 'include' });
     if (res.ok) {
       NARANS = await res.json();
       if (window.GachaNara) window.GachaNara.NARANS = NARANS;
@@ -54,7 +54,7 @@ let backendState = { collection: {}, lastPull: '' };
 
 async function fetchState() {
   try {
-    const res = await fetch(`${BACKEND_URL}/state`);
+    const res = await fetch(`${BACKEND_URL}/state`, { credentials: 'include' });
     if (res.ok) {
       backendState = await res.json();
       localStorage.setItem(GACHA_COOKIE, JSON.stringify(backendState.collection));
@@ -152,7 +152,7 @@ function markQuizFailed() {
 
 /* ── Async random pull ────────────────────────────────── */
 async function pullNaranAsync() {
-  const res = await fetch(`${BACKEND_URL}/pull`, { method: 'POST' });
+  const res = await fetch(`${BACKEND_URL}/pull`, { method: 'POST', credentials: 'include' });
   const data = await res.json();
   if (!res.ok) throw data;
   
