@@ -37,6 +37,10 @@
     <link rel="stylesheet" href="heads.css">
     <script src="../components/analytics.js" defer></script>
     <script src="../components/navbar.js" defer></script>
+        <style>
+            .sort-category-label { color: #64748b; }
+            html:not(.dark) .sort-category-label { color: #334155; }
+        </style>
 </head>
 <body class="bg-[#F0F4FF] text-slate-700 min-h-screen flex flex-col">
     <custom-navbar></custom-navbar>
@@ -117,7 +121,7 @@
                 <!-- Sort Toggle -->
                 <div class="mt-3 sm:mt-4 flex items-center justify-center pb-2 sm:pb-3 border-b border-gray-800">
                     <label class="flex items-center gap-2 sm:gap-3 cursor-pointer select-none">
-                        <span class="text-slate-500 text-xs sm:text-sm">Sort by Category</span>
+                        <span class="sort-category-label text-xs sm:text-sm">Sort by Category</span>
                         <div id="sort-by-category-toggle" class="toggle-switch active"></div>
                     </label>
                 </div>
