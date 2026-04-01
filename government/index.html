@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
+<script>(function(){if(localStorage.getItem('nara_theme')==='dark')document.documentElement.classList.add('dark')})()</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Government | Nara</title>
@@ -40,7 +41,7 @@
             }
             
             /* Card adjustments */
-            .bg-gray-900.p-6 {
+            .gacha-card {
                 padding: 1rem !important;
             }
             
@@ -86,117 +87,132 @@
         }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col">
+<body class="bg-[#F0F4FF] text-slate-700 min-h-screen flex flex-col">
     <script src="../components/navbar.js"></script>
+    <script src="../components/gacha.js"></script>
     <custom-navbar></custom-navbar>
    <div class="h-[100px]"></div>
 
 
     <main class="flex-grow py-20 px-4">
 <div class="max-w-6xl mx-auto">
-            <h1 class="text-5xl font-bold mb-16 text-center text-primary">Naran Government</h1>
+            <h1 class="text-5xl font-bold mb-16 text-center text-gacha">Naran Government</h1>
             
             <div class="mb-20">
-                <h2 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">Feudal Shogunate</h2>
+                <h2 class="text-3xl font-bold mb-8 text-gacha border-b border-pink-400 pb-2">Feudal Shogunate</h2>
                 <p class="text-xl mb-8">
                     Nara is a meritocratic and feudalistic society with many different roles representing the responsibilities, position, and power of a person within Nara. The government is split into hierarchical groups, with positions granted on merit, trust, and activity.
                 </p>
                 
                 <div class="grid md:grid-cols-3 gap-8 mb-12">
-                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-nara-red transition-colors">
+                    <div class="gacha-card p-6 rarity-legendary">
                         <div class="flex items-center mb-4">
-                            <div class="bg-nara-red p-3 rounded-full mr-4">
-                                <i data-feather="star" class="text-white"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold">SwordMaster7777</h3>
+                            <img src="https://mc-heads.net/avatar/SwordMaster7777/48" alt="" class="rounded-full mr-4" style="image-rendering:pixelated;">
+                            <h3 class="text-2xl font-bold" style="color:#FF6B35;">SwordMaster7777</h3>
                         </div>
-                        <p class="text-primary font-semibold mb-1">Shikken</p>
-                        <p class="text-gray-300">Feudal leader of the whole nation.</p>
+                        <p style="color:#FF6B35;" class="font-semibold mb-1">★★★★★ Shikken</p>
+                        <p class="text-slate-500">Feudal leader of the whole nation.</p>
                     </div>
                     
-                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-nara-red transition-colors">
+                    <div class="gacha-card p-6 rarity-legendary">
                         <div class="flex items-center mb-4">
-                            <div class="bg-nara-red p-3 rounded-full mr-4">
-                                <i data-feather="users" class="text-white"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold">GriffSuperShot</h3>
+                            <img src="https://mc-heads.net/avatar/GriffSuperShot/48" alt="" class="rounded-full mr-4" style="image-rendering:pixelated;">
+                            <h3 class="text-2xl font-bold" style="color:#FF6B35;">GriffSuperShot</h3>
                         </div>
-                        <p class="text-primary font-semibold mb-1">Rensho</p>
-                        <p class="text-gray-300">Second in command, leads when Shikken is unavailable.</p>
+                        <p style="color:#FF6B35;" class="font-semibold mb-1">★★★★★ Rensho</p>
+                        <p class="text-slate-500">Second in command, leads when Shikken is unavailable.</p>
                     </div>
                     
-                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-nara-red transition-colors">
+                    <div class="gacha-card p-6 rarity-epic">
                         <div class="flex items-center mb-4">
-                            <div class="bg-nara-red p-3 rounded-full mr-4">
-                                <i data-feather="crosshair" class="text-white"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold">ArkenX</h3>
+                            <img src="https://mc-heads.net/avatar/ArkenX/48" alt="" class="rounded-full mr-4" style="image-rendering:pixelated;">
+                            <h3 class="text-2xl font-bold" style="color:#E040FB;">ArkenX</h3>
                         </div>
-                        <p class="text-primary font-semibold mb-1">Taishō</p>
-                        <p class="text-gray-300">Leads the army; in charge if Shikken and Rensho aren't around.</p>
+                        <p style="color:#E040FB;" class="font-semibold mb-1">★★★★★ Taishō</p>
+                        <p class="text-slate-500">Leads the army; in charge if Shikken and Rensho aren't around.</p>
                     </div>
                 </div>
             </div>
             
             <div class="mb-20">
-                <h2 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">Daimyo</h2>
+                <h2 class="text-3xl font-bold mb-8 text-gacha border-b border-pink-400 pb-2">Daimyo</h2>
                 <p class="text-xl mb-8">
                     Regional lords who manage a Naran province and the day-to-day needs of their region.
                 </p>
                 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-gray-900 p-6 rounded-lg border-l-4 border-nara-red">
-                        <h3 class="text-xl font-bold mb-1 text-primary">HPLaptop, Fumpkle, Dragran</h3>
-                        <p class="text-primary font-semibold mb-1">Lord of the North</p>
-                        <p class="text-gray-300">Manages Northern Nara including Shiroyama, Ichinokawa and Karasu.</p>
+                    <div class="gacha-card rarity-epic" style="padding:1.5rem;">
+                        <div class="flex items-center mb-4">
+                            <img src="https://mc-heads.net/avatar/HPLaptop/48" alt="" class="rounded-full mr-3" style="image-rendering:pixelated;">
+                            <img src="https://mc-heads.net/avatar/Fumpkle/48" alt="" class="rounded-full mr-3" style="image-rendering:pixelated;">
+                            <img src="https://mc-heads.net/avatar/Dragran/48" alt="" class="rounded-full mr-3" style="image-rendering:pixelated;">
+                        </div>
+                        <h3 class="text-xl font-bold mb-1" style="color:#E040FB;">HPLaptop, Fumpkle, Dragran</h3>
+                        <p style="color:#E040FB;" class="font-semibold mb-1">★★★★☆ Lord of the North</p>
+                        <p class="text-slate-500">Manages Northern Nara including Shiroyama, Ichinokawa and Karasu.</p>
                     </div>
-                    <div class="bg-gray-900 p-6 rounded-lg border-l-4 border-nara-red">
-                        <h3 class="text-xl font-bold mb-1 text-primary">OreStraya</h3>
-                        <p class="text-primary font-semibold mb-1">Lord of the Center</p>
-                        <p class="text-gray-300">Manages Central Nara including Orakuru.</p>
+                    <div class="gacha-card rarity-rare" style="padding:1.5rem;">
+                        <div class="flex items-center mb-4">
+                            <img src="https://mc-heads.net/avatar/OreStraya/48" alt="" class="rounded-full mr-4" style="image-rendering:pixelated;">
+                            <h3 class="text-xl font-bold" style="color:#00BCD4;">OreStraya</h3>
+                        </div>
+                        <p style="color:#00BCD4;" class="font-semibold mb-1">★★★★☆ Lord of the Center</p>
+                        <p class="text-slate-500">Manages Central Nara including Orakuru.</p>
                     </div>
-                    <div class="bg-gray-900 p-6 rounded-lg border-l-4 border-nara-red">
-                        <h3 class="text-xl font-bold mb-1 text-primary">Earyx</h3>
-                        <p class="text-primary font-semibold mb-1">Lord of Overseas Territories</p>
-                        <p class="text-gray-300">Manages Q'Barra and all other overseas territories.</p>
+                    <div class="gacha-card rarity-epic" style="padding:1.5rem;">
+                        <div class="flex items-center mb-4">
+                            <img src="https://mc-heads.net/avatar/Earyx/48" alt="" class="rounded-full mr-4" style="image-rendering:pixelated;">
+                            <h3 class="text-xl font-bold" style="color:#E040FB;">Earyx</h3>
+                        </div>
+                        <p style="color:#E040FB;" class="font-semibold mb-1">★★★★☆ Lord of Overseas</p>
+                        <p class="text-slate-500">Manages Q'Barra and all other overseas territories.</p>
                     </div>
-                    <div class="bg-gray-900 p-6 rounded-lg border-l-4 border-nara-red">
-                        <h3 class="text-xl font-bold mb-1 text-primary">ArkenX</h3>
-                        <p class="text-primary font-semibold mb-1">Lord of the South</p>
-                        <p class="text-gray-300">Manages the Nether region and southern territories.</p>
+                    <div class="gacha-card rarity-epic" style="padding:1.5rem;">
+                        <div class="flex items-center mb-4">
+                            <img src="https://mc-heads.net/avatar/ArkenX/48" alt="" class="rounded-full mr-4" style="image-rendering:pixelated;">
+                            <h3 class="text-xl font-bold" style="color:#E040FB;">ArkenX</h3>
+                        </div>
+                        <p style="color:#E040FB;" class="font-semibold mb-1">★★★★★ Lord of the South</p>
+                        <p class="text-slate-500">Manages the Nether region and southern territories.</p>
                     </div>
                 </div>
             </div>
             
             <div class="mb-20">
-                <h2 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">Komuin</h2>
+                <h2 class="text-3xl font-bold mb-8 text-gacha border-b border-pink-400 pb-2">Komuin</h2>
                 <p class="text-xl mb-8">
                     Highly regarded civil servants that help to manage a specific field relevant to Nara's interests.
                 </p>
                 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-gray-900 p-6 rounded-lg border-l-4 border-nara-red">
-                        <h3 class="text-xl font-bold mb-1 text-primary">SQOpenSpellBook</h3>
-                        <p class="text-primary font-semibold mb-1">Komuin of Interior</p>
-                        <p class="text-gray-300">Manages natural resource gathering, farming, and business interests.</p>
+                    <div class="gacha-card rarity-rare" style="padding:1.5rem;">
+                        <div class="flex items-center mb-4">
+                            <img src="https://mc-heads.net/avatar/SQOpenSpellBook/48" alt="" class="rounded-full mr-4" style="image-rendering:pixelated;">
+                            <h3 class="text-xl font-bold" style="color:#00BCD4;">SQOpenSpellBook</h3>
+                        </div>
+                        <p style="color:#00BCD4;" class="font-semibold mb-1">★★★☆☆ Komuin of Interior</p>
+                        <p class="text-slate-500">Manages natural resource gathering, farming, and business interests.</p>
                     </div>
                     
-                    <div class="bg-gray-900 p-6 rounded-lg border-l-4 border-nara-red">
-                        <h3 class="text-xl font-bold mb-1 text-primary">Vacant</h3>
-                        <p class="text-primary font-semibold mb-1">Komuin of Infrastructure</p>
-                        <p class="text-gray-300">Oversees rails, roads, excavation, and construction projects.</p>
+                    <div class="gacha-card" style="padding:1.5rem; opacity:0.5; border-color:rgba(156,163,175,0.3);">
+                        <h3 class="text-xl font-bold mb-1 text-slate-400">🔒 Vacant</h3>
+                        <p class="text-slate-400 font-semibold mb-1">Komuin of Infrastructure</p>
+                        <p class="text-slate-400">Oversees rails, roads, excavation, and construction projects.</p>
                     </div>
                     
-                    <div class="bg-gray-900 p-6 rounded-lg border-l-4 border-nara-red">
-                        <h3 class="text-xl font-bold mb-1 text-primary">Jeem_Jr</h3>
-                        <p class="text-primary font-semibold mb-1">Komuin of Logistics</p>
-                        <p class="text-gray-300">Manages economy, industry, resource production, and XP systems.</p>
+                    <div class="gacha-card rarity-common" style="padding:1.5rem;">
+                        <div class="flex items-center mb-4">
+                            <img src="https://mc-heads.net/avatar/Jeem_Jr/48" alt="" class="rounded-full mr-4" style="image-rendering:pixelated;">
+                            <h3 class="text-xl font-bold" style="color:#78909C;">Jeem_Jr</h3>
+                        </div>
+                        <p style="color:#78909C;" class="font-semibold mb-1">★★★☆☆ Komuin of Logistics</p>
+                        <p class="text-slate-500">Manages economy, industry, resource production, and XP systems.</p>
                     </div>
                     
-                    <div class="bg-gray-900 p-6 rounded-lg border-l-4 border-nara-red">
-                        <h3 class="text-xl font-bold mb-1 text-primary">Vacant</h3>
-                        <p class="text-primary font-semibold mb-1">Komuin of Culture</p>
-                        <p class="text-gray-300">Organizes sports events and maintains cultural identity.</p>
+                    <div class="gacha-card" style="padding:1.5rem; opacity:0.5; border-color:rgba(156,163,175,0.3);">
+                        <h3 class="text-xl font-bold mb-1 text-slate-400">🔒 Vacant</h3>
+                        <p class="text-slate-400 font-semibold mb-1">Komuin of Culture</p>
+                        <p class="text-slate-400">Organizes sports events and maintains cultural identity.</p>
                     </div>
                 </div>
                 
@@ -204,32 +220,29 @@
             
 
             <div class="mb-20">
-                <h2 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">Other Roles</h2>
+                <h2 class="text-3xl font-bold mb-8 text-gacha border-b border-pink-400 pb-2">Other Roles</h2>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-gray-900 p-6 rounded-lg">
-
-                        <h3 class="text-2xl font-bold mb-4 text-primary">Samurai</h3>
-                        <p class="text-gray-300 mb-4">
+                    <div class="gacha-card" style="padding:1.5rem;">
+                        <h3 class="text-2xl font-bold mb-4" style="color:#E040FB;">⚔️ Samurai</h3>
+                        <p class="text-slate-500 mb-4">
                             The state-sponsored soldiers of Nara, their combat kits subsidized by the government. They serve as the main fighting force of Nara and are the pvp leads in situations where the Taishō isn't present.
                         </p>
                     </div>
-
-
-                    <div class="bg-gray-900 p-6 rounded-lg">
-                        <h3 class="text-2xl font-bold mb-4 text-primary">Kazoku</h3>
-                        <p class="text-gray-300">
+                    <div class="gacha-card" style="padding:1.5rem;">
+                        <h3 class="text-2xl font-bold mb-4" style="color:#00BCD4;">🏯 Kazoku</h3>
+                        <p class="text-slate-500">
                             A trusted citizen of Nara. They are the backbone of Nara and are the most trusted citizens of the nation.
                         </p>
                     </div>
-                    <div class="bg-gray-900 p-6 rounded-lg">
-                        <h3 class="text-2xl font-bold mb-4 text-primary">Shuryo</h3>
-                        <p class="text-gray-300">
+                    <div class="gacha-card" style="padding:1.5rem;">
+                        <h3 class="text-2xl font-bold mb-4" style="color:#00BCD4;">👑 Shuryo</h3>
+                        <p class="text-slate-500">
                             Masters of Nara's guilds, democratically elected by the wider guild membership. 
                         </p>
                     </div>
-                    <div class="bg-gray-900 p-6 rounded-lg">
-                        <h3 class="text-2xl font-bold mb-4 text-primary">Shrine Maiden</h3>
-                        <p class="text-gray-300">
+                    <div class="gacha-card" style="padding:1.5rem;">
+                        <h3 class="text-2xl font-bold mb-4" style="color:#FF6B35;">⛩️ Shrine Maiden</h3>
+                        <p class="text-slate-500">
                             God I fucking love Xcios. Everyday I wake up and pray that I will be blessed by the presence of Xcios. The most important single role in Nara.
                         </p>
                     </div>
@@ -237,17 +250,17 @@
             </div>
 
             <div class="mb-20">
-                <h2 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">Nara's Populace</h2>
+                <h2 class="text-3xl font-bold mb-8 text-gacha border-b border-pink-400 pb-2">Nara's Populace</h2>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-gray-900 p-6 rounded-lg">
-                        <h3 class="text-2xl font-bold mb-4 text-primary">Citizens</h3>
-                        <p class="text-gray-300">
+                    <div class="gacha-card" style="padding:1.5rem;">
+                        <h3 class="text-2xl font-bold mb-4" style="color:#78909C;">🎴 Citizens</h3>
+                        <p class="text-slate-500">
                             Those who have lived in Nara for more than one week, with Nara as their primary nation or as their second nation if their first is a close ally. They've passed the citizenship test.
                         </p>
                     </div>
-                    <div class="bg-gray-900 p-6 rounded-lg">
-                        <h3 class="text-2xl font-bold mb-4 text-primary">Residents</h3>
-                        <p class="text-gray-300">
+                    <div class="gacha-card" style="padding:1.5rem;">
+                        <h3 class="text-2xl font-bold mb-4" style="color:#78909C;">🏠 Residents</h3>
+                        <p class="text-slate-500">
                             People who live in Nara but don't meet the requirements to become full citizens yet.
                         </p>
                     </div>
@@ -255,15 +268,15 @@
             </div>
 
             <div class="mb-20">
-                <h2 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">International Relations</h2>
-                <div class="bg-gray-900 p-8 rounded-lg">
-                    <p class="text-lg mb-6">
+                <h2 class="text-3xl font-bold mb-8 text-gacha border-b border-pink-400 pb-2">International Relations</h2>
+                <div class="gacha-card" style="padding:2rem;">
+                    <p class="text-lg mb-6 text-slate-500">
                         Nara maintains friendly relations with most of its neighbors, with an active presence in Alenarith politics, and generally remains positive on the world stage.
                     </p>
                     
 
-                    <h3 class="text-xl font-bold mb-4 mt-8 text-primary">Current Relations</h3>
-                    <p class="text-gray-300">
+                    <h3 class="text-xl font-bold mb-4 mt-8" style="color:#E040FB;">🌐 Current Relations</h3>
+                    <p class="text-slate-500">
                         Shiroyama hosts a number of foreign nationals and is connected by rail to all major nations via OneDest with direct lines to Pavia, Icenia, Volterra, Bloom, and the Commonwealth. 
                         Nara maintains a friendship treaty with Danzilona and Salerno formalized in December 2022 and March 2025 respectively.
                     </p>
@@ -271,41 +284,41 @@
             </div>
 
             <div>
-                <h2 class="text-3xl font-bold mb-8 text-primary border-b border-nara-red pb-2">National Organizations</h2>
+                <h2 class="text-3xl font-bold mb-8 text-gacha border-b border-pink-400 pb-2">National Organizations</h2>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-gray-900 p-6 rounded-lg">
+                    <div class="gacha-card" style="padding:1.5rem;">
                         <div class="flex items-center mb-4">
-                            <i data-feather="book" class="text-primary mr-3"></i>
-                            <h3 class="text-2xl font-bold">Nara Newfriend Society</h3>
+                            <i data-feather="book" style="color:#E040FB;" class="mr-3"></i>
+                            <h3 class="text-2xl font-bold" style="color:#E040FB;">Nara Newfriend Society</h3>
                         </div>
-                        <p class="text-gray-300">
+                        <p class="text-slate-500">
                             A society for new players to learn the ropes of CivMC and adjust to the VIBE culture of Nara.
                         </p>
                     </div>
-                    <div class="bg-gray-900 p-6 rounded-lg">
+                    <div class="gacha-card" style="padding:1.5rem;">
                         <div class="flex items-center mb-4">
-                            <i data-feather="coffee" class="text-primary mr-3"></i>
-                            <h3 class="text-2xl font-bold">Brewer's Guild</h3>
+                            <i data-feather="coffee" style="color:#FF6B35;" class="mr-3"></i>
+                            <h3 class="text-2xl font-bold" style="color:#FF6B35;">Brewer's Guild</h3>
                         </div>
-                        <p class="text-gray-300 mb-4">
+                        <p class="text-slate-500 mb-4">
                             Founded on July 24, 2022, the guild discovered and perfected nearly 40 different brewing recipes in the first 4 days. Nara has two national brews: Nara Puffer Fish Wine and Nara no Uiskui. Alcholism is greatly encouraged.
                         </p>
                     </div>
-                    <div class="bg-gray-900 p-6 rounded-lg">
+                    <div class="gacha-card" style="padding:1.5rem;">
                         <div class="flex items-center mb-4">
-                            <i data-feather="book-open" class="text-primary mr-3"></i>
-                            <h3 class="text-2xl font-bold">Libraries</h3>
+                            <i data-feather="book-open" style="color:#00BCD4;" class="mr-3"></i>
+                            <h3 class="text-2xl font-bold" style="color:#00BCD4;">Libraries</h3>
                         </div>
-                        <p class="text-gray-300">
+                        <p class="text-slate-500">
                             Nara is home to three libraries: Atlas Palace Library in Shiroyama, Ichinokawa Library, and Q'Barra Library. They operate using a library card system.
                         </p>
                     </div>
-                    <div class="bg-gray-900 p-6 rounded-lg">
+                    <div class="gacha-card" style="padding:1.5rem;">
                         <div class="flex items-center mb-4">
-                            <i data-feather="mail" class="text-primary mr-3"></i>
-                            <h3 class="text-2xl font-bold">Naran Postal Service (NPS)</h3>
+                            <i data-feather="mail" style="color:#00BCD4;" class="mr-3"></i>
+                            <h3 class="text-2xl font-bold" style="color:#00BCD4;">Naran Postal Service (NPS)</h3>
                         </div>
-                        <p class="text-gray-300">
+                        <p class="text-slate-500">
                             A government-provided service that ships items to valid NPS mailboxes and PO boxes. Current branches include Shiroyama and Ichinokawa. Carrier pigeons being implemented shortly.
                         </p>
                     </div>
@@ -318,6 +331,34 @@
     <script src="../components/footer.js"></script>
     <script>
         feather.replace();
+        
+        // Load rarity data from narans.json and apply dynamic styling
+        (async () => {
+            const G = window.GachaNara;
+            if (!G) return;
+            await G._naransReady;
+            
+            // Find all person cards and update rarity styling dynamically
+            document.querySelectorAll('.gacha-card[class*="rarity-"]').forEach(card => {
+                const nameEl = card.querySelector('h3');
+                if (!nameEl) return;
+                // Extract first username from the heading text
+                const names = nameEl.textContent.split(',').map(n => n.trim());
+                for (const name of names) {
+                    const naran = G.getNaranByName(name);
+                    if (naran) {
+                        const rarity = G.RARITY[naran.rarity];
+                        // Update rarity class
+                        card.className = card.className.replace(/rarity-\w+/, `rarity-${naran.rarity.toLowerCase()}`);
+                        // Update colors
+                        nameEl.style.color = rarity.color;
+                        const starsEl = card.querySelector('p[class*="font-semibold"]');
+                        if (starsEl) starsEl.style.color = rarity.color;
+                        break;
+                    }
+                }
+            });
+        })();
     </script>
 </body>
 </html>

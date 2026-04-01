@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
+<script>(function(){if(localStorage.getItem('nara_theme')==='dark')document.documentElement.classList.add('dark')})()</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snitch Viewer | Nara</title>
@@ -568,7 +569,7 @@
     <script src="../components/analytics.js" defer></script>
     <script src="../components/navbar.js" defer></script>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col">
+<body class="bg-[#F0F4FF] text-slate-700 min-h-screen flex flex-col">
     <custom-navbar></custom-navbar>
 
     <div class="h-[80px] sm:h-[100px]"></div>
@@ -583,9 +584,9 @@
             <div id="upload-section" class="max-w-2xl mx-auto mb-6">
                 <div class="upload-area" id="upload-area">
                     <input type="file" id="file-input" accept=".sqlite,.db,.sqlite3" class="hidden">
-                    <i data-feather="upload-cloud" class="w-12 h-12 text-gray-500 mx-auto mb-3"></i>
+                    <i data-feather="upload-cloud" class="w-12 h-12 text-slate-400 mx-auto mb-3"></i>
                     <p class="text-lg text-white mb-2">Drop your SnitchMod database here</p>
-                    <p class="text-sm text-gray-400">or click to browse (.sqlite, .db)</p>
+                    <p class="text-sm text-slate-500">or click to browse (.sqlite, .db)</p>
                 </div>
             </div>
             
@@ -601,7 +602,7 @@
                         <div class="stats-bar flex-wrap">
                             <div class="stat-item">
                                 <span class="stat-label">Total:</span>
-                                <span class="stat-value"><span id="stat-total">0</span> <span class="text-gray-500">(<span id="stat-visible">0</span> visible)</span></span>
+                                <span class="stat-value"><span id="stat-total">0</span> <span class="text-slate-400">(<span id="stat-visible">0</span> visible)</span></span>
                             </div>
                             <div class="stat-pill active" id="stat-pill-active">
                                 <span class="stat-dot"></span>
@@ -646,7 +647,7 @@
                                 <div class="settings-container">
                                     <!-- World toggle -->
                                     <div class="mb-6">
-                                        <div class="text-xs text-gray-400 mb-1">World</div>
+                                        <div class="text-xs text-slate-500 mb-1">World</div>
                                         <div class="world-toggle">
                                             <button id="world-overworld" class="active">Overworld</button>
                                             <button id="world-nether">Nether</button>
@@ -656,7 +657,7 @@
                                     <!-- Y Level range slider -->
                                     <div class="mb-4">
                                         <div class="y-label">
-                                            <span class="text-xs text-gray-400">Y Level</span>
+                                            <span class="text-xs text-slate-500">Y Level</span>
                                             <span><input type="number" id="y-min-input" value="-64" min="-64" max="320"> to <input type="number" id="y-max-input" value="320" min="-64" max="320"></span>
                                         </div>
                                         <div class="range-slider">
@@ -669,7 +670,7 @@
                                     
                                     <!-- Click to Select toggle -->
                                     <div class="pt-2 mb-4">
-                                        <div class="text-xs text-gray-400 mb-2">Click to Select</div>
+                                        <div class="text-xs text-slate-500 mb-2">Click to Select</div>
                                         <label class="toggle-switch">
                                             <input type="checkbox" id="click-select-toggle" checked>
                                             <span class="toggle-slider"></span>
@@ -678,7 +679,7 @@
                                     
                                     <!-- Show Will be Dormant toggle -->
                                     <div class="pt-2">
-                                        <div class="text-xs text-gray-400 mb-2">Show which snitches will become dormant (5 days)</div>
+                                        <div class="text-xs text-slate-500 mb-2">Show which snitches will become dormant (5 days)</div>
                                         <label class="toggle-switch">
                                             <input type="checkbox" id="show-will-dormant-toggle" checked>
                                             <span class="toggle-slider"></span>
@@ -692,7 +693,7 @@
                                 <h3 class="text-sm font-semibold text-white">Groups</h3>
                                 <div class="flex gap-2">
                                     <button id="select-all-groups" class="text-xs text-nara-red hover:underline">All</button>
-                                    <button id="select-none-groups" class="text-xs text-gray-400 hover:text-white">None</button>
+                                    <button id="select-none-groups" class="text-xs text-slate-500 hover:text-white">None</button>
                                 </div>
                             </div>
                             <div class="filter-panel" id="group-filters">
@@ -731,7 +732,7 @@
                             <!-- Coordinates display -->
                             <div class="coords-display" id="coords-display">
                                 <div id="coords-text">X: 0, Z: 0</div>
-                                <div class="text-gray-500 text-[0.65rem] mt-1 font-sans">Right click map to copy coordinates</div>
+                                <div class="text-slate-400 text-[0.65rem] mt-1 font-sans">Right click map to copy coordinates</div>
                             </div>
                             
                             <!-- Selection panel -->

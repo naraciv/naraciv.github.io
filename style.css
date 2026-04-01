@@ -1,335 +1,982 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Rajdhani:wght@400;600;700&display=swap');
+
+/* ─── CSS Custom Properties (Bright Gacha Theme) ─────── */
+:root {
+  --gold:   #F7C948;
+  --purple: #E040FB;
+  --blue:   #00BCD4;
+  --nara-red: #FF6B6B;
+  --nara-blue: #4FC3F7;
+  --orange: #FF6B35;
+  --green:  #66BB6A;
+  --pink:   #FF4081;
+  --bg-dark: #F4F7FF;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F5F0FF;
+  --text-muted: #7986CB;
+  --text-body: #334155;
+  --glow-gold: rgba(247,201,72,0.4);
+  --glow-purple: rgba(224,64,251,0.35);
+  --glow-blue: rgba(0,188,212,0.3);
+}
 
 body {
-    font-family: 'Noto Sans JP', sans-serif;
-    scroll-behavior: smooth;
+  font-family: 'Rajdhani', 'Noto Sans JP', sans-serif;
+  scroll-behavior: smooth;
+  background: var(--bg-dark);
+  color: var(--text-body);
 }
 
-/* Mobile Responsive Utilities */
+/* ─── Animated confetti-dot background ────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(3px 3px at 10% 20%, rgba(224,64,251,0.22) 50%, transparent 100%),
+    radial-gradient(2.5px 2.5px at 30% 70%, rgba(0,188,212,0.20) 50%, transparent 100%),
+    radial-gradient(3px 3px at 55% 10%, rgba(255,107,53,0.18) 50%, transparent 100%),
+    radial-gradient(2px 2px at 80% 60%, rgba(247,201,72,0.16) 50%, transparent 100%),
+    radial-gradient(2.5px 2.5px at 65% 85%, rgba(102,187,106,0.15) 50%, transparent 100%),
+    radial-gradient(2px 2px at 90% 30%, rgba(79,195,247,0.18) 50%, transparent 100%);
+  background-size: 150px 150px, 220px 220px, 180px 180px, 260px 260px, 200px 200px, 240px 240px;
+  animation: starDrift 45s linear infinite;
+}
+/* Subtle gradient overlay for light mode depth */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(79,195,247,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(224,64,251,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(255,107,53,0.02) 0%, transparent 60%);
+  pointer-events: none;
+}
+@keyframes starDrift {
+  to { background-position: 200px 200px, -300px 300px, 250px -250px, -350px 350px; }
+}
+
+/* ─── Gacha glow text ─────────────────────────────────── */
+.text-primary { color: #0284C7; }
+html.dark .text-primary { color: var(--nara-blue); }
+.text-gold    { color: var(--orange); }
+.text-gacha   {
+  background: linear-gradient(90deg, #FF6B35, #E040FB, #00BCD4, #FF6B35);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ─── Gacha card base ─────────────────────────────────── */
+.gacha-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.gacha-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(224,64,251,0.15), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.gacha-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(224,64,251,0.15), 0 0 20px rgba(255,107,53,0.1);
+}
+
+/* ─── Rarity borders ──────────────────────────────────── */
+.rarity-legendary { border-color: var(--orange) !important; box-shadow: 0 0 20px var(--glow-gold); }
+.rarity-epic      { border-color: var(--purple) !important; box-shadow: 0 0 16px var(--glow-purple); }
+.rarity-rare      { border-color: var(--blue) !important; box-shadow: 0 0 12px var(--glow-blue); }
+.rarity-uncommon  { border-color: #78909C !important; box-shadow: 0 0 8px rgba(120,144,156,0.3); }
+.rarity-common    { border-color: #90A4AE !important; }
+
+/* ─── Gacha machine ───────────────────────────────────── */
+.gacha-machine {
+  position: relative;
+  width: 340px;
+  height: 480px;
+  margin: 0 auto;
+}
+.gacha-machine-body {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F0F4FF 100%);
+  border-radius: 30px 30px 16px 16px;
+  border: 3px solid rgba(224,64,251,0.35);
+  box-shadow: 0 8px 40px rgba(224,64,251,0.12), 0 0 0 1px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+.gacha-dome {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 240px;
+  border-radius: 130px 130px 20px 20px;
+  background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.6), transparent 60%),
+              linear-gradient(180deg, rgba(224,64,251,0.08) 0%, rgba(0,188,212,0.05) 100%);
+  border: 2px solid rgba(224,64,251,0.15);
+  margin-top: 20px;
+  overflow: hidden;
+}
+.gacha-dome::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 15%;
+  width: 35%;
+  height: 25%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.12), transparent);
+  border-radius: 50%;
+}
+/* Balls inside dome */
+.gacha-balls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+}
+.gacha-ball {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: ballBounce 3s ease-in-out infinite;
+}
+@keyframes ballBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.gacha-ball:nth-child(odd)  { animation-delay: -1.5s; }
+.gacha-ball:nth-child(3n)   { animation-delay: -0.7s; }
+
+.gacha-slot {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 50px;
+  background: #E8EAF6;
+  border-radius: 0 0 40px 40px;
+  border: 2px solid rgba(224,64,251,0.25);
+  border-top: none;
+}
+
+/* ─── Lever ───────────────────────────────────────────── */
+.gacha-lever-wrap {
+  position: absolute;
+  right: -50px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  z-index: 10;
+}
+.gacha-lever-track {
+  width: 12px;
+  height: 100px;
+  background: linear-gradient(180deg, #B0BEC5, #90A4AE);
+  border-radius: 6px;
+  position: relative;
+  margin: 0 auto;
+}
+.gacha-lever-handle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #FF4081, #E040FB);
+  border: 3px solid #FF80AB;
+  box-shadow: 0 0 12px rgba(255,64,129,0.5);
+  transition: top 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  cursor: grab;
+}
+.gacha-lever-wrap:active .gacha-lever-handle,
+.gacha-lever-wrap.pulled .gacha-lever-handle {
+  top: 64px;
+}
+
+/* ─── Pull button (mobile / accessible) ──────────────── */
+.gacha-pull-btn {
+  display: inline-block;
+  padding: 14px 48px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #FF6B35, #E040FB);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(224,64,251,0.3);
+  position: relative;
+  overflow: hidden;
+}
+.gacha-pull-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+  animation: btnSheen 3s ease-in-out infinite;
+}
+@keyframes btnSheen {
+  0%   { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+.gacha-pull-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 30px rgba(224,64,251,0.4), 0 0 50px rgba(255,107,53,0.2);
+}
+.gacha-pull-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ─── Reveal overlay ──────────────────────────────────── */
+.gacha-reveal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(240,244,255,0.95);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.gacha-reveal-overlay.active { display: flex; }
+
+.gacha-reveal-card {
+  width: 280px;
+  padding: 24px;
+  border-radius: 20px;
+  text-align: center;
+  border: 3px solid;
+  background: #FFFFFF;
+  animation: revealPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform: scale(0);
+}
+@keyframes revealPop {
+  to { transform: scale(1); }
+}
+.gacha-reveal-card .skin-render {
+  width: 150px;
+  height: auto;
+  margin: 0 auto 12px;
+  image-rendering: pixelated;
+}
+.gacha-reveal-card .stars {
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+}
+.gacha-reveal-card .naran-name {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin: 8px 0 4px;
+}
+.gacha-reveal-card .naran-title {
+  font-size: 0.95rem;
+  opacity: 0.7;
+}
+.gacha-reveal-card .naran-desc {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  line-height: 1.5;
+}
+
+/* Burst particles behind reveal */
+.burst-particles {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  pointer-events: none;
+}
+.burst-particles span {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: burstOut 1s ease-out forwards;
+}
+@keyframes burstOut {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--bx), var(--by)) scale(0); opacity: 0; }
+}
+
+/* ─── Collection grid ─────────────────────────────────── */
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+.collection-card {
+  background: var(--bg-card);
+  border: 2px solid rgba(0,0,0,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.collection-card:hover {
+  transform: translateY(-4px);
+}
+.collection-card.locked {
+  filter: grayscale(1) brightness(0.3);
+  pointer-events: none;
+}
+.collection-card.locked::after {
+  content: '🔒';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  background: rgba(0,0,0,0.5);
+}
+.collection-card .skin-thumb {
+  width: 120px;
+  height: 120px;
+  margin: 8px auto 12px;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+.collection-card .card-stars {
+  font-size: 1rem;
+  letter-spacing: 2px;
+}
+.collection-card .card-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 4px 0;
+}
+.collection-card .card-title {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+.collection-card .card-count {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+/* ─── Section headings ────────────────────────────────── */
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+/* ─── City card overrides ─────────────────────────────── */
+.city-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.city-card:hover {
+  transform: scale(1.03) translateY(-6px);
+  box-shadow: 0 12px 40px rgba(224,64,251,0.15);
+}
+
+/* Fullscreen modal */
+.fullscreen-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(240,244,255,0.95);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+.fullscreen-modal.active { display: flex; }
+.fullscreen-modal img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+}
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(224,64,251,0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.close-button:hover {
+  background-color: rgba(224,64,251,1);
+  transform: scale(1.1);
+}
+.city-image { cursor: pointer; transition: opacity 0.3s; }
+.city-image:hover { opacity: 0.85; }
+
+.big-city-image { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.big-city-image:hover {
+  transform: scale(1.03) translateY(-6px);
+  box-shadow: 0 12px 40px rgba(224,64,251,0.15);
+}
+
+/* ─── Custom scrollbar ────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+/* ─── Gacha-themed backgrounds for sections ───────────── */
+.gacha-section {
+  position: relative;
+}
+.gacha-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(224,64,251,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ─── Banner / streak display ─────────────────────────── */
+.gacha-banner {
+  background: linear-gradient(135deg, #FFFFFF, #F3E5F5);
+  border: 1px solid rgba(224,64,251,0.2);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.gacha-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(255,107,53,0.03), transparent, rgba(224,64,251,0.03), transparent);
+  animation: bannerSpin 12s linear infinite;
+}
+@keyframes bannerSpin { to { transform: rotate(360deg); } }
+
+/* ─── Countdown timer ─────────────────────────────────── */
+.countdown {
+  font-family: 'Rajdhani', monospace;
+  font-size: 1.1rem;
+  color: var(--orange);
+  font-weight: 600;
+}
+
+/* ════════════════════════════════════════════════════════════
+   DARK MODE (html.dark)
+   ════════════════════════════════════════════════════════════ */
+html.dark {
+  --bg-dark: #0a0a14;
+  --bg-card: #141425;
+  --bg-card-hover: #1a1a30;
+  --text-body: #c8cad0;
+  --text-muted: #7986CB;
+}
+html.dark body {
+  background: var(--bg-dark);
+  color: var(--text-body);
+}
+/* Dark confetti background */
+html.dark body::before {
+  background:
+    radial-gradient(1.5px 1.5px at 10% 20%, rgba(224,64,251,0.10) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 30% 70%, rgba(0,188,212,0.08) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 55% 10%, rgba(255,107,53,0.07) 50%, transparent 100%),
+    radial-gradient(1px 1px at 80% 60%, rgba(247,201,72,0.06) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 65% 85%, rgba(102,187,106,0.06) 50%, transparent 100%),
+    radial-gradient(1px 1px at 90% 30%, rgba(79,195,247,0.07) 50%, transparent 100%);
+}
+html.dark body::after {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(224,64,251,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(79,195,247,0.03) 0%, transparent 50%);
+}
+/* Cards */
+html.dark .gacha-card {
+  background: var(--bg-card);
+  border-color: rgba(255,255,255,0.06);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+html.dark .gacha-card::before {
+  background: linear-gradient(135deg, rgba(255,107,53,0.12), rgba(224,64,251,0.08), transparent);
+}
+html.dark .gacha-card:hover {
+  box-shadow: 0 12px 40px rgba(224,64,251,0.2), 0 0 20px rgba(255,107,53,0.12);
+}
+/* Collection cards */
+html.dark .collection-card {
+  background: var(--bg-card);
+  border-color: rgba(255,255,255,0.06);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+/* Gacha machine */
+html.dark .gacha-machine-body {
+  background: linear-gradient(180deg, #141425 0%, #0f0f1e 100%);
+  border-color: rgba(224,64,251,0.4);
+  box-shadow: 0 8px 40px rgba(224,64,251,0.15), 0 0 0 1px rgba(255,255,255,0.04);
+}
+html.dark .gacha-dome {
+  background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.05), transparent 60%),
+              linear-gradient(180deg, rgba(224,64,251,0.1) 0%, rgba(0,188,212,0.06) 100%);
+  border-color: rgba(224,64,251,0.2);
+}
+html.dark .gacha-slot {
+  background: #1a1a2e;
+  border-color: rgba(224,64,251,0.3);
+}
+/* Reveal overlay */
+html.dark .gacha-reveal-overlay {
+  background: rgba(10,10,20,0.95);
+}
+html.dark .gacha-reveal-card {
+  background: #141425;
+}
+/* Banner */
+html.dark .gacha-banner {
+  background: linear-gradient(135deg, #141425, #1a1030);
+  border-color: rgba(224,64,251,0.25);
+}
+/* Fullscreen modal */
+html.dark .fullscreen-modal {
+  background-color: rgba(10,10,20,0.95);
+}
+/* Scrollbar */
+html.dark ::-webkit-scrollbar-track { background: var(--bg-dark); }
+/* Section overlays */
+html.dark .gacha-section::before {
+  background: radial-gradient(ellipse at 50% 0%, rgba(224,64,251,0.06) 0%, transparent 70%);
+}
+
+/* ─── Dark mode for collect page ──────────────────────── */
+html.dark #card-detail-overlay {
+  background: rgba(10,10,20,0.95) !important;
+}
+html.dark #card-detail-box {
+  background: #141425 !important;
+  color: #c8cad0 !important;
+}
+html.dark #detail-title,
+html.dark #detail-desc,
+html.dark #detail-count {
+  color: #9ca3b0 !important;
+  opacity: 1 !important;
+}
+html.dark .stat-box {
+  background: var(--bg-card) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+}
+html.dark .stat-box .stat-label {
+  color: #8891a5 !important;
+}
+html.dark .rarity-filter-btn {
+  background: var(--bg-card) !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #9ca3b0 !important;
+}
+html.dark .rarity-filter-btn.active {
+  color: #fff !important;
+}
+html.dark .progress-bar-bg {
+  background: var(--bg-card) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+html.dark .collection-card .card-title {
+  color: #9ca3b0;
+  opacity: 1;
+}
+html.dark .collection-card .card-count {
+  color: #8891a5;
+  opacity: 1;
+}
+
+/* ─── Dark mode Tailwind-style overrides ──────────────── */
+html.dark .bg-\[#F0F4FF\] { background-color: #0a0a14 !important; }
+html.dark .text-slate-700 { color: #c8cad0 !important; }
+html.dark .text-slate-800 { color: #e2e4e8 !important; }
+html.dark .text-slate-500 { color: #a1a8b8 !important; }
+html.dark .text-slate-400 { color: #8b95a8 !important; }
+html.dark .text-gray-300 { color: #c8cad0 !important; }
+html.dark .text-gray-400 { color: #a1a8b8 !important; }
+html.dark .bg-white { background-color: #141425 !important; }
+html.dark .border-slate-200 { border-color: rgba(255,255,255,0.1) !important; }
+
+/* Quiz option selected state */
+#quiz-options button.quiz-selected {
+  border-color: #E040FB !important;
+  background: #FCE4EC !important;
+}
+/* Dark mode for quiz option buttons & inputs */
+html.dark #quiz-options button {
+  background: #1a1a2e !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #c8cad0 !important;
+}
+html.dark #quiz-options button:hover {
+  border-color: #E040FB !important;
+}
+html.dark #quiz-options button.quiz-selected {
+  border-color: #E040FB !important;
+  background: rgba(224,64,251,0.18) !important;
+  color: #f3e5f5 !important;
+}
+html.dark #quiz-short-answer-input,
+html.dark #quiz-date-answer {
+  background: #1a1a2e !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #c8cad0 !important;
+}
+html.dark #quiz-question {
+  color: #e2e4e8 !important;
+}
+
+/* Dark mode for page-specific sections */
+html.dark .bg-\[#F3E5F5\],
+html.dark [style*="rgba(243,229,245"] {
+  background: transparent !important;
+}
+/* Dark table/stat overrides for subpages */
+html.dark table { color: #e2e4e8; }
+html.dark th { background: #141425 !important; color: #e2e4e8 !important; border-color: rgba(255,255,255,0.08) !important; }
+html.dark td { color: #c8cad0 !important; border-color: rgba(255,255,255,0.06) !important; }
+html.dark tr:hover td { background: rgba(224,64,251,0.06) !important; }
+html.dark input, html.dark select {
+  background: #1a1a2e !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: #e2e4e8 !important;
+}
+html.dark ::placeholder { color: #8b95a8 !important; }
+html.dark .shadow-lg, html.dark .shadow-xl, html.dark .shadow-2xl {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4) !important;
+}
+
+/* ─── Nara brand utility classes (work without Tailwind config) ─── */
+.bg-nara-red   { background-color: var(--nara-blue); }
+.border-nara-red { border-color: var(--nara-blue); }
+.text-nara-red { color: #0284C7; }
+html.dark .text-nara-red { color: var(--nara-blue); }
+.focus-within\:border-nara-red:focus-within { border-color: var(--nara-blue); }
+.focus\:border-nara-red:focus { border-color: var(--nara-blue); }
+.focus\:ring-nara-red:focus { --tw-ring-color: var(--nara-blue); }
+.hover\:border-nara-red:hover { border-color: var(--nara-blue); }
+.hover\:text-nara-red:hover { color: #0284C7; }
+html.dark .hover\:text-nara-red:hover { color: var(--nara-blue); }
+.checked\:bg-nara-red:checked { background-color: var(--nara-blue); }
+
+/* ─── Light mode contrast boost ───────────────────────── */
+.text-slate-500 { color: #475569 !important; }
+.text-slate-400 { color: #64748b !important; }
+.text-gray-300 { color: #64748b !important; }
+.text-gray-400 { color: #6b7280 !important; }
+/* Prevent white-on-white text when hovering in light mode */
+.hover\:text-white:hover { color: var(--nara-blue) !important; }
+html.dark .hover\:text-white:hover { color: #fff !important; }
+
+/* ─── CTA gradient section ────────────────────────────── */
+.cta-gradient {
+  background: linear-gradient(135deg, var(--nara-blue) 0%, #7dd3fc 50%, #e0f2fe 100%);
+  color: #0c4a6e;
+}
+.cta-gradient h3,
+.cta-gradient p { color: #0c4a6e; }
+.cta-gradient a {
+  background: #0c4a6e !important;
+  color: #fff !important;
+}
+.cta-gradient a:hover {
+  background: #164e63 !important;
+}
+html.dark .cta-gradient {
+  background: linear-gradient(135deg, #0c4a6e 0%, #155e75 60%, #141425 100%);
+  color: #e0f2fe;
+}
+html.dark .cta-gradient h3,
+html.dark .cta-gradient p { color: #bae6fd; }
+html.dark .cta-gradient a {
+  background: #fff !important;
+  color: #0c4a6e !important;
+}
+html.dark .cta-gradient a:hover {
+  background: #e0f2fe !important;
+}
+
+/* ─── Base text size boost for readability ─────────────── */
+main p {
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+main li {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SUBPAGE LIGHT MODE — make dark-themed cards bright
+   ═══════════════════════════════════════════════════════════ */
+.bg-gray-900 {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(79,195,247,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  border: 1px solid rgba(79,195,247,0.15);
+}
+.bg-gray-800 {
+  background-color: #f0f4ff !important;
+}
+.bg-gray-800\/50 {
+  background-color: rgba(240,244,255,0.7) !important;
+}
+.border-gray-800 {
+  border-color: rgba(79,195,247,0.15) !important;
+}
+.border-gray-700 {
+  border-color: rgba(79,195,247,0.18) !important;
+}
+.border-gray-600 {
+  border-color: #cbd5e1 !important;
+}
+/* Fix text inside light-converted cards */
+.bg-gray-900 .text-white,
+.bg-gray-800 .text-white {
+  color: #1e293b !important;
+}
+.bg-gray-900 .text-slate-500,
+.bg-gray-800 .text-slate-500 {
+  color: #475569 !important;
+}
+.bg-gray-900 .text-slate-400,
+.bg-gray-800 .text-slate-400 {
+  color: #64748b !important;
+}
+.bg-gray-900 .placeholder-gray-400::placeholder {
+  color: #94a3b8 !important;
+}
+.bg-gray-900 input,
+.bg-gray-900 .text-white input {
+  color: #334155 !important;
+}
+/* Fix hover states on light cards */
+.bg-gray-700 {
+  background-color: #e2e8f0 !important;
+}
+.hover\:bg-gray-800:hover {
+  background-color: #e8efff !important;
+}
+.hover\:bg-gray-700:hover {
+  background-color: #dbeafe !important;
+}
+/* Keep tab active states visible */
+.bg-gray-900 .hover\:text-white:hover {
+  color: var(--nara-blue) !important;
+}
+.bg-gray-900 .text-slate-500.hover\:text-white:hover {
+  color: var(--nara-blue) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DARK MODE — restore dark cards & add dark overrides
+   ═══════════════════════════════════════════════════════════ */
+html.dark .bg-gray-900 {
+  background-color: #141425 !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  border-color: rgba(255,255,255,0.06) !important;
+}
+html.dark .bg-gray-800 {
+  background-color: #1a1a2e !important;
+}
+html.dark .bg-gray-800\/50 {
+  background-color: rgba(26,26,46,0.5) !important;
+}
+html.dark .bg-gray-700 {
+  background-color: #252540 !important;
+}
+html.dark .hover\:bg-gray-800:hover {
+  background-color: #1a1a2e !important;
+}
+html.dark .hover\:bg-gray-700:hover {
+  background-color: #252540 !important;
+}
+html.dark .border-gray-800 {
+  border-color: rgba(255,255,255,0.08) !important;
+}
+html.dark .border-gray-700 {
+  border-color: rgba(255,255,255,0.1) !important;
+}
+html.dark .border-gray-600 {
+  border-color: rgba(255,255,255,0.12) !important;
+}
+/* Restore white text on dark cards in dark mode */
+html.dark .bg-gray-900 .text-white,
+html.dark .bg-gray-800 .text-white {
+  color: #fff !important;
+}
+html.dark .bg-gray-900 .text-slate-500,
+html.dark .bg-gray-800 .text-slate-500 {
+  color: #a1a8b8 !important;
+}
+html.dark .bg-gray-900 .placeholder-gray-400::placeholder {
+  color: #6b7280 !important;
+}
+html.dark .bg-gray-900 input {
+  color: #c8cad0 !important;
+}
+html.dark .bg-gray-900 .hover\:text-white:hover,
+html.dark .bg-gray-900 .text-slate-500.hover\:text-white:hover {
+  color: #fff !important;
+}
+/* Dark mode gradient CTA fix (joining page) */
+html.dark .from-nara-red { --tw-gradient-from: var(--nara-blue); }
+html.dark .to-gray-800 { --tw-gradient-to: #141425; }
+/* Stats/data page dark mode fixes */
+html.dark .player-card:hover { background-color: #1a1a30 !important; }
+html.dark .status-indicator { border-color: #0a0a14; }
+html.dark #calendar-tooltip,
+html.dark #d3-tooltip {
+  background-color: #141425;
+  border-color: rgba(255,255,255,0.1);
+  color: #c8cad0;
+}
+html.dark .chart-container text { fill: #8891a5; }
+/* Stats/data page light mode fixes */
+.player-card:hover { background-color: #f0f4ff !important; }
+.status-indicator { border-color: #F4F7FF !important; }
+#calendar-tooltip,
+#d3-tooltip {
+  background-color: #fff !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+}
+.chart-container text { fill: #475569 !important; }
+.leaderboard-scroll::-webkit-scrollbar-track { background: #f1f5f9 !important; }
+.leaderboard-scroll::-webkit-scrollbar-thumb { background: #cbd5e1 !important; }
+.time-tooltip {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #fff !important;
+}
+html.dark .leaderboard-scroll::-webkit-scrollbar-track { background: #1f2937; }
+html.dark .leaderboard-scroll::-webkit-scrollbar-thumb { background: #4b5563; }
+
+/* ─── Sparkle keyframes ───────────────────────────────── */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50%      { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+/* ─── Mobile Responsive ───────────────────────────────── */
 @media (max-width: 768px) {
-    /* Padding adjustments for mobile */
-    .py-20 {
-        padding-top: 3rem !important;
-        padding-bottom: 3rem !important;
-    }
-    
-    /* Font size adjustments */
-    .text-6xl {
-        font-size: 2.5rem !important;
-    }
-    
-    .text-5xl {
-        font-size: 2rem !important;
-    }
-    
-    .text-4xl {
-        font-size: 1.75rem !important;
-    }
-    
-    .text-3xl {
-        font-size: 1.5rem !important;
-    }
-    
-    .text-2xl {
-        font-size: 1.25rem !important;
-    }
-    
-    .text-xl {
-        font-size: 1.125rem !important;
-    }
-    
-    /* Container width adjustments */
-    .max-w-6xl {
-        max-width: 100% !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
-    
-    /* Grid adjustments */
-    .grid {
-        gap: 1rem !important;
-    }
-    
-    /* Button adjustments */
-    .px-6 {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
-    
-    .py-3 {
-        padding-top: 0.625rem !important;
-        padding-bottom: 0.625rem !important;
-    }
-    
-    /* Improve touch targets */
-    button, a {
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-}
+  .py-20 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+  .text-6xl { font-size: 2.5rem !important; }
+  .text-5xl { font-size: 2rem !important; }
+  .text-4xl { font-size: 1.75rem !important; }
+  .text-3xl { font-size: 1.5rem !important; }
+  .text-2xl { font-size: 1.25rem !important; }
+  .text-xl  { font-size: 1.125rem !important; }
 
-/* --- Remove the line-art stroke --- */
-#flag-container svg path {
-    fill: #2596be; /* Use your Nara blue instead of stroke */
-    stroke: none;
-    transition: fill 1s ease-in-out;
-}
+  .max-w-6xl { max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+  .grid { gap: 1rem !important; }
+  .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .py-3 { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
 
-/* --- Optional hover for subtle interactive shimmer (if you like) --- */
-#flag-container:hover svg path {
-    filter: drop-shadow(0 0 8px rgba(37, 150, 190, 0.6));
-}
+  button, a { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
 
-/* --- Glowing background once sun settles --- */
-#sun-glow {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    filter: blur(60px);
-    opacity: 0;
-    background: none;
-    mix-blend-mode: screen;
-    animation: sunGlowPulse 8s ease-in-out infinite;
-}
+  .gacha-machine { transform: scale(0.8); }
+  .gacha-lever-wrap { right: -30px; }
+  .gacha-reveal-card { width: 240px; padding: 16px; }
+  .collection-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
 
-/* --- Smooth glow pulsing effect --- */
-@keyframes sunGlowPulse {
-    0% {
-        opacity: 0.1;
-        transform: translate(-50%, -50%) scale(1);
-        /* filter: blur(.5rem); */
-    }
-    50% {
-        opacity: 0.5;
-        transform: translate(-50%, -50%) scale(1.2);
-        /* filter: blur(2rem); */
-    }
-    100% {
-        opacity: 0.15;
-        transform: translate(-50%, -50%) scale(1);
-        /* filter: blur(.75rem); */
-    }
-}
+  .section-title { font-size: 1.75rem; }
 
-/* --- Custom scrollbar (unchanged) --- */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #111;
-}
-::-webkit-scrollbar-thumb {
-    background: #2596be;
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #1d7a9c;
-}
+  .city-card { margin-bottom: 1rem; }
+  .city-image, .big-city-image { width: 100%; height: auto; }
+  .fullscreen-modal .close-button { width: 40px; height: 40px; top: 10px; right: 10px; }
+  .city-card:hover, .big-city-image:hover { transform: none !important; box-shadow: none !important; }
 
-/* --- Optional: the old keyframe (flagRise) can stay or be removed if unused --- */
-@keyframes flagRise {
-    from { transform: translateY(0); }
-    to { transform: translateY(-100%); }
-}
+  .fixed.bottom-10.left-6 { bottom: 1rem !important; left: 1rem !important; }
+  .fixed.bottom-10.left-6 a { width: 3.5rem !important; min-width: 3.5rem !important; height: 3.5rem !important; padding: 0.625rem !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+  .fixed.bottom-10.left-6 a svg { width: 2rem !important; height: 2rem !important; flex-shrink: 0 !important; display: block !important; }
+  .fixed.bottom-10.left-6 a span { display: none !important; }
 
-/* Mobile-Specific Improvements */
-@media (max-width: 768px) {
-    /* City cards for mobile */
-    .city-card {
-        margin-bottom: 1rem;
-    }
-    
-    /* Images responsive */
-    .city-image, .big-city-image {
-        width: 100%;
-        height: auto;
-    }
-    
-    /* Modal improvements for mobile */
-    .fullscreen-modal .close-button {
-        width: 40px;
-        height: 40px;
-        top: 10px;
-        right: 10px;
-    }
-    
-    /* Hero section adjustments */
-    #flag-container {
-        width: 200px !important;
-        height: 100px !important;
-    }
-    
-    #sun-glow {
-        width: 400px !important;
-        height: 400px !important;
-    }
-    
-    /* Discord button mobile positioning and sizing */
-    .fixed.bottom-10.left-6 {
-        bottom: 1rem !important;
-        left: 1rem !important;
-    }
-    
-    .fixed.bottom-10.left-6 a {
-        width: 3.5rem !important;
-        min-width: 3.5rem !important;
-        height: 3.5rem !important;
-        padding: 0.625rem !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-    
-    .fixed.bottom-10.left-6 a svg {
-        width: 2rem !important;
-        height: 2rem !important;
-        flex-shrink: 0 !important;
-        display: block !important;
-    }
-    
-    .fixed.bottom-10.left-6 a:hover {
-        width: 10.5rem !important;
-        justify-content: flex-start !important;
-        padding-left: 0.625rem !important;
-        padding-right: 0.625rem !important;
-    }
-    
-    /* Hide Discord text on mobile */
-    .fixed.bottom-10.left-6 a span {
-        display: none !important;
-    }
-    
-    /* Improve spacing on mobile */
-    section {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    
-    /* Better flex wrapping */
-    .flex.flex-wrap.gap-4 {
-        gap: 0.75rem !important;
-    }
-    
-    /* Adjust about section layout */
-    .about-image-container .absolute {
-        position: static !important;
-        margin-top: 1rem;
-        text-align: center;
-    }
+  section { padding-left: 1rem; padding-right: 1rem; }
+  .flex.flex-wrap.gap-4 { gap: 0.75rem !important; }
 }
 
 @media (max-width: 480px) {
-    /* Extra small devices */
-    #flag-container {
-        width: 150px !important;
-        height: 75px !important;
-    }
-    
-    /* Further reduce padding */
-    .px-4 {
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-    }
-    
-    /* Discord button sizing on very small screens */
-    .fixed.bottom-10.left-6 {
-        bottom: 0.75rem !important;
-        left: 0.75rem !important;
-    }
-    
-    .fixed.bottom-10.left-6 a {
-        width: 3.5rem !important;
-        min-width: 3.5rem !important;
-        height: 3.5rem !important;
-        padding: 0.625rem !important;
-    }
-    
-    .fixed.bottom-10.left-6 a svg {
-        width: 2rem !important;
-        height: 2rem !important;
-    }
-    
-    .fixed.bottom-10.left-6 a:hover {
-        width: 9rem !important;
-    }
+  .gacha-machine { transform: scale(0.65); }
+  .collection-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .px-4 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+  .fixed.bottom-10.left-6 { bottom: 0.75rem !important; left: 0.75rem !important; }
+  .fixed.bottom-10.left-6 a { width: 3.5rem !important; min-width: 3.5rem !important; height: 3.5rem !important; padding: 0.625rem !important; }
 }
 
-/* Improve table responsiveness for shops page */
+/* ─── Shops page table ────────────────────────────────── */
 @media (max-width: 1024px) {
-    .overflow-x-auto {
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    table {
-        min-width: 800px;
-    }
+  .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+  table { min-width: 800px; }
 }
-
-/* Mobile improvements for shop filters */
 @media (max-width: 768px) {
-    /* Stack filter controls vertically */
-    .flex.items-center.justify-between {
-        flex-direction: column;
-        align-items: stretch !important;
-        gap: 1rem;
-    }
-    
-    /* Full width search on mobile */
-    .w-1\/2 {
-        width: 100% !important;
-    }
-    
-    /* Adjust city filter buttons */
-    .flex.gap-2 {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .city-filter-btn {
-        flex: 1;
-        font-size: 0.875rem;
-        padding: 0.5rem 0.75rem !important;
-    }
-    
-    /* Table wrapper adjustments */
-    .w-\[80\%\] {
-        width: 100% !important;
-    }
-    
-    /* Smaller table text on mobile */
-    table th,
-    table td {
-        padding: 0.5rem !important;
-        font-size: 0.75rem !important;
-    }
-    
-    /* Tags grid adjustments */
-    #tags-filter {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
+  .flex.items-center.justify-between { flex-direction: column; align-items: stretch !important; gap: 1rem; }
+  .w-1\/2 { width: 100% !important; }
+  .flex.gap-2 { width: 100%; justify-content: space-between; }
+  .city-filter-btn { flex: 1; font-size: 0.875rem; padding: 0.5rem 0.75rem !important; }
+  .w-\[80\%\] { width: 100% !important; }
+  table th, table td { padding: 0.5rem !important; font-size: 0.75rem !important; }
+  #tags-filter { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
-/* Touch-friendly improvements */
+/* Touch-friendly */
 @media (hover: none) and (pointer: coarse) {
-    /* Increase touch targets */
-    button, a, .nav-link, .city-filter-btn, .field-option {
-        min-height: 44px;
-        min-width: 44px;
-    }
-    
-    /* Remove hover effects on touch devices */
-    .city-card:hover,
-    .big-city-image:hover,
-    .city-image:hover {
-        transform: none !important;
-        box-shadow: none !important;
-        opacity: 1 !important;
-    }
+  button, a, .nav-link, .city-filter-btn, .field-option { min-height: 44px; min-width: 44px; }
+  .city-card:hover, .big-city-image:hover, .city-image:hover { transform: none !important; box-shadow: none !important; opacity: 1 !important; }
 }

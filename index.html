@@ -1,511 +1,327 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
 <link rel="icon" href="images/nara_flag_white_border.svg" type="image/svg+xml">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nara | CivMC Nation</title>
+<title>Nara | Collect-a-Naran</title>
+<script>
+  // Apply saved theme immediately to prevent flash
+  (function() {
+    const saved = localStorage.getItem('nara_theme');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/feather-icons"></script>
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 <link rel="stylesheet" href="style.css">
+<script src="components/gacha.js"></script>
 <style>
     @font-face {
-    font-family: 'HIROMISAKE';
-    src: url('/static/HIROMISAKE.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+      font-family: 'HIROMISAKE';
+      src: url('/static/HIROMISAKE.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    #nara-title { font-family: 'HIROMISAKE', sans-serif; }
+
+    /* Hero gacha section */
+    .hero-gacha {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 2rem;
+    }
+    .hero-gacha::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 30%, rgba(224,64,251,0.06) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 80%, rgba(255,107,53,0.04) 0%, transparent 50%);
+      pointer-events: none;
     }
 
-    #nara-title {
-    font-family: 'HIROMISAKE', sans-serif;
+    /* Spinning sparkles around machine */
+    .machine-sparkles {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      pointer-events: none;
+      animation: sparkleRotate 20s linear infinite;
     }
-    /* City card hover effect */
-    .city-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    @keyframes sparkleRotate { to { transform: rotate(360deg); } }
+    .machine-sparkles span {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--orange);
+      border-radius: 50%;
+      animation: sparkle 2s ease-in-out infinite;
     }
-    
-    .city-card:hover {
-        transform: scale(1.05) translateY(-10px);
-        box-shadow: 0 20px 50px rgba(220, 38, 38, 0.3);
-    }
-    
-    /* Fullscreen modal */
-    .fullscreen-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.95);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .fullscreen-modal.active {
-        display: flex;
-    }
-    
-    .fullscreen-modal img {
-        max-width: 90vw;
-        max-height: 90vh;
-        object-fit: contain;
-    }
-    
-    .close-button {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background-color: rgba(220, 38, 38, 0.8);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-    
-    .close-button:hover {
-        background-color: rgba(220, 38, 38, 1);
-        transform: scale(1.1);
-    }
-    
-    .city-image {
-        cursor: pointer;
-        transition: opacity 0.3s ease;
-    }
-    
-    .city-image:hover {
-        opacity: 0.8;
-        
-    }
+    .machine-sparkles span:nth-child(1) { top: 10%; left: 50%; animation-delay: 0s; }
+    .machine-sparkles span:nth-child(2) { top: 30%; left: 90%; animation-delay: 0.4s; }
+    .machine-sparkles span:nth-child(3) { top: 70%; left: 85%; animation-delay: 0.8s; }
+    .machine-sparkles span:nth-child(4) { top: 90%; left: 50%; animation-delay: 1.2s; }
+    .machine-sparkles span:nth-child(5) { top: 70%; left: 15%; animation-delay: 1.6s; }
+    .machine-sparkles span:nth-child(6) { top: 30%; left: 10%; animation-delay: 0.2s; }
 
-    .big-city-image {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Machine shake when pulling */
+    @keyframes machineShake {
+      0%, 100% { transform: translateX(0); }
+      10% { transform: translateX(-4px) rotate(-0.5deg); }
+      30% { transform: translateX(4px) rotate(0.5deg); }
+      50% { transform: translateX(-3px) rotate(-0.3deg); }
+      70% { transform: translateX(3px) rotate(0.3deg); }
+      90% { transform: translateX(-1px); }
     }
-    
-    .big-city-image:hover {
-        
-        transform: scale(1.05) translateY(-10px);
-        box-shadow: 0 20px 50px rgba(220, 38, 38, 0.3);
-    }
-    
-    /* Mobile Responsive Improvements */
+    .machine-shaking { animation: machineShake 0.6s ease-in-out; }
+
     @media (max-width: 768px) {
-        /* Reduce hero height on mobile */
-        header {
-            height: 80vh !important;
-        }
-        
-        /* Adjust hero text positioning */
-        #nara-title {
-            font-size: 3rem !important;
-        }
-        
-        #hero-subtitle {
-            font-size: 1rem !important;
-            padding: 0 1rem;
-        }
-        
-        /* Better spacing for city cards */
-        .city-card {
-            margin-bottom: 1.5rem;
-        }
-        
-        /* Disable hover effects on mobile */
-        .city-card:hover,
-        .big-city-image:hover {
-            transform: none !important;
-            box-shadow: none !important;
-        }
-        
-        .city-image:hover {
-            opacity: 1 !important;
-        }
-        
-        /* Button group stacking */
-        .flex.flex-wrap.gap-4 {
-            flex-direction: column;
-            gap: 0.75rem !important;
-        }
-        
-        .flex.flex-wrap.gap-4 a {
-            width: 100%;
-            text-align: center;
-            justify-content: center;
-        }
-        
-        /* Culture section icons - keep horizontal on mobile */
-        .space-y-4 .flex.items-start {
-            align-items: flex-start !important;
-            text-align: left;
-        }
-        
-        .space-y-4 .flex.items-start i {
-            flex-shrink: 0;
-            margin-right: 1rem !important;
-            margin-top: 0.25rem;
-        }
-        
-        /* About section button overlap fix */
-        .about-image-container {
-            margin-top: 2rem;
-        }
-        
-        .flex.flex-wrap.gap-4 {
-            margin-bottom: 2rem;
-        }
+      .hero-gacha { padding: 6rem 1rem 2rem; }
+      .gacha-lever-wrap { display: none; }
     }
 </style>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-  // --- feather icons ---
-  if (typeof feather !== 'undefined' && feather.replace) {
-  feather.replace();
-  }
-  
-  // Elements (guarded)
-  const flagContainer = document.getElementById('flag-container');
-  const flagImg = document.getElementById('flag-img');
-  const flagBg = document.getElementById('flag-bg');
-  const sunGlow = document.getElementById('sun-glow');
-  // Safe initialisation (only if flagContainer exists)
-  if (flagContainer) {
-  // Create a clone for the background transition
-  const flagClone = flagContainer.cloneNode(true);
-  flagClone.id = 'flag-clone';
-  flagClone.style.zIndex = '-1'; // Behind the original initially
-  flagClone.style.pointerEvents = 'none';
-  flagContainer.parentElement.insertBefore(flagClone, flagContainer);
-  
-  // initial states
-  flagContainer.style.transform = 'translate(-50%, 80%) scale(0.8)';
-  flagContainer.style.opacity = '0';
-  flagClone.style.opacity = '0';
-  if (sunGlow) sunGlow.style.opacity = '0';
-  
-  // sequence
-  setTimeout(() => {
-  // rise up to peak (10% above text)
-  flagContainer.style.transition = 'transform 2.5s cubic-bezier(0.45, 0, 0.25, 1), opacity 2s ease-out';
-  flagContainer.style.transform = 'translate(-50%, -40%) scale(1)';
-  flagContainer.style.opacity = '1';
-  
-
-  
-  // At peak, wait 0.5s then transition to background
-  setTimeout(() => {
-  // Position clone at the same spot
-  flagClone.style.transform = flagContainer.style.transform;
-  flagClone.style.opacity = '0';
-  
-  // Wait 0.5s before starting transition
-  setTimeout(() => {
-    // Fade out original
-    flagContainer.style.transition = 'opacity 0.5s ease-out';
-    flagContainer.style.opacity = '0';
-    
-    // Show clone at same position
-    flagClone.style.transition = 'opacity 0.3s ease-in';
-    flagClone.style.opacity = '1';
-    
-    // After original fades, start expanding clone slowly
-    setTimeout(() => {
-      
-      // Slow expansion to background (5 seconds)
-      flagClone.style.transition = 'transform 5s cubic-bezier(0.19, 1, 0.22, 1), opacity 5s cubic-bezier(0.19, 1, 0.22, 1)';
-      flagClone.style.transform = 'translate(-50%, -15%) scale(8)';
-      flagClone.style.opacity = '0.10'; // Keep it visible when done
-      
-      setTimeout(() => {
-        // Show the CSS radial glow
-        if (sunGlow) {
-            sunGlow.style.background = 'radial-gradient(circle, rgba(37,150,190,0.25) 0%, rgba(37,150,190,0.05) 70%, transparent 100%)';
-            sunGlow.style.transition = 'opacity 5s ease-in-out';
-            sunGlow.style.opacity = '1';
-        }
-      }, 3000);
-    }, 500);
-  }, 500);
-  }, 4000);
-  }, 500);
-  } else {
-  // If flagContainer missing, don't crash — optionally log
-  console.warn('flag-container not found — skipping flag animation.');
-  }
-  
-  // --- About-image (rising) animation via IntersectionObserver ---
-  const image = document.getElementById('rising-image');
-  const aboutSection = document.getElementById('about');
-  
-  if (image && aboutSection) {
-  // Initial state
-  image.style.transform = 'translateY(100px) scale(0.95)';
-  image.style.opacity = '0';
-  image.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
-  
-  const animateImage = () => {
-  // rise to normal
-  image.style.transform = 'translateY(0) scale(1)';
-  image.style.opacity = '1';
-  
-  setTimeout(() => {
-  // float slightly into background
-  image.style.transition = 'transform 1.5s ease-in-out, opacity 1.5s ease-in-out';
-  image.style.transform = 'translateY(-50px) scale(0.92)';
-  image.style.opacity = '0.8';
-  image.style.zIndex = '-1';
-  }, 1500);
-  };
-  
-  const observer = new IntersectionObserver((entries, obs) => {
-  if (entries[0].isIntersecting) {
-  animateImage();
-  obs.unobserve(aboutSection);
-  }
-  }, { threshold: 0.12 });
-  
-  observer.observe(aboutSection);
-  } else {
-  if (!image) console.warn('rising-image not found — skipping image animation.');
-  if (!aboutSection) console.warn('about section not found — cannot observe.');
-  }
-  
-  // --- Fullscreen Image Modal ---
-  const modal = document.getElementById('fullscreen-modal');
-  const modalImg = document.getElementById('modal-image');
-  const closeBtn = document.getElementById('close-modal');
-  const cityImages = document.querySelectorAll('.city-image');
-  
-  // Add click event to all city images
-  cityImages.forEach(img => {
-  img.addEventListener('click', () => {
-  modal.classList.add('active');
-  modalImg.src = img.src;
-  modalImg.alt = img.alt;
-  document.body.style.overflow = 'hidden'; // Prevent scrolling
-  });
-  });
-  
-  // Close modal when clicking close button
-  if (closeBtn) {
-  closeBtn.addEventListener('click', () => {
-  modal.classList.remove('active');
-  document.body.style.overflow = ''; // Restore scrolling
-  });
-  }
-  
-  // Close modal when clicking outside the image
-  if (modal) {
-  modal.addEventListener('click', (e) => {
-  if (e.target === modal) {
-  modal.classList.remove('active');
-  document.body.style.overflow = ''; // Restore scrolling
-  }
-  });
-  }
-  
-  // Close modal with ESC key
-  document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && modal.classList.contains('active')) {
-  modal.classList.remove('active');
-  document.body.style.overflow = ''; // Restore scrolling
-  }
-  });
-  
-  // Re-initialize feather icons after modal is added
-  setTimeout(() => {
-  if (typeof feather !== 'undefined' && feather.replace) {
-  feather.replace();
-  }
-  }, 100);
-  });
-  </script>
-
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col">
+<body class="bg-[#F0F4FF] text-slate-700 min-h-screen flex flex-col">
 <script src="components/navbar.js"></script>
 <custom-navbar></custom-navbar>
 <main class="flex-grow">
-<!-- Hero Section with Flag Animation -->
-<header class="relative h-screen overflow-hidden">
-<!-- Background elements -->
-<div class="absolute inset-0 bg-gradient-to-b from-black to-gray-900 z-0">
-<div id="flag-bg" class="absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-1000 ease-in-out"></div>
-</div>
 
-<div class="absolute inset-0 flex items-center justify-center z-10">
-<div class="text-center px-4 relative">
-<div class="relative h-48 mb-8 overflow-visible">
+<!-- ═══════ HERO: GACHA MACHINE ═══════ -->
+<header class="hero-gacha">
+  <!-- Title -->
+  <h1 id="nara-title" class="text-7xl md:text-8xl font-bold text-slate-800 mb-2 z-10">NARA</h1>
+  <p class="text-gacha text-xl md:text-2xl font-bold mb-2 z-10 tracking-widest">COLLECT-A-NARAN</p>
+  <p class="text-slate-500 mb-8 z-10 text-center">Pull the lever once per day to unlock a Naran citizen!</p>
 
-<!-- Rising sun (flag) -->
-<div id="flag-container" class="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full w-64 h-32 opacity-0">
-<img src="images/nara_flag_white_border.svg" alt="Nara Flag" class="w-full h-full object-contain" id="flag-img">
-</div>
+  <!-- Countdown timer -->
+  <div id="gacha-countdown" class="countdown mb-6 z-10" style="display:none;">
+    Next free pull in <span id="countdown-timer">--:--:--</span>
+  </div>
 
-<!-- Glow background (starts invisible) -->
-<div id="sun-glow" class="absolute left-1/2 top-1/2 w-[600px] h-[600px] rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+  <!-- Gacha Machine -->
+  <div class="gacha-machine z-10" id="gacha-machine">
+    <div class="machine-sparkles">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="gacha-machine-body">
+      <!-- Dome with balls -->
+      <div class="gacha-dome">
+        <div class="gacha-balls" id="gacha-balls">
+          <!-- Balls are generated by JS -->
+        </div>
+      </div>
+      <!-- Label -->
+      <div style="position:absolute;bottom:120px;left:0;right:0;text-align:center;">
+        <span class="text-gacha font-bold text-lg tracking-widest">NARAN GACHA</span>
+      </div>
+      <!-- Slot -->
+      <div class="gacha-slot"></div>
+      <!-- Coin display -->
+      <div style="position:absolute;bottom:20px;left:0;right:0;text-align:center;">
+        <span class="text-slate-400 text-sm" id="collection-count">0 / 10 collected</span>
+      </div>
+    </div>
+    <!-- Lever -->
+    <div class="gacha-lever-wrap" id="gacha-lever" title="Pull the lever!">
+      <div class="gacha-lever-track">
+        <div class="gacha-lever-handle"></div>
+      </div>
+    </div>
+  </div>
 
-<!-- Title -->
-<h1 id="nara-title" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-8xl font-bold text-white">
-NARA
-</h1>
-</div>
+  <!-- Mobile pull button -->
+  <button class="gacha-pull-btn mt-8 z-10" id="gacha-pull-btn">
+    🎰 Pull Gacha!
+  </button>
 
-<p id="hero-subtitle" class="mt-8 text-xl max-w-2xl mx-auto transition-opacity duration-1000 delay-500">
-A vibe-based Japanese-themed nation on CivMC
-</p>
-</div>
-</div>
-
-
-</div>
-<div class="absolute bottom-10 left-0 right-0 flex justify-center z-20">
-<a href="#about" class="animate-bounce">
-<i data-feather="chevron-down" class="text-white w-10 h-10"></i>
-</a>
-</div>
+  <!-- Scroll hint -->
+  <div class="absolute bottom-8 left-0 right-0 flex justify-center z-20">
+    <a href="#about" class="animate-bounce">
+      <i data-feather="chevron-down" class="text-slate-400 w-8 h-8"></i>
+    </a>
+  </div>
 </header>
 
+<!-- ═══════ REVEAL OVERLAY ═══════ -->
+<div class="gacha-reveal-overlay" id="gacha-reveal">
+  <div class="burst-particles" id="burst-particles"></div>
+  <div class="gacha-reveal-card" id="reveal-card">
+    <div class="stars" id="reveal-stars"></div>
+    <img class="skin-render" id="reveal-skin" src="" alt="">
+    <div class="naran-name" id="reveal-name"></div>
+    <div class="naran-title" id="reveal-title"></div>
+    <div class="naran-desc" id="reveal-desc"></div>
+    <div style="margin-top:16px;font-size:0.8rem;opacity:0.4;" id="reveal-dupe"></div>
+    <button onclick="closeReveal()" style="margin-top:20px;padding:8px 32px;border-radius:24px;background:linear-gradient(135deg,#E040FB,#FF6B35);border:none;color:#fff;cursor:pointer;font-weight:600;">Continue</button>
+  </div>
+</div>
 
-<!-- About Section -->
-<section id="about" class="py-20 px-4 max-w-6xl mx-auto relative">
-  <h2 class="text-4xl font-bold mb-10 text-center text-primary">The Nation of Nara</h2>
+<!-- ═══════ QUIZ RESET SECTION ═══════ -->
+<section id="quiz-section" class="py-12 px-4 gacha-section" style="display:none;">
+  <div class="max-w-2xl mx-auto">
+    <div class="gacha-banner" style="border:2px solid rgba(0,188,212,0.3);">
+      <h2 class="text-2xl font-bold text-gacha mb-2 relative z-10">🧠 Nara Quiz — Earn an Extra Pull!</h2>
+      <p class="text-slate-500 mb-2 relative z-10">Answer correctly to reset your pull timer.</p>
+      <p id="quiz-counter" class="text-sm text-slate-400 mb-4 relative z-10"></p>
+      <div id="quiz-difficulty-badge" class="relative z-10 mb-4" style="display:inline-block;padding:4px 16px;border-radius:20px;font-weight:700;font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;"></div>
+      
+      <div id="quiz-container" class="relative z-10" style="text-align:left;">
+        <div id="quiz-question" class="text-lg font-bold mb-4 text-slate-700"></div>
+        <div id="quiz-options" class="space-y-3 mb-4"></div>
+        <div id="quiz-short-answer" style="display:none;" class="mb-4">
+          <input type="text" id="quiz-short-answer-input" placeholder="Type your answer..." class="w-full p-3 rounded-lg border-2 border-slate-200 bg-white text-slate-700 font-semibold" />
+        </div>
+        <div id="quiz-date-input" style="display:none;" class="mb-4">
+          <input type="date" id="quiz-date-answer" class="w-full p-3 rounded-lg border-2 border-slate-200 bg-white text-slate-700 font-semibold" />
+        </div>
+        <button id="quiz-submit" class="gacha-pull-btn" style="padding:10px 32px;font-size:1rem;width:100%;">Submit Answer</button>
+        <div id="quiz-result" class="mt-4 text-center font-bold text-lg" style="display:none;"></div>
+      </div>
+      
+      <div id="quiz-used" class="relative z-10" style="display:none;">
+        <p class="text-slate-500">✅ You've used all 3 quiz attempts today. Come back tomorrow!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ ABOUT SECTION ═══════ -->
+<section id="about" class="py-20 px-4 max-w-6xl mx-auto relative gacha-section">
+  <h2 class="section-title text-gacha">The Nation of Nara</h2>
   <div class="grid md:grid-cols-2 gap-10 items-center">
-  <div class="z-20">
-  <p class="text-xl mb-6">
-  Nara is a meritocratic and feudalistic shogunate located in the +,+ quadrant on the continent of Alenarith.
-  History has redefined Nara into a <span class="text-primary">multicultural empire</span> with regions of different styles and cultures joined under one Shogunate.
-  </p>
-  <p class="text-lg mb-6">
-  Founded on June 2nd, 2022, we've grown from a small settlement to a thriving nation with multiple cities,
-  a robust economy, and a rich culture. Our philosophy is to <span class="text-primary">chill</span> and enjoy being part of a large and vibrant community from across the world.
-  </p>
-  <div class="flex flex-wrap gap-4 mt-8">
-  <a href="/government" class="bg-nara-red hover:bg-nara-blue text-white px-6 py-3 rounded-lg transition-colors">
-  Our Government
-  </a>
-  <a href="/joining" class="border-2 border-nara-red hover:bg-nara-red text-white px-6 py-3 rounded-lg transition-colors">
-  Join Nara
-  </a>
+    <div class="z-20">
+      <p class="text-xl mb-6">
+        Nara is a meritocratic and feudalistic shogunate located in the +,+ quadrant on the continent of Alenarith.
+        History has redefined Nara into a <span class="text-gacha">multicultural empire</span> with regions of different styles and cultures joined under one Shogunate.
+      </p>
+      <p class="text-lg mb-6 text-slate-500">
+        Founded on June 2nd, 2022, we've grown from a small settlement to a thriving nation with multiple cities,
+        a robust economy, and a rich culture. Our philosophy is to <span class="text-gacha">chill</span> and enjoy being part of a large and vibrant community from across the world.
+      </p>
+      <div class="flex flex-wrap gap-4 mt-8">
+        <a href="/government" class="gacha-pull-btn" style="padding:10px 28px;font-size:1rem;">Our Government</a>
+        <a href="/joining" style="padding:10px 28px;font-size:1rem;border:2px solid var(--purple);border-radius:50px;color:#546E7A;font-weight:600;transition:all 0.3s;" onmouseover="this.style.background='var(--purple)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#546E7A'">Join Nara</a>
+      </div>
+    </div>
+    <div class="about-image-container relative z-10">
+      <img id="rising-image" src="images/nara_above.webp" alt="Shiroyama landscape" class="big-city-image city-image rounded-lg shadow-2xl">
+      <div class="absolute -bottom-5 -right-5 p-4 rounded-lg shadow-lg pointer-events-none" style="background:linear-gradient(135deg,#FF6B35,#E040FB);">
+        <p class="text-white font-bold">Capital: Shiroyama</p>
+      </div>
+    </div>
   </div>
-  </div>
-  <div class="about-image-container relative z-10">
-  <img id="rising-image" src="images/nara_above.webp" alt="Shiroyama landscape" class="big-city-image city-image rounded-lg shadow-2xl transform transition-all duration-1000 ease-in-out">
-  <div class="absolute -bottom-5 -right-5 bg-nara-red p-4 rounded-lg shadow-lg pointer-events-none">
-  <p class="text-white font-bold">Capital: Shiroyama</p>
-  </div>
-  </div>
-  </div>
-  </section>
+</section>
 
-<!-- Cities Section -->
-<section class="py-20 bg-gray-900 px-4">
+<!-- ═══════ CITIES SECTION ═══════ -->
+<section class="py-20 px-4 gacha-section" style="background:linear-gradient(180deg,rgba(243,229,245,0.5),rgba(240,244,255,1));">
 <div class="max-w-6xl mx-auto">
-<h2 class="text-4xl font-bold mb-10 text-center text-primary">Our Cities</h2>
+<h2 class="section-title text-gacha">Our Cities</h2>
 <div class="grid md:grid-cols-3 gap-8">
-<!-- Shiroyama -->
-<div class="city-card bg-gray-800 rounded-lg overflow-hidden shadow-xl">
+<div class="gacha-card">
 <img src="images/shiro.webp" alt="Shiroyama" class="city-image w-full h-48 object-cover">
 <div class="p-6">
-<h3 class="text-2xl font-bold mb-2 text-primary">Shiroyama</h3>
-<p class="text-sm text-gray-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 3200, 4800</p>
-<p class="text-gray-300">The capital and largest city of Nara. A world-class city featuring feudal and modern Japanese architecture with high density and environmental integration. Home to extensive security, production, and transport infrastructure.</p>
+<h3 class="text-2xl font-bold mb-2 text-gacha">Shiroyama</h3>
+<p class="text-sm text-slate-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 3200, 4800</p>
+<p class="text-slate-500">The capital and largest city of Nara. A world-class city featuring feudal and modern Japanese architecture with high density and environmental integration.</p>
 </div>
 </div>
-<!-- Ichinokawa -->
-<div class="city-card bg-gray-800 rounded-lg overflow-hidden shadow-xl">
+<div class="gacha-card">
 <img src="images/ichino.webp" alt="Ichinokawa" class="city-image w-full h-48 object-cover">
 <div class="p-6">
-<h3 class="text-2xl font-bold mb-2 text-primary">Ichinokawa</h3>
-<p class="text-sm text-gray-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 3750, 5400</p>
-<p class="text-gray-300">A serene rural village featuring feudal Japanese architecture. An escape from the hustle and bustle of the big city with realistic farms, a tea shop, and a Shinto shrine dedicated to Tsukuyomi.</p>
+<h3 class="text-2xl font-bold mb-2 text-gacha">Ichinokawa</h3>
+<p class="text-sm text-slate-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 3750, 5400</p>
+<p class="text-slate-500">A serene rural village featuring feudal Japanese architecture. An escape from the hustle and bustle of the big city.</p>
 </div>
 </div>
-<!-- Q'Barra -->
-<div class="city-card bg-gray-800 rounded-lg overflow-hidden shadow-xl">
+<div class="gacha-card">
 <img src="images/qbarra.webp" alt="Q'Barra" class="city-image w-full h-48 object-cover">
 <div class="p-6">
-<h3 class="text-2xl font-bold mb-2 text-primary">Q'Barra</h3>
-<p class="text-sm text-gray-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 7000, 700</p>
-<p class="text-gray-300">An overseas exclave blending Aztec and Argonian fantasy themes. A magical place lost in the jungle with low density, high environmentalism, deep lore, and step pyramid temples.</p>
+<h3 class="text-2xl font-bold mb-2 text-gacha">Q'Barra</h3>
+<p class="text-sm text-slate-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 7000, 700</p>
+<p class="text-slate-500">An overseas exclave blending Aztec and Argonian fantasy themes. A magical place lost in the jungle.</p>
 </div>
 </div>
-<!-- Tronjheim -->
-<div class="city-card bg-gray-800 rounded-lg overflow-hidden shadow-xl">
+<div class="gacha-card">
 <img src="images/tronjheim.webp" alt="Tronjheim" class="city-image w-full h-48 object-cover">
 <div class="p-6">
-<h3 class="text-2xl font-bold mb-2 text-primary">Tronjheim</h3>
-<p class="text-sm text-gray-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 3300, 5300</p>
-<p class="text-gray-300">An independent province and breathtaking dwarven-themed underground city. Once a separate nation closely allied to Nara, Dalgon formally joined as an independent province. A huge underground haven for all dwarves.</p>
+<h3 class="text-2xl font-bold mb-2 text-gacha">Tronjheim</h3>
+<p class="text-sm text-slate-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 3300, 5300</p>
+<p class="text-slate-500">A breathtaking dwarven-themed underground city. A huge underground haven for all dwarves.</p>
 </div>
 </div>
-<!-- Orakuru -->
-<div class="city-card bg-gray-800 rounded-lg overflow-hidden shadow-xl">
+<div class="gacha-card">
 <img src="images/orakuru.webp" alt="Orakuru" class="city-image w-full h-48 object-cover">
 <div class="p-6">
-<h3 class="text-2xl font-bold mb-2 text-primary">Orakuru</h3>
-<p class="text-sm text-gray-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 3700, 7000</p>
-<p class="text-gray-300">A vibrant 1800s European industrial era city. Originally developed as an industrial area, now blending its origins with urban design, artistic and cultural expression with high density in mind.</p>
+<h3 class="text-2xl font-bold mb-2 text-gacha">Orakuru</h3>
+<p class="text-sm text-slate-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 3700, 7000</p>
+<p class="text-slate-500">A vibrant 1800s European industrial era city blending its origins with urban design and artistic expression.</p>
 </div>
 </div>
-<!-- Karasu -->
-<div class="city-card bg-gray-800 rounded-lg overflow-hidden shadow-xl">
+<div class="gacha-card">
 <img src="images/karasu.webp" alt="Karasu" class="city-image w-full h-48 object-cover">
 <div class="p-6">
-<h3 class="text-2xl font-bold mb-2 text-primary">Karasu</h3>
-<p class="text-sm text-gray-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 3400, 5800</p>
-<p class="text-gray-300">A welcoming settlement founded west of Ichinokawa. Originally settled by refugees from the Papal States, it has grown with a significant number of newfriends joining the community.</p>
+<h3 class="text-2xl font-bold mb-2 text-gacha">Karasu</h3>
+<p class="text-sm text-slate-400 mb-2 flex items-center gap-1"><i data-feather="map-pin" class="w-4 h-4"></i> 3400, 5800</p>
+<p class="text-slate-500">A welcoming settlement founded west of Ichinokawa, grown with a significant number of newfriends.</p>
 </div>
 </div>
 </div>
 </div>
 </section>
 
-<!-- Culture Section -->
-<section class="py-20 px-4 max-w-6xl mx-auto">
-<h2 class="text-4xl font-bold mb-10 text-center text-primary">Our Culture</h2>
+<!-- ═══════ CULTURE SECTION ═══════ -->
+<section class="py-20 px-4 max-w-6xl mx-auto gacha-section">
+<h2 class="section-title text-gacha">Our Culture</h2>
 <div class="grid md:grid-cols-2 gap-10 items-center">
 <div class="order-2 md:order-1">
-<p class="text-xl mb-6">
-Nara was born as a nation inspired by East Asian styles, particularly Japanese. As we grew, we developed new styles inspired by different cultures, molding regions into different themes—from traditional feudal Japan to Aztec-Argonian fantasy, to dwarven underground cities.
+<p class="text-xl mb-6 text-slate-500">
+Nara was born as a nation inspired by East Asian styles, particularly Japanese. As we grew, we developed new styles inspired by different cultures, molding regions into different themes.
 </p>
 <div class="space-y-4">
 <div class="flex items-start">
-<i data-feather="heart" class="text-primary mr-4 mt-1"></i>
+<i data-feather="heart" class="text-purple-400 mr-4 mt-1"></i>
 <div>
-<h4 class="font-bold text-lg">Chill Philosophy</h4>
-<p class="text-gray-300">We aim for low drama and minding our own business, while still being a player on the international stage. We don't seek war but rather harmony.</p>
+<h4 class="font-bold text-lg text-gacha">Chill Philosophy</h4>
+<p class="text-slate-500">We aim for low drama and minding our own business, while still being a player on the international stage.</p>
 </div>
 </div>
 <div class="flex items-start">
-<i data-feather="sun" class="text-primary mr-4 mt-1"></i>
+<i data-feather="sun" class="text-yellow-400 mr-4 mt-1"></i>
 <div>
-<h4 class="font-bold text-lg">Environmentalism</h4>
-<p class="text-gray-300">We carefully consider terrain in all construction, avoiding unnecessary destruction of natural features. Our builds integrate with the environment.</p>
+<h4 class="font-bold text-lg text-gacha">Environmentalism</h4>
+<p class="text-slate-500">We carefully consider terrain in all construction, avoiding unnecessary destruction of natural features.</p>
 </div>
 </div>
 <div class="flex items-start">
-<i data-feather="users" class="text-primary mr-4 mt-1"></i>
+<i data-feather="users" class="text-blue-400 mr-4 mt-1"></i>
 <div>
-<h4 class="font-bold text-lg">Multicultural Community</h4>
-<p class="text-gray-300">A vibrant community from across the world, with diverse architectural styles and cultures united under one Shogunate.</p>
+<h4 class="font-bold text-lg text-gacha">Multicultural Community</h4>
+<p class="text-slate-500">A vibrant community from across the world (if the world was just NA and Australia), with unique architectural styles united under one Shogunate.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="order-1 md:order-2">
-    <!-- Larger responsive flag for culture section -->
-    <img src="images/nara_flag_white_border.svg" alt="Nara culture" class="rounded-lg shadow-xl w-3/4 mx-auto md:w-[600px] lg:w-[800px] h-auto">
+    <img src="images/nara_flag_white_border.svg" alt="Nara culture" class="rounded-lg shadow-xl w-3/4 mx-auto md:w-[600px] lg:w-[800px] h-auto" style="filter: drop-shadow(0 0 30px rgba(224,64,251,0.2));">
 </div>
 </div>
 </section>
+
+<!-- ═══════ GACHA COLLECTION CTA ═══════ -->
+<section class="py-16 px-4 gacha-section">
+  <div class="max-w-2xl mx-auto text-center gacha-banner">
+    <h2 class="text-3xl font-bold text-gacha mb-4 relative z-10">📦 View Your Collection</h2>
+    <p class="text-slate-500 mb-6 relative z-10">See all the Narans you've found and check your progress of completing the full nara</p>
+    <a href="/collect" class="gacha-pull-btn relative z-10" style="text-decoration:none;">View Collection</a>
+  </div>
+</section>
+
 </main>
 
 <!-- Fullscreen Image Modal -->
@@ -518,7 +334,6 @@ Nara was born as a nation inspired by East Asian styles, particularly Japanese. 
 
 <custom-footer></custom-footer>
 <!-- Discord Floating Button -->
-
 <div class="fixed bottom-10 left-6 z-50 group">
 <a href="https://discord.gg/M8etHAEyBB" target="_blank" rel="noopener noreferrer" class="bg-[#5865F2] hover:bg-[#4752C4] text-white p-3 rounded-full shadow-lg transition-all duration-300 flex items-center overflow-hidden w-[3.5rem] hover:w-[10.5rem]">
 <svg class="w-8 h-8 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" fill="currentColor">
@@ -530,5 +345,389 @@ Nara was born as a nation inspired by East Asian styles, particularly Japanese. 
 
 <script src="components/footer.js"></script>
 <script src="script.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (typeof feather !== 'undefined') feather.replace();
+
+  const G = window.GachaNara;
+  if (!G) return;
+
+  // Wait for narans data to load
+  await Promise.all([G._naransReady, G._stateReady]);
+
+  // ── Populate gacha balls ──
+  const ballsContainer = document.getElementById('gacha-balls');
+  const ballColors = ['#FF6B35','#E040FB','#00BCD4','#78909C','#FF6B6B','#4FC3F7','#F7C948','#E040FB','#00BCD4','#78909C','#FF4081','#00BCD4','#E040FB','#66BB6A','#FF6B35'];
+  ballColors.forEach((c,i) => {
+    const b = document.createElement('div');
+    b.className = 'gacha-ball';
+    b.style.background = `radial-gradient(circle at 35% 35%, ${c}, ${c}88)`;
+    b.style.animationDelay = `${(i*0.2)%3}s`;
+    ballsContainer.appendChild(b);
+  });
+
+  // ── Update collection count ──
+  function updateCount() {
+    const col = G.getCollection();
+    const count = Object.keys(col).length;
+    document.getElementById('collection-count').textContent = `${count} / ${G.NARANS.length} collected`;
+  }
+  updateCount();
+
+  // ── Countdown ──
+  let quizNeedsRefresh = false;
+
+  function updateCountdown() {
+    if (G.canPullToday()) {
+      document.getElementById('gacha-countdown').style.display = 'none';
+      document.getElementById('gacha-pull-btn').disabled = false;
+      document.getElementById('gacha-pull-btn').textContent = '🎰 Pull Gacha!';
+      document.getElementById('quiz-section').style.display = 'none';
+      return;
+    }
+    document.getElementById('gacha-countdown').style.display = 'block';
+    document.getElementById('gacha-pull-btn').disabled = true;
+    document.getElementById('gacha-pull-btn').textContent = '⏳ Come Back Tomorrow';
+    
+    // Only show quiz section if user has pulled at least once
+    if (G.hasEverPulled()) {
+      document.getElementById('quiz-section').style.display = '';
+    }
+    
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0,0,0,0);
+    const diff = tomorrow - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('countdown-timer').textContent = 
+      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // ── Pull logic ──
+  let pulling = false;
+  function doPull() {
+    if (pulling || !G.canPullToday()) return;
+    pulling = true;
+
+    const machine = document.getElementById('gacha-machine');
+    const lever = document.getElementById('gacha-lever');
+    
+    // Animate lever
+    lever.classList.add('pulled');
+    machine.querySelector('.gacha-machine-body').classList.add('machine-shaking');
+
+    setTimeout(() => {
+      lever.classList.remove('pulled');
+      machine.querySelector('.gacha-machine-body').classList.remove('machine-shaking');
+
+      // Do the pull
+      G.pullNaranAsync().then(naran => {
+        showReveal(naran);
+        updateCount();
+        updateCountdown();
+        quizNeedsRefresh = true;
+        pulling = false;
+      }).catch(err => {
+        alert(err.error || 'Failed to pull');
+        pulling = false;
+      });
+    }, 1200);
+  }
+
+  // Lever click
+  document.getElementById('gacha-lever').addEventListener('click', doPull);
+  // Button click
+  document.getElementById('gacha-pull-btn').addEventListener('click', doPull);
+
+  // ── Reveal ──
+  function showReveal(naran) {
+    const rarity = G.RARITY[naran.rarity];
+    const overlay = document.getElementById('gacha-reveal');
+    const card = document.getElementById('reveal-card');
+
+    // Set content
+    document.getElementById('reveal-stars').textContent = G.starString(naran.rarity);
+    document.getElementById('reveal-stars').style.color = rarity.color;
+    document.getElementById('reveal-skin').src = G.getSkinUrl(naran.name);
+    document.getElementById('reveal-name').textContent = naran.name;
+    document.getElementById('reveal-name').style.color = rarity.color;
+    document.getElementById('reveal-title').textContent = naran.title;
+    document.getElementById('reveal-desc').textContent = naran.description;
+    
+    const col = G.getCollection();
+    const count = col[naran.id]?.count || 1;
+    document.getElementById('reveal-dupe').textContent = count > 1 ? `Duplicate! (×${count})` : 'NEW!';
+
+    card.style.borderColor = rarity.color;
+    card.style.boxShadow = `0 0 40px ${rarity.glow}, 0 0 80px ${rarity.glow}`;
+
+    // Particles
+    createBurst(rarity.color);
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  window.closeReveal = function() {
+    document.getElementById('gacha-reveal').classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  document.getElementById('gacha-reveal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('gacha-reveal')) window.closeReveal();
+  });
+
+  function createBurst(color) {
+    const container = document.getElementById('burst-particles');
+    container.innerHTML = '';
+    for (let i = 0; i < 20; i++) {
+      const span = document.createElement('span');
+      const angle = (Math.PI * 2 * i) / 20;
+      const dist = 80 + Math.random() * 120;
+      span.style.setProperty('--bx', `${Math.cos(angle) * dist}px`);
+      span.style.setProperty('--by', `${Math.sin(angle) * dist}px`);
+      span.style.background = color;
+      span.style.left = '50%';
+      span.style.top = '50%';
+      span.style.animationDelay = `${Math.random() * 0.3}s`;
+      container.appendChild(span);
+    }
+  }
+
+  // ── Image modal (reuse for city images) ──
+  const modal = document.getElementById('fullscreen-modal');
+  const modalImg = document.getElementById('modal-image');
+  const closeBtn = document.getElementById('close-modal');
+  document.querySelectorAll('.city-image').forEach(img => {
+    img.addEventListener('click', () => {
+      modal.classList.add('active');
+      modalImg.src = img.src;
+      modalImg.alt = img.alt;
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  if (closeBtn) closeBtn.addEventListener('click', () => { modal.classList.remove('active'); document.body.style.overflow = ''; });
+  if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) { modal.classList.remove('active'); document.body.style.overflow = ''; } });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { modal.classList.remove('active'); document.body.style.overflow = ''; window.closeReveal && window.closeReveal(); } });
+
+  // ── Quiz logic ──
+  let currentQuestion = null;
+  let quizAnswered = false;
+
+  async function loadQuizQuestion(difficulty) {
+    try {
+      // const res = await fetch(`https://gacha.nara.rocks/question?difficulty=${difficulty}`);
+      const res = await fetch(`http://localhost:3000/question?difficulty=${difficulty}`); // Temporary for local testing
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {}
+    return null;
+  }
+
+  function greyOutQuiz() {
+    quizAnswered = true;
+    const container = document.getElementById('quiz-container');
+    container.style.opacity = '0.45';
+    container.style.pointerEvents = 'none';
+    container.style.filter = 'grayscale(0.5)';
+  }
+
+  function enableQuiz() {
+    quizAnswered = false;
+    const container = document.getElementById('quiz-container');
+    container.style.opacity = '1';
+    container.style.pointerEvents = '';
+    container.style.filter = '';
+  }
+
+  async function initQuiz() {
+    const quizCount = G.getQuizCountToday();
+    const counterEl = document.getElementById('quiz-counter');
+    counterEl.textContent = `Attempts today: ${quizCount} / ${G.QUIZ_MAX_PER_DAY}`;
+
+    // If quiz was answered and we haven't been asked to refresh, keep it greyed out
+    if (quizAnswered && !quizNeedsRefresh) return;
+
+    // Reset refresh flag
+    quizNeedsRefresh = false;
+
+    // Reset UI state for fresh question
+    enableQuiz();
+    document.getElementById('quiz-container').style.display = '';
+    document.getElementById('quiz-used').style.display = 'none';
+    document.getElementById('quiz-result').style.display = 'none';
+    document.getElementById('quiz-result').textContent = '';
+    document.getElementById('quiz-options').innerHTML = '';
+    document.getElementById('quiz-short-answer').style.display = 'none';
+    document.getElementById('quiz-date-input').style.display = 'none';
+
+    // Failed today or all attempts used — show message and grey out
+    if (G.quizFailedToday() || G.hasUsedQuizToday()) {
+      document.getElementById('quiz-question').textContent = 'Sorry! Try again tomorrow.';
+      document.getElementById('quiz-options').innerHTML = '';
+      document.getElementById('quiz-short-answer').style.display = 'none';
+      document.getElementById('quiz-date-input').style.display = 'none';
+      document.getElementById('quiz-difficulty-badge').style.display = 'none';
+      const btn = document.getElementById('quiz-submit');
+      if (btn) { btn.disabled = true; btn.textContent = 'Come back tomorrow'; }
+      document.getElementById('quiz-result').style.display = 'none';
+      greyOutQuiz();
+      return;
+    }
+
+    const difficulty = G.getNextQuizDifficulty();
+    const q = await loadQuizQuestion(difficulty);
+    if (!q) { document.getElementById('quiz-section').style.display = 'none'; return; }
+    currentQuestion = q;
+
+    // Show difficulty badge
+    const badge = document.getElementById('quiz-difficulty-badge');
+    const diffColors = { easy: { bg: '#E8F5E9', color: '#66BB6A', border: '#66BB6A' }, medium: { bg: '#FFF3E0', color: '#FF9800', border: '#FF9800' }, hard: { bg: '#FFEBEE', color: '#EF5350', border: '#EF5350' } };
+    const dc = diffColors[difficulty] || diffColors.easy;
+    badge.textContent = difficulty;
+    badge.style.background = dc.bg;
+    badge.style.color = dc.color;
+    badge.style.border = `2px solid ${dc.border}`;
+    badge.style.display = 'inline-block';
+
+    document.getElementById('quiz-question').textContent = q.question;
+
+    const optionsDiv = document.getElementById('quiz-options');
+    const dateInput = document.getElementById('quiz-date-input');
+    const shortInput = document.getElementById('quiz-short-answer');
+    optionsDiv.innerHTML = '';
+    dateInput.style.display = 'none';
+    shortInput.style.display = 'none';
+    let selectedAnswer = null;
+
+    if (q.type === 'multiple_choice') {
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = 'w-full p-3 rounded-lg border-2 border-slate-200 bg-white text-slate-700 font-semibold cursor-pointer transition-all text-left';
+        btn.style.display = 'block';
+        btn.addEventListener('click', () => {
+          optionsDiv.querySelectorAll('button').forEach(b => b.classList.remove('quiz-selected'));
+          btn.classList.add('quiz-selected');
+          selectedAnswer = opt;
+        });
+        optionsDiv.appendChild(btn);
+      });
+    } else if (q.type === 'true_false') {
+      ['True', 'False'].forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = 'w-full p-3 rounded-lg border-2 border-slate-200 bg-white text-slate-700 font-semibold cursor-pointer transition-all text-left';
+        btn.style.display = 'block';
+        btn.addEventListener('click', () => {
+          optionsDiv.querySelectorAll('button').forEach(b => b.classList.remove('quiz-selected'));
+          btn.classList.add('quiz-selected');
+          selectedAnswer = opt === 'True';
+        });
+        optionsDiv.appendChild(btn);
+      });
+    } else if (q.type === 'short_answer') {
+      shortInput.style.display = '';
+      document.getElementById('quiz-short-answer-input').value = '';
+    } else if (q.type === 'date') {
+      dateInput.style.display = '';
+    }
+
+    // Replace submit button to remove old event listeners
+    const oldSubmit = document.getElementById('quiz-submit');
+    const newSubmit = oldSubmit.cloneNode(true);
+    newSubmit.disabled = false;
+    newSubmit.textContent = 'Submit Answer';
+    oldSubmit.parentNode.replaceChild(newSubmit, oldSubmit);
+
+    newSubmit.addEventListener('click', async () => {
+      if (quizAnswered) return; // prevent double-submit
+      const resultDiv = document.getElementById('quiz-result');
+      
+      let finalAnswer = selectedAnswer;
+
+      if (q.type === 'multiple_choice') {
+        if (selectedAnswer === null) { resultDiv.textContent = 'Please select an answer!'; resultDiv.style.color = '#FF6B35'; resultDiv.style.display = ''; return; }
+      } else if (q.type === 'true_false') {
+        if (selectedAnswer === null) { resultDiv.textContent = 'Please select True or False!'; resultDiv.style.color = '#FF6B35'; resultDiv.style.display = ''; return; }
+      } else if (q.type === 'short_answer') {
+        finalAnswer = document.getElementById('quiz-short-answer-input').value.trim();
+        if (!finalAnswer) { resultDiv.textContent = 'Please type your answer!'; resultDiv.style.color = '#FF6B35'; resultDiv.style.display = ''; return; }
+      } else if (q.type === 'date') {
+        finalAnswer = document.getElementById('quiz-date-answer').value;
+        if (!finalAnswer) { resultDiv.textContent = 'Please enter a date!'; resultDiv.style.color = '#FF6B35'; resultDiv.style.display = ''; return; }
+      }
+
+      newSubmit.disabled = true;
+      newSubmit.textContent = 'Submitting...';
+
+      let correct = false;
+      let explanation = '';
+      try {
+        // const res = await fetch(`https://gacha.nara.rocks/answer`, {
+        const res = await fetch(`http://localhost:3000/answer`, { // Temporary for local testing
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: q.id, answer: finalAnswer })
+        });
+        const data = await res.json();
+        correct = data.correct;
+        explanation = data.explanation;
+      } catch (err) {
+        resultDiv.textContent = 'Server error. Please try again later.';
+        resultDiv.style.color = '#FF6B6B';
+        resultDiv.style.display = '';
+        newSubmit.disabled = false;
+        newSubmit.textContent = 'Submit Answer';
+        return;
+      }
+
+      G.markQuizUsed();
+      resultDiv.style.display = '';
+
+      if (correct) {
+        resultDiv.textContent = '🎉 Correct! ' + explanation + ' Your timer has been reset!';
+        resultDiv.style.color = '#66BB6A';
+        G.resetPullTimer();
+        newSubmit.textContent = '✅ Timer Reset!';
+      } else {
+        G.markQuizFailed();
+        resultDiv.textContent = '❌ Sorry! ' + explanation + ' Try again tomorrow.';
+        resultDiv.style.color = '#FF6B6B';
+        newSubmit.textContent = 'Come back tomorrow';
+      }
+
+      // Grey out the quiz after answering
+      greyOutQuiz();
+
+      // Update counter
+      document.getElementById('quiz-counter').textContent = `Attempts today: ${G.getQuizCountToday()} / ${G.QUIZ_MAX_PER_DAY}`;
+
+      // If correct, update countdown after a short delay so user sees the result
+      if (correct) {
+        setTimeout(() => { updateCountdown(); }, 1500);
+      }
+    });
+  }
+
+  // Watch for quiz section becoming visible to refresh if needed
+  const quizObserver = new MutationObserver(() => {
+    const section = document.getElementById('quiz-section');
+    if (section.style.display !== 'none' && quizNeedsRefresh) {
+      initQuiz();
+    }
+  });
+  quizObserver.observe(document.getElementById('quiz-section'), { attributes: true, attributeFilter: ['style'] });
+
+  initQuiz();
+});
+</script>
 </body>
 </html>

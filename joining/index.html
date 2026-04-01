@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
+<script>(function(){if(localStorage.getItem('nara_theme')==='dark')document.documentElement.classList.add('dark')})()</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join Nara | Nara</title>
@@ -10,19 +11,7 @@
     <link rel="stylesheet" href="../style.css">
     <script>
         tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#2596be',
-                        secondary: '#2596be',
-                        nara: {
-                            red: '#2596be',
-                            blue: '#2596be'
-                        }
-                    }
-                }
-            }
+            darkMode: 'class'
         }
     </script>
     <script src="../components/analytics.js"></script>
@@ -85,7 +74,7 @@
             }
             
             /* CTA section */
-            .bg-gradient-to-r {
+            .cta-gradient {
                 padding: 2rem 1rem !important;
             }
             
@@ -110,7 +99,7 @@
         }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col">
+<body class="bg-[#F0F4FF] text-slate-700 min-h-screen flex flex-col">
     <script src="../components/navbar.js"></script>
     <custom-navbar></custom-navbar>
 
@@ -121,7 +110,7 @@
             <!-- Introduction -->
             <div class="mb-16 text-center">
                 <h2 class="text-4xl font-bold mb-6 text-primary">Welcome to Nara</h2>
-                <p class="text-xl text-gray-300">
+                <p class="text-xl text-slate-500">
                     We're always looking for dedicated players who share our values of vibing, environmentalism, and quality building.
                 </p>
             </div>
@@ -135,7 +124,7 @@
                             <i data-feather="check-circle" class="text-primary mr-3 mt-1 flex-shrink-0"></i>
                             <div>
                                 <h4 class="text-xl font-bold mb-2">Good Vibes</h4>
-                                <p class="text-gray-300">Friendly, respectful players who enjoy collaborative gameplay and community building.</p>
+                                <p class="text-slate-500">Friendly, respectful players who enjoy collaborative gameplay and community building.</p>
                             </div>
                         </div>
                     </div>
@@ -144,7 +133,7 @@
                             <i data-feather="check-circle" class="text-primary mr-3 mt-1 flex-shrink-0"></i>
                             <div>
                                 <h4 class="text-xl font-bold mb-2">Active Participation</h4>
-                                <p class="text-gray-300">Regular players who contribute to the nation through building, industry, or community events.</p>
+                                <p class="text-slate-500">Regular players who contribute to the nation through building, industry, or community events.</p>
                             </div>
                         </div>
                     </div>
@@ -153,7 +142,7 @@
                             <i data-feather="check-circle" class="text-primary mr-3 mt-1 flex-shrink-0"></i>
                             <div>
                                 <h4 class="text-xl font-bold mb-2">Quality Building</h4>
-                                <p class="text-gray-300">Appreciation for Japanese aesthetics and environmental conservation in development.</p>
+                                <p class="text-slate-500">Appreciation for Japanese aesthetics and environmental conservation in development.</p>
                             </div>
                         </div>
                     </div>
@@ -162,7 +151,7 @@
                             <i data-feather="check-circle" class="text-primary mr-3 mt-1 flex-shrink-0"></i>
                             <div>
                                 <h4 class="text-xl font-bold mb-2">Team Player</h4>
-                                <p class="text-gray-300">Willingness to work with others and contribute to national projects and goals.</p>
+                                <p class="text-slate-500">Willingness to work with others and contribute to national projects and goals.</p>
                             </div>
                         </div>
                     </div>
@@ -180,7 +169,7 @@
                             </div>
                             <div>
                                 <h4 class="text-xl font-bold mb-2">Join Our Discord</h4>
-                                <p class="text-gray-300 mb-3">Connect with our community on Naracord to introduce yourself and learn more about our nation.</p>
+                                <p class="text-slate-500 mb-3">Connect with our community on Naracord to introduce yourself and learn more about our nation.</p>
                                 <a href="https://discord.gg/M8etHAEyBB" target="_blank" class="inline-flex items-center bg-[#5865F2] hover:bg-[#4752C4] text-white px-6 py-2 rounded-lg transition-colors">
                                     <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" fill="currentColor">
                                         <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
@@ -195,7 +184,7 @@
                             </div>
                             <div>
                                 <h4 class="text-xl font-bold mb-2">Connect on CivMC</h4>
-                                <p class="text-gray-300">Join the CivMC server and visit Nara in the +,+ on the continent of Alenarith. Our capital Shiroyama can be found at 3200, 4800. Explore our cities and meet our citizens.</p>
+                                <p class="text-slate-500">Join the CivMC server and visit Nara in the +,+ on the continent of Alenarith. Our capital Shiroyama can be found at 3200, 4800. Explore our cities and meet our citizens.</p>
                             </div>
                         </li>
                         <li class="flex items-start">
@@ -204,7 +193,7 @@
                             </div>
                             <div>
                                 <h4 class="text-xl font-bold mb-2">Apply for Citizenship</h4>
-                                <p class="text-gray-300">After getting to know the community, speak with a government member about becoming a citizen. We're extremely friendly, some say too friendly.</p>
+                                <p class="text-slate-500">After getting to know the community, speak with a government member about becoming a citizen. We're extremely friendly, some say too friendly.</p>
                             </div>
                         </li>
                     </ol>
@@ -219,40 +208,40 @@
                         <i data-feather="home" class="text-primary mr-4 mt-1 flex-shrink-0"></i>
                         <div>
                             <h4 class="text-lg font-bold mb-2">Land & Property</h4>
-                            <p class="text-gray-300">Access to plots in our beautiful cities and the ability to build your own home or business.</p>
+                            <p class="text-slate-500">Access to plots in our beautiful cities and the ability to build your own home or business.</p>
                         </div>
                     </div>
                     <div class="bg-gray-900 p-6 rounded-lg flex items-start">
                         <i data-feather="shield" class="text-primary mr-4 mt-1 flex-shrink-0"></i>
                         <div>
                             <h4 class="text-lg font-bold mb-2">Protection & Security</h4>
-                            <p class="text-gray-300">Safety under Nara's military and strong international relations.</p>
+                            <p class="text-slate-500">Safety under Nara's military and strong international relations.</p>
                         </div>
                     </div>
                     <div class="bg-gray-900 p-6 rounded-lg flex items-start">
                         <i data-feather="users" class="text-primary mr-4 mt-1 flex-shrink-0"></i>
                         <div>
                             <h4 class="text-lg font-bold mb-2">Community</h4>
-                            <p class="text-gray-300">Join a friendly, active community of players who share your interests.</p>
+                            <p class="text-slate-500">Join a friendly, active community of players who share your interests.</p>
                         </div>
                     </div>
                     <div class="bg-gray-900 p-6 rounded-lg flex items-start">
                         <i data-feather="trending-up" class="text-primary mr-4 mt-1 flex-shrink-0"></i>
                         <div>
                             <h4 class="text-lg font-bold mb-2">Growth Opportunities</h4>
-                            <p class="text-gray-300">Potential to advance in government, military, or guild positions based on your contributions.</p>
+                            <p class="text-slate-500">Potential to advance in government, military, or guild positions based on your contributions.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- CTA -->
-            <div class="bg-gradient-to-r from-nara-red to-gray-800 p-12 rounded-lg text-center">
+            <div class="cta-gradient p-12 rounded-lg text-center">
                 <h3 class="text-3xl font-bold mb-4">Ready to Join?</h3>
                 <p class="text-xl mb-6">
                     Take the first step and join our Discord community today!
                 </p>
-                <a href="https://discord.gg/M8etHAEyBB" target="_blank" class="inline-block bg-white text-black px-8 py-3 rounded-lg font-bold hover:bg-gray-200 transition-colors">
+                <a href="https://discord.gg/M8etHAEyBB" target="_blank" class="inline-block px-8 py-3 rounded-lg font-bold transition-colors">
                     Join Naracord
                 </a>
             </div>

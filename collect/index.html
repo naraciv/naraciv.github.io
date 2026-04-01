@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){if(localStorage.getItem('nara_theme')==='dark')document.documentElement.classList.add('dark')})()</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collect-a-Naran | Nara</title>
+    <link rel="icon" href="../images/nara_flag_white_border.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../components/gacha.js"></script>
+    <script src="../components/analytics.js"></script>
+    <style>
+        .progress-bar-bg {
+            background: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 12px;
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .rarity-filter-btn {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 2px solid rgba(0,0,0,0.12);
+            background: var(--bg-card);
+            color: #546E7A;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .rarity-filter-btn:hover {
+            opacity: 0.85;
+        }
+        .rarity-filter-btn.active {
+            color: #fff;
+            background: var(--border-color, #546E7A);
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .stat-box .stat-num {
+            font-size: 2rem;
+            font-weight: 900;
+        }
+        .stat-box .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* 3D skin rotation */
+        .skin-3d-wrap {
+            perspective: 600px;
+            display: inline-block;
+        }
+        .skin-3d {
+            transition: transform 0.1s linear;
+            image-rendering: pixelated;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+    </style>
+</head>
+<body class="bg-[#F0F4FF] text-slate-700 min-h-screen flex flex-col">
+    <script src="../components/navbar.js"></script>
+    <custom-navbar></custom-navbar>
+
+    <div class="h-[100px]"></div>
+
+    <main class="flex-grow py-10 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-5xl font-bold text-gacha mb-3 tracking-widest">COLLECT-A-NARAN</h1>
+                <p class="text-slate-500 text-xl">Your personal collection of Nara's finest citizens</p>
+            </div>
+
+            <!-- Stats row -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 stats-grid">
+                <div class="stat-box">
+                    <div class="stat-num text-gacha" id="stat-collected">0</div>
+                    <div class="stat-label">Collected</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num text-gold" id="stat-total">0</div>
+                    <div class="stat-label">Total Narans</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color:var(--purple)" id="stat-pulls">0</div>
+                    <div class="stat-label">Total Pulls</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color:var(--blue)" id="stat-dupes">0</div>
+                    <div class="stat-label">Duplicates</div>
+                </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="mb-8">
+                <div class="flex justify-between mb-2">
+                    <span class="text-sm text-slate-400">Collection Progress</span>
+                    <span class="text-sm text-gacha font-bold" id="progress-pct">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-fill" style="width:0%;background:linear-gradient(90deg,var(--purple),var(--gold));"></div>
+                </div>
+            </div>
+
+            <!-- Pull CTA -->
+            <div class="text-center mb-10 gacha-banner">
+                <p class="text-slate-500 mb-4 relative z-10" id="pull-status"></p>
+                <a href="/" class="gacha-pull-btn relative z-10" style="text-decoration:none;">🎰 Go Pull!</a>
+            </div>
+
+            <!-- Rarity filters -->
+            <div class="flex flex-wrap gap-3 mb-8 justify-center">
+                <button class="rarity-filter-btn active" data-rarity="all" data-color="#546E7A" style="border-color:#546E7A;background:#546E7A;color:#fff;">All</button>
+                <button class="rarity-filter-btn" data-rarity="LEGENDARY" data-color="#FF6B35" style="border-color:#FF6B35;">★ Legendary</button>
+                <button class="rarity-filter-btn" data-rarity="EPIC" data-color="#E040FB" style="border-color:#E040FB;">★ Epic</button>
+                <button class="rarity-filter-btn" data-rarity="RARE" data-color="#00BCD4" style="border-color:#00BCD4;">★ Rare</button>
+                <button class="rarity-filter-btn" data-rarity="UNCOMMON" data-color="#78909C" style="border-color:#78909C;">★ Uncommon</button>
+                <button class="rarity-filter-btn" data-rarity="COMMON" data-color="#6B7280" style="border-color:#6B7280;">★ Common</button>
+            </div>
+
+            <!-- Collection grid -->
+            <div class="collection-grid" id="collection-grid">
+                <!-- populated by JS -->
+            </div>
+
+            <!-- Expanded card modal -->
+            <div id="card-detail-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(240,244,255,0.95);align-items:center;justify-content:center;flex-direction:column;overflow-y:auto;padding:2rem 1rem;">
+                <div style="max-width:360px;width:90%;padding:32px;border-radius:20px;text-align:center;border:3px solid;background:#FFFFFF;box-shadow:0 12px 40px rgba(0,0,0,0.1);" id="card-detail-box">
+                    <div class="stars" id="detail-stars" style="font-size:1.5rem;letter-spacing:4px;"></div>
+                    <div class="skin-3d-wrap" style="margin:16px auto;">
+                        <img class="skin-3d" id="detail-skin" src="" alt="" style="width:150px;height:auto;">
+                    </div>
+                    <div id="detail-name" style="font-size:1.5rem;font-weight:900;margin:8px 0 4px;"></div>
+                    <div id="detail-title" style="font-size:1rem;opacity:0.7;"></div>
+                    <div id="detail-desc" style="margin-top:12px;font-size:0.85rem;opacity:0.6;line-height:1.5;"></div>
+                    <div id="detail-rarity-badge" style="margin-top:12px;display:inline-block;padding:4px 16px;border-radius:20px;font-size:0.8rem;font-weight:700;"></div>
+                    <div id="detail-count" style="margin-top:8px;font-size:0.75rem;opacity:0.4;"></div>
+                    <button onclick="closeDetail()" style="margin-top:20px;padding:8px 32px;border-radius:24px;background:linear-gradient(135deg,#E040FB,#FF6B35);border:none;color:#fff;cursor:pointer;font-weight:600;">Close</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <custom-footer></custom-footer>
+    <script src="../components/footer.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (typeof feather !== 'undefined') feather.replace();
+        const G = window.GachaNara;
+        if (!G) return;
+
+        // Wait for narans data and user state to load
+        await Promise.all([G._naransReady, G._stateReady]);
+
+        const collection = G.getCollection();
+        let currentFilter = 'all';
+
+        // Stats
+        const totalNarans = G.NARANS.length;
+        const collected = Object.keys(collection).length;
+        const totalPulls = Object.values(collection).reduce((s,v) => s + v.count, 0);
+        const totalDupes = totalPulls - collected;
+
+        document.getElementById('stat-collected').textContent = collected;
+        document.getElementById('stat-total').textContent = totalNarans;
+        document.getElementById('stat-pulls').textContent = totalPulls;
+        document.getElementById('stat-dupes').textContent = Math.max(0, totalDupes);
+
+        const pct = Math.round((collected / totalNarans) * 100);
+        document.getElementById('progress-pct').textContent = pct + '%';
+        document.getElementById('progress-fill').style.width = pct + '%';
+
+        // Pull status
+        if (G.canPullToday()) {
+            document.getElementById('pull-status').innerHTML = '✨ <span style=\"color:#FF6B35;\">Your daily pull is available!</span>';
+        } else {
+            document.getElementById('pull-status').textContent = 'Come back tomorrow for your next pull!';
+        }
+
+        // Render grid
+        function renderGrid(filter) {
+            const grid = document.getElementById('collection-grid');
+            grid.innerHTML = '';
+
+            const narans = filter === 'all' ? G.NARANS : G.NARANS.filter(n => n.rarity === filter);
+
+            // Sort: collected first, then by rarity
+            const rarityOrder = { LEGENDARY: 0, EPIC: 1, RARE: 2, UNCOMMON: 3, COMMON: 4 };
+            narans.sort((a, b) => {
+                const aOwned = collection[a.id] ? 0 : 1;
+                const bOwned = collection[b.id] ? 0 : 1;
+                if (aOwned !== bOwned) return aOwned - bOwned;
+                return rarityOrder[a.rarity] - rarityOrder[b.rarity];
+            });
+
+            narans.forEach(naran => {
+                const owned = collection[naran.id];
+                const rarity = G.RARITY[naran.rarity];
+                const card = document.createElement('div');
+                card.className = `collection-card rarity-${naran.rarity.toLowerCase()} ${!owned ? 'locked' : ''}`;
+                card.style.borderColor = owned ? rarity.color : 'rgba(255,255,255,0.06)';
+                if (owned) {
+                    card.style.cursor = 'pointer';
+                    card.addEventListener('click', () => showDetail(naran));
+                }
+
+                card.innerHTML = `
+                    <div class="card-stars" style="color:${rarity.color}">${G.starString(naran.rarity)}</div>
+                    <img class="skin-thumb" src="${G.getSkinUrl(naran.name)}" alt="${naran.name}" loading="lazy">
+                    <div class="card-name" style="color:${owned ? rarity.color : '#B0BEC5'}">${naran.name}</div>
+                    <div class="card-title">${naran.title}</div>
+                    ${owned ? `<div class="card-count">×${owned.count}</div>` : ''}
+                `;
+                grid.appendChild(card);
+            });
+        }
+        renderGrid(currentFilter);
+
+        // Filter buttons
+        function activateFilterButtons(activeBtn) {
+            const isAll = activeBtn.dataset.rarity === 'all';
+            document.querySelectorAll('.rarity-filter-btn').forEach(b => {
+                if (isAll || b === activeBtn) {
+                    b.classList.add('active');
+                    b.style.setProperty('background', b.dataset.color, 'important');
+                    b.style.color = '#fff';
+                    b.style.borderColor = b.dataset.color;
+                } else {
+                    b.classList.remove('active');
+                    b.style.background = '';
+                    b.style.color = '';
+                    b.style.borderColor = b.dataset.color;
+                }
+            });
+        }
+        // Light up all buttons on initial load (All is selected)
+        activateFilterButtons(document.querySelector('.rarity-filter-btn[data-rarity="all"]'));
+
+        document.querySelectorAll('.rarity-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activateFilterButtons(btn);
+                currentFilter = btn.dataset.rarity;
+                renderGrid(currentFilter);
+            });
+        });
+
+        // Detail modal
+        window.showDetail = function(naran) {
+            const rarity = G.RARITY[naran.rarity];
+            const owned = collection[naran.id];
+            const overlay = document.getElementById('card-detail-overlay');
+            const box = document.getElementById('card-detail-box');
+
+            document.getElementById('detail-stars').textContent = G.starString(naran.rarity);
+            document.getElementById('detail-stars').style.color = rarity.color;
+            document.getElementById('detail-skin').src = G.getSkinUrl(naran.name);
+            document.getElementById('detail-name').textContent = naran.name;
+            document.getElementById('detail-name').style.color = rarity.color;
+            document.getElementById('detail-title').textContent = naran.title;
+            document.getElementById('detail-desc').textContent = naran.description;
+            
+            const badge = document.getElementById('detail-rarity-badge');
+            badge.textContent = rarity.label;
+            badge.style.background = rarity.bg;
+            badge.style.color = '#fff';
+
+            document.getElementById('detail-count').textContent = owned ? `Pulled ${owned.count} time${owned.count > 1 ? 's' : ''} · First: ${new Date(owned.firstPulled).toLocaleDateString()}` : '';
+            
+            box.style.borderColor = rarity.color;
+            box.style.boxShadow = `0 0 30px ${rarity.glow}`;
+
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            // 3D rotation on mouse move
+            const skin = document.getElementById('detail-skin');
+            const handler = (e) => {
+                const rect = skin.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const dx = (e.clientX - cx) / rect.width;
+                const dy = (e.clientY - cy) / rect.height;
+                skin.style.transform = `rotateY(${dx * 20}deg) rotateX(${-dy * 15}deg)`;
+            };
+            overlay._handler = handler;
+            overlay.addEventListener('mousemove', handler);
+        };
+
+        window.closeDetail = function() {
+            const overlay = document.getElementById('card-detail-overlay');
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+            if (overlay._handler) overlay.removeEventListener('mousemove', overlay._handler);
+            document.getElementById('detail-skin').style.transform = '';
+        };
+
+        document.getElementById('card-detail-overlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('card-detail-overlay')) window.closeDetail();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') window.closeDetail();
+        });
+    });
+    </script>
+</body>
+</html>

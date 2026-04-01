@@ -4,11 +4,11 @@ class CustomFooter extends HTMLElement {
         this.shadowRoot.innerHTML = `
             <style>
                 footer {
-                    background-color: rgba(10, 10, 10, 0.95);
-                    color: white;
+                    background-color: rgba(255, 255, 255, 0.95);
+                    color: #334155;
                     padding: 3rem 1rem;
                     text-align: center;
-                    border-top: 1px solid rgba(37, 150, 190, 0.2);
+                    border-top: 1px solid rgba(224, 64, 251, 0.12);
                 }
                 .footer-content {
                     max-width: 1200px;
@@ -19,12 +19,14 @@ class CustomFooter extends HTMLElement {
                     text-align: left;
                 }
                 .footer-section h3 {
-                    color: #2596be;
+                    color: #E040FB;
                     margin-bottom: 1rem;
                     font-size: 1.25rem;
+                    font-weight: 700;
+                    letter-spacing: 1px;
                 }
                 .footer-section p {
-                    color: #aaa;
+                    color: #78909C;
                     line-height: 1.6;
                 }
 
@@ -36,13 +38,13 @@ class CustomFooter extends HTMLElement {
                 }
 
                 .footer-links a {
-                    color: #aaa;
+                    color: #78909C;
                     text-decoration: none;
                     transition: color 0.3s;
                     padding: 0.25rem 0;
                 }
                 .footer-links a:hover {
-                    color: #2596be;
+                    color: #FF6B35;
                 }
 
                 .social-links {
@@ -52,7 +54,7 @@ class CustomFooter extends HTMLElement {
                 }
                 .social-links a {
                     color: white;
-                    background: #333;
+                    background: #B0BEC5;
                     width: 36px;
                     height: 36px;
                     border-radius: 50%;
@@ -62,15 +64,15 @@ class CustomFooter extends HTMLElement {
                     transition: all 0.3s;
                 }
                 .social-links a:hover {
-                    background: #2596be;
+                    background: linear-gradient(135deg, #E040FB, #FF6B35);
                     transform: translateY(-3px);
                 }
 
                 .copyright {
                     margin-top: 2rem;
                     padding-top: 1rem;
-                    border-top: 1px solid #333;
-                    color: #666;
+                    border-top: 1px solid rgba(224,64,251,0.1);
+                    color: #B0BEC5;
                     font-size: 0.9rem;
                     text-align: center;
                 }
@@ -124,23 +126,43 @@ class CustomFooter extends HTMLElement {
                         font-size: 0.85rem;
                     }
                 }
+
+                /* ─── Dark mode ─── */
+                footer.dark {
+                    background-color: rgba(18, 18, 30, 0.95);
+                    color: #B0BEC5;
+                    border-top-color: rgba(224, 64, 251, 0.2);
+                }
+                footer.dark .footer-section p {
+                    color: #78909C;
+                }
+                footer.dark .footer-links a {
+                    color: #78909C;
+                }
+                footer.dark .footer-links a:hover {
+                    color: #FF6B35;
+                }
+                footer.dark .copyright {
+                    color: #546E7A;
+                    border-top-color: rgba(224,64,251,0.15);
+                }
             </style>
             <footer>
                 <div class="footer-content">
                     <div class="footer-section">
                         <h3>About Nara</h3>
-                        <p>A Japanese-themed nation on CivMC, located in the +,+ on the continent of Alenarith. Founded on vibes and environmentalism.</p>
+                        <p>A Japanese-themed nation on CivMC, located in the +,+ on the continent of Alenarith. Collect all the Narans! 🎰</p>
                     </div>
 
                     <div class="footer-section">
                         <h3>Quick Links</h3>
                         <div class="footer-links">
+                            <a href="/collect" style="color:#FF6B35;">🎰 Collect-a-Naran</a>
                             <a href="/government">Government</a>
                             <a href="/properties">Properties</a>
                             <a href="/shops">Shops</a>
                             <a href="/joining">Joining Nara</a>
                             <a href="/privacy">Privacy Policy</a>
-                            <a href="/map">Map</a>
                         </div>
                     </div>
 
@@ -159,6 +181,14 @@ class CustomFooter extends HTMLElement {
             </footer>
             <script>feather.replace();</script>
         `;
+
+        // Sync dark class from html to footer element
+        const footerEl = this.shadowRoot.querySelector('footer');
+        const syncDark = () => {
+          footerEl.classList.toggle('dark', document.documentElement.classList.contains('dark'));
+        };
+        syncDark();
+        new MutationObserver(syncDark).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     }
 }
 

@@ -1,0 +1,565 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Rajdhani:wght@400;600;700&display=swap');
+
+/* ─── CSS Custom Properties (Gacha Theme) ─────────────── */
+:root {
+  --gold:   #FFD700;
+  --purple: #A855F7;
+  --blue:   #3B82F6;
+  --nara-red: #cd2e3a;
+  --nara-blue: #2596be;
+  --bg-dark: #0a0a12;
+  --bg-card: #12121e;
+  --bg-card-hover: #1a1a2e;
+  --text-muted: #8888aa;
+  --glow-gold: rgba(255,215,0,0.35);
+  --glow-purple: rgba(168,85,247,0.3);
+  --glow-blue: rgba(59,130,246,0.25);
+}
+
+body {
+  font-family: 'Rajdhani', 'Noto Sans JP', sans-serif;
+  scroll-behavior: smooth;
+  background: var(--bg-dark);
+  color: #e2e2f0;
+}
+
+/* ─── Animated star-field background ──────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.15) 50%, transparent 100%),
+    radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.10) 50%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 60% 20%, rgba(255,255,255,0.12) 50%, transparent 100%),
+    radial-gradient(1px 1px at 80% 80%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  background-size: 200px 200px, 300px 300px, 250px 250px, 350px 350px;
+  animation: starDrift 60s linear infinite;
+}
+@keyframes starDrift {
+  to { background-position: 200px 200px, -300px 300px, 250px -250px, -350px 350px; }
+}
+
+/* ─── Gacha glow text ─────────────────────────────────── */
+.text-primary { color: var(--nara-blue); }
+.text-gold    { color: var(--gold); }
+.text-gacha   {
+  background: linear-gradient(90deg, var(--gold), var(--purple), var(--blue), var(--gold));
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ─── Gacha card base ─────────────────────────────────── */
+.gacha-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+.gacha-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(168,85,247,0.1), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.gacha-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(168,85,247,0.15), 0 0 20px rgba(255,215,0,0.08);
+}
+
+/* ─── Rarity borders ──────────────────────────────────── */
+.rarity-legendary { border-color: var(--gold) !important; box-shadow: 0 0 20px var(--glow-gold); }
+.rarity-epic      { border-color: var(--purple) !important; box-shadow: 0 0 16px var(--glow-purple); }
+.rarity-rare      { border-color: var(--blue) !important; box-shadow: 0 0 12px var(--glow-blue); }
+.rarity-common    { border-color: #6B7280 !important; }
+
+/* ─── Gacha machine ───────────────────────────────────── */
+.gacha-machine {
+  position: relative;
+  width: 340px;
+  height: 480px;
+  margin: 0 auto;
+}
+.gacha-machine-body {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #1e1e3a 0%, #12121e 100%);
+  border-radius: 30px 30px 16px 16px;
+  border: 2px solid rgba(255,215,0,0.25);
+  box-shadow: 0 0 40px rgba(168,85,247,0.15), inset 0 0 30px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+.gacha-dome {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 240px;
+  border-radius: 130px 130px 20px 20px;
+  background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.08), transparent 60%),
+              linear-gradient(180deg, rgba(168,85,247,0.12) 0%, rgba(59,130,246,0.06) 100%);
+  border: 2px solid rgba(255,255,255,0.08);
+  margin-top: 20px;
+  overflow: hidden;
+}
+.gacha-dome::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 15%;
+  width: 35%;
+  height: 25%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.12), transparent);
+  border-radius: 50%;
+}
+/* Balls inside dome */
+.gacha-balls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+}
+.gacha-ball {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: ballBounce 3s ease-in-out infinite;
+}
+@keyframes ballBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.gacha-ball:nth-child(odd)  { animation-delay: -1.5s; }
+.gacha-ball:nth-child(3n)   { animation-delay: -0.7s; }
+
+.gacha-slot {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 50px;
+  background: #0a0a14;
+  border-radius: 0 0 40px 40px;
+  border: 2px solid rgba(255,215,0,0.2);
+  border-top: none;
+}
+
+/* ─── Lever ───────────────────────────────────────────── */
+.gacha-lever-wrap {
+  position: absolute;
+  right: -50px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  z-index: 10;
+}
+.gacha-lever-track {
+  width: 12px;
+  height: 100px;
+  background: linear-gradient(180deg, #333, #222);
+  border-radius: 6px;
+  position: relative;
+  margin: 0 auto;
+}
+.gacha-lever-handle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff5555, #cc2222);
+  border: 3px solid #ff8888;
+  box-shadow: 0 0 12px rgba(255,50,50,0.4);
+  transition: top 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  cursor: grab;
+}
+.gacha-lever-wrap:active .gacha-lever-handle,
+.gacha-lever-wrap.pulled .gacha-lever-handle {
+  top: 64px;
+}
+
+/* ─── Pull button (mobile / accessible) ──────────────── */
+.gacha-pull-btn {
+  display: inline-block;
+  padding: 14px 48px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, var(--nara-red), var(--purple));
+  border: 2px solid rgba(255,215,0,0.3);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 0 20px rgba(168,85,247,0.3);
+  position: relative;
+  overflow: hidden;
+}
+.gacha-pull-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+  animation: btnSheen 3s ease-in-out infinite;
+}
+@keyframes btnSheen {
+  0%   { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+.gacha-pull-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(168,85,247,0.5), 0 0 60px rgba(255,215,0,0.15);
+}
+.gacha-pull-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ─── Reveal overlay ──────────────────────────────────── */
+.gacha-reveal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.92);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.gacha-reveal-overlay.active { display: flex; }
+
+.gacha-reveal-card {
+  width: 280px;
+  padding: 24px;
+  border-radius: 20px;
+  text-align: center;
+  border: 2px solid;
+  background: var(--bg-card);
+  animation: revealPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform: scale(0);
+}
+@keyframes revealPop {
+  to { transform: scale(1); }
+}
+.gacha-reveal-card .skin-render {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 12px;
+  image-rendering: pixelated;
+}
+.gacha-reveal-card .stars {
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+}
+.gacha-reveal-card .naran-name {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin: 8px 0 4px;
+}
+.gacha-reveal-card .naran-title {
+  font-size: 0.95rem;
+  opacity: 0.7;
+}
+.gacha-reveal-card .naran-desc {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  line-height: 1.5;
+}
+
+/* Burst particles behind reveal */
+.burst-particles {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  pointer-events: none;
+}
+.burst-particles span {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: burstOut 1s ease-out forwards;
+}
+@keyframes burstOut {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--bx), var(--by)) scale(0); opacity: 0; }
+}
+
+/* ─── Collection grid ─────────────────────────────────── */
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+.collection-card {
+  background: var(--bg-card);
+  border: 2px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.collection-card:hover {
+  transform: translateY(-4px);
+}
+.collection-card.locked {
+  filter: grayscale(1) brightness(0.3);
+  pointer-events: none;
+}
+.collection-card.locked::after {
+  content: '🔒';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  background: rgba(0,0,0,0.5);
+}
+.collection-card .skin-thumb {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 8px;
+  image-rendering: pixelated;
+}
+.collection-card .card-stars {
+  font-size: 1rem;
+  letter-spacing: 2px;
+}
+.collection-card .card-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 4px 0;
+}
+.collection-card .card-title {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+.collection-card .card-count {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  opacity: 0.5;
+}
+
+/* ─── Section headings ────────────────────────────────── */
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+/* ─── City card overrides ─────────────────────────────── */
+.city-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.city-card:hover {
+  transform: scale(1.03) translateY(-6px);
+  box-shadow: 0 12px 40px rgba(168,85,247,0.2);
+}
+
+/* Fullscreen modal */
+.fullscreen-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+.fullscreen-modal.active { display: flex; }
+.fullscreen-modal img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+}
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(168,85,247,0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.close-button:hover {
+  background-color: rgba(168,85,247,1);
+  transform: scale(1.1);
+}
+.city-image { cursor: pointer; transition: opacity 0.3s; }
+.city-image:hover { opacity: 0.85; }
+
+.big-city-image { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.big-city-image:hover {
+  transform: scale(1.03) translateY(-6px);
+  box-shadow: 0 12px 40px rgba(168,85,247,0.2);
+}
+
+/* ─── Custom scrollbar ────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ─── Gacha-themed backgrounds for sections ───────────── */
+.gacha-section {
+  position: relative;
+}
+.gacha-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ─── Banner / streak display ─────────────────────────── */
+.gacha-banner {
+  background: linear-gradient(135deg, var(--bg-card), #1a1030);
+  border: 1px solid rgba(168,85,247,0.2);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.gacha-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(255,215,0,0.03), transparent, rgba(168,85,247,0.03), transparent);
+  animation: bannerSpin 12s linear infinite;
+}
+@keyframes bannerSpin { to { transform: rotate(360deg); } }
+
+/* ─── Countdown timer ─────────────────────────────────── */
+.countdown {
+  font-family: 'Rajdhani', monospace;
+  font-size: 1.1rem;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* ─── Sparkle keyframes ───────────────────────────────── */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50%      { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+/* ─── Mobile Responsive ───────────────────────────────── */
+@media (max-width: 768px) {
+  .py-20 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+  .text-6xl { font-size: 2.5rem !important; }
+  .text-5xl { font-size: 2rem !important; }
+  .text-4xl { font-size: 1.75rem !important; }
+  .text-3xl { font-size: 1.5rem !important; }
+  .text-2xl { font-size: 1.25rem !important; }
+  .text-xl  { font-size: 1.125rem !important; }
+
+  .max-w-6xl { max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+  .grid { gap: 1rem !important; }
+  .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .py-3 { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
+
+  button, a { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+
+  .gacha-machine { transform: scale(0.8); }
+  .gacha-lever-wrap { right: -30px; }
+  .gacha-reveal-card { width: 240px; padding: 16px; }
+  .collection-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+
+  .section-title { font-size: 1.75rem; }
+
+  .city-card { margin-bottom: 1rem; }
+  .city-image, .big-city-image { width: 100%; height: auto; }
+  .fullscreen-modal .close-button { width: 40px; height: 40px; top: 10px; right: 10px; }
+  .city-card:hover, .big-city-image:hover { transform: none !important; box-shadow: none !important; }
+
+  .fixed.bottom-10.left-6 { bottom: 1rem !important; left: 1rem !important; }
+  .fixed.bottom-10.left-6 a { width: 3.5rem !important; min-width: 3.5rem !important; height: 3.5rem !important; padding: 0.625rem !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+  .fixed.bottom-10.left-6 a svg { width: 2rem !important; height: 2rem !important; flex-shrink: 0 !important; display: block !important; }
+  .fixed.bottom-10.left-6 a span { display: none !important; }
+
+  section { padding-left: 1rem; padding-right: 1rem; }
+  .flex.flex-wrap.gap-4 { gap: 0.75rem !important; }
+}
+
+@media (max-width: 480px) {
+  .gacha-machine { transform: scale(0.65); }
+  .collection-grid { grid-template-columns: repeat(2, 1fr); }
+  .px-4 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+  .fixed.bottom-10.left-6 { bottom: 0.75rem !important; left: 0.75rem !important; }
+  .fixed.bottom-10.left-6 a { width: 3.5rem !important; min-width: 3.5rem !important; height: 3.5rem !important; padding: 0.625rem !important; }
+}
+
+/* ─── Shops page table ────────────────────────────────── */
+@media (max-width: 1024px) {
+  .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+  table { min-width: 800px; }
+}
+@media (max-width: 768px) {
+  .flex.items-center.justify-between { flex-direction: column; align-items: stretch !important; gap: 1rem; }
+  .w-1\/2 { width: 100% !important; }
+  .flex.gap-2 { width: 100%; justify-content: space-between; }
+  .city-filter-btn { flex: 1; font-size: 0.875rem; padding: 0.5rem 0.75rem !important; }
+  .w-\[80\%\] { width: 100% !important; }
+  table th, table td { padding: 0.5rem !important; font-size: 0.75rem !important; }
+  #tags-filter { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* Touch-friendly */
+@media (hover: none) and (pointer: coarse) {
+  button, a, .nav-link, .city-filter-btn, .field-option { min-height: 44px; min-width: 44px; }
+  .city-card:hover, .big-city-image:hover, .city-image:hover { transform: none !important; box-shadow: none !important; opacity: 1 !important; }
+}

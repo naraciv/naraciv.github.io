@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
+<script>(function(){if(localStorage.getItem('nara_theme')==='dark')document.documentElement.classList.add('dark')})()</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shops | Nara</title>
@@ -155,13 +156,13 @@
             opacity: 0;
             position: absolute;
             z-index: 1000;
-            background-color: #1f2937;
-            color: #fff;
+            background-color: #1e293b;
+            color: #f1f5f9;
             text-align: left;
             padding: 8px 12px;
             border-radius: 6px;
-            border: 1px solid #4b5563;
-            font-size: 0.875rem;
+            border: 1px solid #334155;
+            font-size: 0.9375rem;
             white-space: pre-wrap;
             width: 15vw;
             min-width: 200px;
@@ -213,7 +214,7 @@
     
 <script src="../components/analytics.js"></script>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col">
+<body class="bg-[#F0F4FF] text-slate-700 min-h-screen flex flex-col">
     <script src="../components/navbar.js"></script>
     <custom-navbar></custom-navbar>
 
@@ -241,7 +242,7 @@
 
                     <!-- Search Bar with Field Selector -->
                     <div class="w-1/2 relative bg-gray-900 border border-gray-700 rounded-full focus-within:border-nara-red transition-colors h-12">
-                        <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                        <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-5 h-5"></i>
                         <input type="text" id="search-input" placeholder="Search shops..." 
                                class="w-full h-full pl-10 pr-32 bg-transparent text-white placeholder-gray-400 focus:outline-none rounded-full">
                         <details class="absolute right-0 top-0 h-full group" id="field-selector-dropdown">
@@ -273,12 +274,12 @@
         <div>
           <details class="group" id="tags-dropdown">
             <summary
-              class="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white transition-colors bg-gray-800 border border-gray-700 rounded-full px-4 py-2 min-h-12 w-full max-w-md">
+              class="flex items-center gap-2 cursor-pointer text-slate-500 hover:text-white transition-colors bg-gray-800 border border-gray-700 rounded-full px-4 py-2 min-h-12 w-full max-w-md">
               <i data-feather="chevron-down"
                  class="chevron-icon w-4 h-4 transition-transform duration-200 flex items-center"
                  id="tags-selector-chevron"></i>
               <div id="selected-tags-container" class="flex flex-wrap gap-1 items-center">
-                <span class="text-gray-400 text-sm">Select Tags</span>
+                <span class="text-slate-500 text-sm">Select Tags</span>
               </div>
             </summary>
             <div class="mt-2 p-2 w-full max-w-md rounded-lg">
@@ -294,7 +295,7 @@
           <label class="flex items-center gap-3 cursor-pointer select-none">
             <input type="checkbox" id="exclude-out-of-stock"
                    class="w-5 h-5 rounded-full bg-gray-700 border-gray-600 checked:bg-nara-red focus:ring-nara-red focus:ring-2 transition duration-200">
-            <span class="text-gray-300">Exclude out of stock shops</span>
+            <span class="text-slate-500">Exclude out of stock shops</span>
           </label>
         </div>
       </div>
@@ -308,31 +309,31 @@
                     <table class="w-full table-fixed">
                         <thead class="bg-gray-800">
                             <tr>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(1)">
+                                <th class="w-1/6 px-6 py-4 text-left text-base font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(1)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1" style="transition: transform 0.2s, opacity 0.2s;"></i>
                                         <span>Input</span>
                                     </div>
                                 </th>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(3)">
+                                <th class="w-1/6 px-6 py-4 text-left text-base font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(3)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>Output</span>
                                     </div>
                                 </th>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(5)">
+                                <th class="w-1/6 px-6 py-4 text-left text-base font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(5)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>Coords</span>
                                     </div>
                                 </th>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(7)">
+                                <th class="w-1/6 px-6 py-4 text-left text-base font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(7)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>City</span>
                                     </div>
                                 </th>
-                                <th class="w-1/6 px-6 py-4 text-left text-sm font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(9)">
+                                <th class="w-1/6 px-6 py-4 text-left text-base font-semibold text-primary cursor-pointer hover:text-white transition-colors whitespace-nowrap" onclick="sortTable(9)">
                                     <div class="flex items-center">
                                         <i data-feather="chevron-up" class="sort-arrow w-4 h-4 mr-1 transition-all duration-200"></i>
                                         <span>Contact</span>
@@ -540,7 +541,7 @@
                 btn.className = `tag-filter-btn px-3 py-2 rounded-full border transition-colors text-xs ${
                     isActive 
                         ? 'bg-nara-red border-nara-red text-white' 
-                        : 'border-gray-600 bg-gray-900 text-gray-300 hover:border-nara-red hover:text-white'
+                        : 'border-gray-600 bg-gray-900 text-slate-500 hover:border-nara-red hover:text-white'
                 }`;
                 if (isActive) btn.classList.add('active');
                 btn.textContent = tag;
@@ -556,11 +557,11 @@
             if (selectedTags.has(tag)) {
                 selectedTags.delete(tag);
                 btn.classList.remove('active', 'bg-nara-red', 'border-nara-red', 'text-white');
-                btn.classList.add('border-gray-600', 'text-gray-300');
+                btn.classList.add('border-gray-600', 'text-slate-500');
             } else {
                 selectedTags.add(tag);
                 btn.classList.add('active', 'bg-nara-red', 'border-nara-red', 'text-white');
-                btn.classList.remove('border-gray-600', 'text-gray-300');
+                btn.classList.remove('border-gray-600', 'text-slate-500');
             }
             updateSelectedTagsDisplay();
             filterData();
@@ -572,7 +573,7 @@
             const container = document.getElementById('selected-tags-container');
             container.innerHTML = '';
             if (selectedTags.size === 0) {
-                container.innerHTML = '<span class="text-gray-400 text-sm">Select Tags</span>';
+                container.innerHTML = '<span class="text-slate-500 text-sm">Select Tags</span>';
                 return;
             }
             selectedTags.forEach(tag => {
@@ -596,7 +597,7 @@
             const btn = document.querySelector(`[data-tag="${tag}"]`);
             if (btn) {
                 btn.classList.remove('active', 'bg-nara-red', 'border-nara-red', 'text-white');
-                btn.classList.add('border-gray-600', 'text-gray-300');
+                btn.classList.add('border-gray-600', 'text-slate-500');
             }
             filterData();
             updateSelectedTagsDisplay();
@@ -654,10 +655,10 @@
             const updateButton = (btn, active) => {
                 if (active) {
                     btn.classList.add('active', 'bg-nara-red', 'border-nara-red', 'text-white');
-                    btn.classList.remove('border-gray-600', 'text-gray-300');
+                    btn.classList.remove('border-gray-600', 'text-slate-500');
                 } else {
                     btn.classList.remove('active', 'bg-nara-red', 'border-nara-red', 'text-white');
-                    btn.classList.add('border-gray-600', 'text-gray-300');
+                    btn.classList.add('border-gray-600', 'text-slate-500');
                 }
             };
         
@@ -841,7 +842,7 @@
                 
                 displayColumns.forEach(i => {
                     const td = document.createElement('td');
-                    td.className = 'px-6 py-4 text-sm text-gray-300 break-words whitespace-normal';
+                    td.className = 'px-6 py-4 text-base text-slate-500 break-words whitespace-normal';
                     td.style.maxWidth = '200px';
                     
                     let cell = row[i] || '';
@@ -874,7 +875,7 @@
                         if (loreContent && loreContent.trim()) {
                             const icon = document.createElement('span');
                             icon.className = 'lore-icon';
-                            icon.innerHTML = '<i data-feather="book-open" class="w-4 h-4 text-gray-400"></i>';
+                            icon.innerHTML = '<i data-feather="book-open" class="w-4 h-4 text-slate-500"></i>';
                             
                             const tooltip = document.createElement('span');
                             tooltip.className = 'lore-tooltip';
@@ -914,7 +915,7 @@
                         if (loreContent && loreContent.trim()) {
                             const icon = document.createElement('span');
                             icon.className = 'lore-icon';
-                            icon.innerHTML = '<i data-feather="book-open" class="w-4 h-4 text-gray-400"></i>';
+                            icon.innerHTML = '<i data-feather="book-open" class="w-4 h-4 text-slate-500"></i>';
                             
                             const tooltip = document.createElement('span');
                             tooltip.className = 'lore-tooltip';

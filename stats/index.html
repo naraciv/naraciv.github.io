@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
+<script>(function(){if(localStorage.getItem('nara_theme')==='dark')document.documentElement.classList.add('dark')})()</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stats | Nara</title>
@@ -78,7 +79,7 @@
 <script src="../components/analytics.js" defer></script>
 <script src="../components/navbar.js" defer></script>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col">
+<body class="bg-[#F0F4FF] text-slate-700 min-h-screen flex flex-col">
     <custom-navbar></custom-navbar>
 
     <div id="calendar-tooltip"></div>
@@ -101,22 +102,22 @@
                     <!-- Tabs -->
                     <div class="flex gap-2 mb-4 bg-gray-800 p-1 rounded-lg">
                         <button onclick="switchLeaderboard('weekly')" id="tab-weekly" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors bg-nara-red text-white font-bold">Weekly</button>
-                        <button onclick="switchLeaderboard('monthly')" id="tab-monthly" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Monthly</button>
-                        <button onclick="switchLeaderboard('alltime')" id="tab-alltime" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors text-gray-400 hover:text-white">All-Time</button>
+                        <button onclick="switchLeaderboard('monthly')" id="tab-monthly" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors text-slate-500 hover:text-white">Monthly</button>
+                        <button onclick="switchLeaderboard('alltime')" id="tab-alltime" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors text-slate-500 hover:text-white">All-Time</button>
                     </div>
 
                     <!-- List -->
                     <div id="leaderboard-list" class="space-y-3 leaderboard-scroll max-h-[60vh] overflow-y-auto pr-2">
                         <!-- Populated by JS -->
-                        <div class="text-center text-gray-500 py-4">Loading...</div>
+                        <div class="text-center text-slate-400 py-4">Loading...</div>
                     </div>
                     
-                    <div class="mt-4 text-xs text-gray-500 text-center border-t border-gray-800 pt-3">
+                    <div class="mt-4 text-xs text-slate-400 text-center border-t border-gray-800 pt-3">
                         Updated daily at 12am UTC
                     </div>
                 </div>
 
-                <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300">
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-slate-500">
                     <p class="font-semibold text-white">Sources</p>
                     <p class="mt-2 leading-relaxed">Playtime stats are provided by <a href="https://api.civinfo.net" target="_blank" class="text-nara-red hover:underline">api.civinfo.net</a>. Please contact <span class="font-medium">Gjum</span> if you spot any data errors. Player heads are sourced from <a href="https://mc-heads.net" target="_blank" class="text-nara-red hover:underline">mc-heads.net</a> and <a href="https://minotar.net" target="_blank" class="text-nara-red hover:underline">minotar.net</a>.</p>
                     
@@ -129,14 +130,14 @@
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                     <h1 class="text-4xl font-bold text-primary flex items-center gap-3">
                         Online Players 
-                        <span class="text-gray-400 text-2xl flex items-center gap-2">
+                        <span class="text-slate-500 text-2xl flex items-center gap-2">
                             <i data-feather="users" class="w-6 h-6"></i> <span id="header-count">0</span>
                         </span>
                     </h1>
                     
                     <!-- Search -->
                     <div class="relative w-full md:w-[30%]">
-                        <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                        <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-5 h-5"></i>
                         <input type="text" id="player-search" placeholder="Search players..." 
                                class="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-nara-red transition-colors">
                     </div>
@@ -145,7 +146,7 @@
                 <!-- Grid -->
                 <div id="player-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
                     <!-- Populated by JS -->
-                    <div class="col-span-full text-center py-12 text-gray-500">
+                    <div class="col-span-full text-center py-12 text-slate-400">
                         Loading player data...
                     </div>
                 </div>
@@ -169,41 +170,41 @@
                     
                     <div class="w-full space-y-4 text-left text-sm">
                         <div class="bg-gray-800/50 p-3 rounded-lg">
-                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Total Playtime</div>
+                            <div class="text-slate-500 text-xs uppercase tracking-wider mb-1">Total Playtime</div>
                             <div id="profile-playtime" class="text-xl font-mono text-primary">Loading...</div>
                         </div>
                         
                         <div class="bg-gray-800/50 p-3 rounded-lg">
-                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">First Join</div>
+                            <div class="text-slate-500 text-xs uppercase tracking-wider mb-1">First Join</div>
                             <div id="profile-first-join" class="text-white">Loading...</div>
                         </div>
                         
                         <div class="bg-gray-800/50 p-3 rounded-lg">
-                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Last Join</div>
+                            <div class="text-slate-500 text-xs uppercase tracking-wider mb-1">Last Join</div>
                             <div id="profile-last-join" class="text-white">Loading...</div>
                         </div>
 
                         <div id="profile-status-container" class="bg-gray-800/50 p-3 rounded-lg hidden">
-                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Status</div>
+                            <div class="text-slate-500 text-xs uppercase tracking-wider mb-1">Status</div>
                             <div id="profile-status" class="text-green-400 font-semibold">Online</div>
                         </div>
 
                         <div id="profile-last-logout-container" class="bg-gray-800/50 p-3 rounded-lg hidden">
-                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Last Logout</div>
+                            <div class="text-slate-500 text-xs uppercase tracking-wider mb-1">Last Logout</div>
                             <div id="profile-last-logout" class="text-white">Loading...</div>
                         </div>
 
-                        <a id="profile-namemc" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-gray-300 hover:text-white">
+                        <a id="profile-namemc" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-slate-500 hover:text-white">
                             <i data-feather="external-link" class="w-4 h-4"></i> NameMC Profile
                         </a>
                         
-                        <button onclick="goBackToList()" class="flex items-center justify-center gap-2 w-full py-2 border border-gray-700 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-white mt-4">
+                        <button onclick="goBackToList()" class="flex items-center justify-center gap-2 w-full py-2 border border-gray-700 hover:bg-gray-800 rounded-lg transition-colors text-slate-500 hover:text-white mt-4">
                             <i data-feather="arrow-left" class="w-4 h-4"></i> Back to List
                         </button>
                     </div>
                 </div>
 
-                <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300">
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-slate-500">
                     <p class="font-semibold text-white">Sources</p>
                     <p class="mt-2 leading-relaxed">Playtime stats are provided by <a href="https://api.civinfo.net" target="_blank" class="text-nara-red hover:underline">api.civinfo.net</a>. Please contact <span class="font-medium">Gjum</span> if you spot any data errors. Player skins are sourced from <a href="https://mc-heads.net" target="_blank" class="text-nara-red hover:underline">mc-heads.net</a>.</p>
                     <p class="">Performance errors are likely my fault.</p>
@@ -221,15 +222,15 @@
                         <!-- Tabs (Left) -->
                         <div class="flex bg-gray-800 rounded-lg p-1">
                             <button onclick="switchChart('calendar')" id="chart-tab-calendar" class="px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold">Calendar</button>
-                            <button onclick="switchChart('line')" id="chart-tab-line" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Line</button>
-                            <button onclick="switchChart('bar')" id="chart-tab-bar" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Bar</button>
+                            <button onclick="switchChart('line')" id="chart-tab-line" class="px-4 py-1.5 text-sm rounded-md transition-colors text-slate-500 hover:text-white">Line</button>
+                            <button onclick="switchChart('bar')" id="chart-tab-bar" class="px-4 py-1.5 text-sm rounded-md transition-colors text-slate-500 hover:text-white">Bar</button>
                         </div>
 
                         <!-- Granularity Toggle (Right) - Only shown for line/bar charts -->
                         <div id="granularity-controls" class="hidden flex items-center gap-2">
-                            <span class="text-xs text-gray-500">Smoothing:</span>
+                            <span class="text-xs text-slate-400">Smoothing:</span>
                             <div class="flex bg-gray-800 rounded-lg p-1">
-                                <button onclick="setGranularity('daily')" id="granularity-daily" class="px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white">Daily</button>
+                                <button onclick="setGranularity('daily')" id="granularity-daily" class="px-3 py-1 text-xs rounded-md transition-colors text-slate-500 hover:text-white">Daily</button>
                                 <button onclick="setGranularity('weekly')" id="granularity-weekly" class="px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold">Weekly</button>
                             </div>
                         </div>
@@ -242,7 +243,7 @@
                         <div id="chart-d3-brush" class="w-full h-[60px] hidden mt-2 chart-container"></div>
                     </div>
                     
-                    <div class="text-xs text-gray-500 mt-2 text-center">
+                    <div class="text-xs text-slate-400 mt-2 text-center">
                         <span id="chart-hint-zoom" class="hidden">Drag the bottom bar to filter range.</span>
                     </div>
                 </div>
@@ -301,8 +302,8 @@
             ? window.location.pathname
             : '/' + pathSegments.slice(0, statsIndex + 1).join('/') + '/';
 
-        const ICON_CLOCK = '<svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
-        const ICON_LOGOUT = '<svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>';
+        const ICON_CLOCK = '<svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+        const ICON_LOGOUT = '<svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>';
 
         let avatarObserver = null;
         
@@ -509,7 +510,7 @@
                 card.className = 'player-card bg-gray-900 border border-gray-800 rounded-lg p-4 flex flex-col items-center gap-3 relative cursor-pointer';
                 card.dataset.username = player.username;
                 
-                card.innerHTML = `<div class="relative"><img class="w-20 h-20 rounded-md shadow-lg bg-gray-800" alt="" data-username="${player.username}"><div class="${statusClass} status-indicator"></div></div><div class="font-bold text-white text-lg truncate w-full text-center mt-2">${player.username}</div><div class="text-center w-full mt-1"><div class="relative group cursor-help flex items-center justify-center gap-2 text-sm text-gray-400 font-medium">${statusContent}<div class="time-tooltip">${tooltipTime}</div></div></div>`;
+                card.innerHTML = `<div class="relative"><img class="w-20 h-20 rounded-md shadow-lg bg-gray-800" alt="" data-username="${player.username}"><div class="${statusClass} status-indicator"></div></div><div class="font-bold text-white text-lg truncate w-full text-center mt-2">${player.username}</div><div class="text-center w-full mt-1"><div class="relative group cursor-help flex items-center justify-center gap-2 text-sm text-slate-500 font-medium">${statusContent}<div class="time-tooltip">${tooltipTime}</div></div></div>`;
                 
                 // Collect image reference directly
                 const img = card.querySelector('img');
@@ -680,7 +681,7 @@
             cachedElements.viewProfile.classList.remove('hidden');
             document.getElementById('profile-username').textContent = username;
             document.getElementById('profile-playtime').textContent = 'Loading...';
-            document.getElementById('chart-calendar').innerHTML = '<div class="text-center py-20 text-gray-500">Loading history...</div>';
+            document.getElementById('chart-calendar').innerHTML = '<div class="text-center py-20 text-slate-400">Loading history...</div>';
             document.getElementById('monthly-data-container').innerHTML = '';
             document.getElementById('profile-status-container').classList.add('hidden');
             document.getElementById('profile-last-logout-container').classList.add('hidden');
@@ -991,7 +992,7 @@
                 const ms = profileData.monthlyPlaytime[key] || 0;
                 const hours = (ms / 3600000).toFixed(1);
                 const monthName = current.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
-                monthBuffer.push(`<div class="flex justify-between text-sm"><span class="text-gray-400">${monthName}:</span> <span class="font-mono text-white">${hours}h</span></div>`);
+                monthBuffer.push(`<div class="flex justify-between text-sm"><span class="text-slate-500">${monthName}:</span> <span class="font-mono text-white">${hours}h</span></div>`);
                 if (monthBuffer.length === 6) {
                     const col = document.createElement('div'); col.className = 'flex flex-col gap-1 min-w-[160px]';
                     col.innerHTML = monthBuffer.join(''); container.appendChild(col); monthBuffer = [];
@@ -1009,7 +1010,7 @@
             currentChartType = type;
             ['calendar', 'line', 'bar'].forEach(t => {
                 const btn = document.getElementById(`chart-tab-${t}`);
-                btn.className = t === type ? 'px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold' : 'px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white';
+                btn.className = t === type ? 'px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold' : 'px-4 py-1.5 text-sm rounded-md transition-colors text-slate-500 hover:text-white';
             });
 
             const calDiv = document.getElementById('chart-calendar');
@@ -1037,9 +1038,9 @@
             const weeklyBtn = document.getElementById('granularity-weekly');
             if (userGranularityPreference === 'daily') {
                 dailyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
-                weeklyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white';
+                weeklyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors text-slate-500 hover:text-white';
             } else {
-                dailyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white';
+                dailyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors text-slate-500 hover:text-white';
                 weeklyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
             }
         }
@@ -1086,7 +1087,7 @@
                 monthCard.className = 'bg-gray-800/30 p-1 rounded-lg';
                 
                 // Smaller font for title
-                let html = `<h4 class="text-xs font-bold text-gray-400 mb-1 text-center truncate">${mData.name}</h4><div class="calendar-grid">`;
+                let html = `<h4 class="text-xs font-bold text-slate-500 mb-1 text-center truncate">${mData.name}</h4><div class="calendar-grid">`;
                 for(let i=0; i<firstDayOffset; i++) html += `<div></div>`;
                 for(let d=1; d<=daysInMonth; d++) {
                     const ms = mData.days[d] || 0;
@@ -1305,18 +1306,18 @@
                 const results = Papa.parse(csvText, { header: true, skipEmptyLines: true });
                 leaderboardData = results.data;
                 renderLeaderboard();
-            } catch (error) { document.getElementById('leaderboard-list').innerHTML = '<div class="text-center text-gray-500 text-sm py-4">Unavailable</div>'; }
+            } catch (error) { document.getElementById('leaderboard-list').innerHTML = '<div class="text-center text-slate-400 text-sm py-4">Unavailable</div>'; }
         }
         function switchLeaderboard(tab) {
             currentLeaderboardTab = tab;
             ['weekly', 'monthly', 'alltime'].forEach(t => {
-                document.getElementById(`tab-${t}`).className = t === tab ? 'flex-1 py-1 px-2 text-sm rounded-md transition-colors bg-nara-red text-white font-bold' : 'flex-1 py-1 px-2 text-sm rounded-md transition-colors text-gray-400 hover:text-white';
+                document.getElementById(`tab-${t}`).className = t === tab ? 'flex-1 py-1 px-2 text-sm rounded-md transition-colors bg-nara-red text-white font-bold' : 'flex-1 py-1 px-2 text-sm rounded-md transition-colors text-slate-500 hover:text-white';
             });
             renderLeaderboard();
         }
         function renderLeaderboard() {
             const container = document.getElementById('leaderboard-list'); container.innerHTML = '';
-            if (leaderboardData.length === 0) { container.innerHTML = '<div class="text-center text-gray-500 text-sm">No data</div>'; return; }
+            if (leaderboardData.length === 0) { container.innerHTML = '<div class="text-center text-slate-400 text-sm">No data</div>'; return; }
             const keys = Object.keys(leaderboardData[0]);
             const userKey = keys.find(k => k.toLowerCase().includes('user') || k.toLowerCase().includes('name')) || keys[0];
             const timeKey = keys.find(k => k.toLowerCase().includes(currentLeaderboardTab)) || keys[1];
@@ -1326,8 +1327,8 @@
                 const item = document.createElement('div');
                 item.className = 'flex items-center gap-3 bg-gray-800/50 p-2 rounded hover:bg-gray-800 transition-colors cursor-pointer';
                 item.onclick = () => { updateURL(null, username); showProfileView(username); };
-                let rankClass = index === 0 ? 'text-yellow-400' : index === 1 ? 'text-gray-300' : index === 2 ? 'text-amber-600' : 'text-gray-400';
-                item.innerHTML = `<div class="font-bold w-6 text-center ${rankClass}">#${index + 1}</div><img src="https://minotar.net/avatar/${username}/32" class="w-8 h-8 rounded bg-gray-700"><div class="flex-1 min-w-0"><div class="text-sm font-medium truncate text-white">${username}</div><div class="text-xs text-gray-400">${timeVal} hrs</div></div>`;
+                let rankClass = index === 0 ? 'text-yellow-400' : index === 1 ? 'text-slate-500' : index === 2 ? 'text-amber-600' : 'text-slate-500';
+                item.innerHTML = `<div class="font-bold w-6 text-center ${rankClass}">#${index + 1}</div><img src="https://minotar.net/avatar/${username}/32" class="w-8 h-8 rounded bg-gray-700"><div class="flex-1 min-w-0"><div class="text-sm font-medium truncate text-white">${username}</div><div class="text-xs text-slate-500">${timeVal} hrs</div></div>`;
                 container.appendChild(item);
             });
         }
@@ -1507,7 +1508,7 @@
             }
 
             if (allPlayers.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">Loading player data...</div>';
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400">Loading player data...</div>';
                 return;
             }
 
@@ -1534,7 +1535,7 @@
             offlineIndex = 0;
 
             if (onlinePlayers.length === 0 && offlinePlayers.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">No players found</div>';
+                grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-8">No players found</div>';
                 teardownInfiniteScroll();
                 return;
             }
