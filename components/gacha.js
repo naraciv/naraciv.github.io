@@ -19,8 +19,7 @@ const RARITY = {
 };
 
 /* ── Config ──────────────────────────────────────── */
-// const BACKEND_URL = 'https://gacha.nara.rocks';
-const BACKEND_URL = 'http://localhost:3000'; // Temporary for local testing
+const BACKEND_URL = 'https://gacha.nara.rocks';
 
 /* ── Naran roster (loaded async from backend) ────────── */
 let NARANS = [];
