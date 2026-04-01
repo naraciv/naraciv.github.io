@@ -522,8 +522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadQuizQuestion(difficulty) {
     try {
-      // const res = await fetch(`https://gacha.nara.rocks/question?difficulty=${difficulty}`);
-      const res = await fetch(`http://localhost:3000/question?difficulty=${difficulty}`); // Temporary for local testing
+      const res = await fetch(`https://gacha.nara.rocks/question?difficulty=${difficulty}`);
       if (res.ok) {
         return await res.json();
       }
@@ -671,8 +670,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       let correct = false;
       let explanation = '';
       try {
-        // const res = await fetch(`https://gacha.nara.rocks/answer`, {
-        const res = await fetch(`http://localhost:3000/answer`, { // Temporary for local testing
+        const res = await fetch(`https://gacha.nara.rocks/answer`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: q.id, answer: finalAnswer })
