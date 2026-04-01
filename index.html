@@ -82,8 +82,25 @@
     .machine-shaking { animation: machineShake 0.6s ease-in-out; }
 
     @media (max-width: 768px) {
-      .hero-gacha { padding: 6rem 1rem 2rem; }
-      .gacha-lever-wrap { display: none; }
+      .hero-gacha { padding: 5rem 1rem 3.75rem; align-items: flex-start; text-align: left; }
+      .gacha-machine { margin-bottom: 2.5rem; margin-left: 0; }
+      /* Keep lever beside the machine on mobile */
+      .gacha-lever-wrap {
+        display: flex;
+        position: absolute;
+        right: -30px;
+        left: auto;
+        top: 50%;
+        bottom: auto;
+        transform: translateY(-50%);
+      }
+      /* Remove scroll hint on mobile to avoid overlap */
+      .scroll-hint { display: none !important; }
+      /* Recentre CTA button even when container is left-aligned */
+      .gacha-pull-btn { align-self: center; }
+    }
+    @media (max-width: 520px) {
+      .gacha-machine { transform: scale(0.78); margin-bottom: 2rem; }
     }
 </style>
 </head>
@@ -141,7 +158,7 @@
   </button>
 
   <!-- Scroll hint -->
-  <div class="absolute bottom-8 left-0 right-0 flex justify-center z-20">
+  <div class="scroll-hint absolute bottom-8 left-0 right-0 flex justify-center z-20">
     <a href="#about" class="animate-bounce">
       <i data-feather="chevron-down" class="text-slate-400 w-8 h-8"></i>
     </a>
@@ -522,7 +539,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadQuizQuestion(difficulty) {
     try {
-      const res = await fetch(`https://gacha.nara.rocks/question?difficulty=${difficulty}`);
+      const res = await fetch(`/api/gacha/question?difficulty=${difficulty}`);
       if (res.ok) {
         return await res.json();
       }
@@ -670,7 +687,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       let correct = false;
       let explanation = '';
       try {
-        const res = await fetch(`https://gacha.nara.rocks/answer`, {
+        const res = await fetch(`/api/gacha/answer`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: q.id, answer: finalAnswer })
