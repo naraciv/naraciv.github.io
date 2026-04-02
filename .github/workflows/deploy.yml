@@ -2,9 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ gacha ]
   pull_request:
-    branches: [ main ]
+    branches: [ gacha ]
   workflow_dispatch: # <--- Add this line
 
 permissions:
