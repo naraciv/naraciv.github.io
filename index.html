@@ -754,13 +754,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       resultDiv.style.display = '';
 
       if (correct) {
-        resultDiv.textContent = '🎉 Correct! ' + explanation + ' Your timer has been reset!';
+        resultDiv.textContent = 'Correct! ' + explanation + ' Your timer has been reset!';
         resultDiv.style.color = '#66BB6A';
         G.resetPullTimer();
-        newSubmit.textContent = '✅ Timer Reset!';
+        newSubmit.textContent = 'Timer Reset!';
       } else {
         G.markQuizFailed();
-        resultDiv.textContent = '❌ Sorry! ' + explanation + ' Try again tomorrow.';
+        resultDiv.textContent = 'Sorry! ' + explanation + ' Try again tomorrow.';
         resultDiv.style.color = '#FF6B6B';
         newSubmit.textContent = 'Come back tomorrow';
       }
@@ -773,7 +773,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // If correct, update countdown after a short delay so user sees the result
       if (correct) {
-        setTimeout(() => { updateCountdown(); }, 1500);
+        setTimeout(() => { updateCountdown(); }, 7500);
       }
     });
   }
