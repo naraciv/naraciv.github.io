@@ -106,45 +106,6 @@ async function main() {
                 const logins = history.loginTimestamps || [];
                 const logouts = history.logoutTimestamps || [];
 
-                // Pair logins with their corresponding logout and sort by login time
-                const sessionsArr = logins.map((login, i) => ({ login, logout: logouts[i] || null }));
-                sessionsArr.sort((a, b) => (a.login || 0) - (b.login || 0));
-                
-                // Normalize sessions (cap per-day), filter invalid and merge overlaps so we don't double-count
-                const normalized = [];
-                for (const s of sessionsArr) {
-                    let login = s.login;
-                    let logout = s.logout;
-                    if (!login) continue;
-                    if (!logout || logout <= login) logout = now;
-                    if (logout - login > oneDayMs) logout = login + oneDayMs;
-                    if (logout <= login) continue;
-                    normalized.push({ start: login, end: logout });
-                }
-                
-                const merged = [];
-                for (const s of normalized) {
-                    if (merged.length === 0) {
-                        merged.push({ ...s });
-                        continue;
-                    }
-                    const last = merged[merged.length - 1];
-                    if (s.start <= last.end) {
-                        // overlapping or adjacent -> extend the last segment
-                        last.end = Math.max(last.end, s.end);
-                    } else {
-                        merged.push({ ...s });
-                    }
-                }
-                
-                // Cap merged sessions to 23.8 hours max each
-                const maxSessionMs = 23.8 * 3600 * 1000;
-                for (const s of merged) {
-                    if (s.end - s.start > maxSessionMs) {
-                        s.end = s.start + maxSessionMs;
-                    }
-                }
-                
                 let weekly = 0;
                 let monthly = 0;
                 let allTime = 0;
