@@ -10,14 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Dark mode toggle (if needed in future)
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-        });
-    }
 });
 
 // Intersection Observer for scroll animations

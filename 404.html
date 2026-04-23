@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <title>Redirecting...</title>
@@ -8,26 +8,41 @@
             var path = window.location.pathname;
             var segments = path.split('/').filter(p => p);
             
-            // Check if we are in /stats/username
+            // Check if we are in /stats/{username}
             var statsIndex = segments.indexOf('stats');
             
-            if (statsIndex !== -1 && segments.length > statsIndex + 1) {
-                var username = segments[segments.length - 1];
-                // Reconstruct the base path to /stats/
-                // e.g. /repo/stats/
-                var basePath = '/' + segments.slice(0, statsIndex + 1).join('/') + '/';
-                basePath = basePath.replace('//', '/'); // Cleanup
-                
-                // Redirect to query param version
-                window.location.replace(basePath + '?player=' + username);
-            } else {
+            if (statsIndex !== -1) {
+                var trailing = segments.slice(statsIndex + 1);
+                var basePath = '/' + segments.slice(0, statsIndex + 1).join('/');
+
+                // Only rewrite pretty profile URLs like /stats/SomePlayer.
+                if (trailing.length === 1) {
+                    var slug = trailing[0];
+                    if (slug !== 'user' && slug !== 'index.html') {
+                        var username = slug;
+                        try {
+                            username = decodeURIComponent(slug);
+                        } catch (e) {}
+                        window.location.replace(basePath + '/user/?player=' + encodeURIComponent(username));
+                        return;
+                    }
+                }
+
+                // If we landed on the stats root path, go to the list page.
+                if (trailing.length === 0 || (trailing.length === 1 && trailing[0] === 'index.html')) {
+                    window.location.replace(basePath + '/');
+                    return;
+                }
+            }
+
+            {
                 // Fallback to home if not a stats route
                 window.location.replace('/');
             }
         })();
     </script>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-200">
     <p>Redirecting...</p>
 </body>
 </html>

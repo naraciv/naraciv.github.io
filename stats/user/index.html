@@ -1,0 +1,3078 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stats | Nara</title>
+    <!-- DNS prefetch for faster resolution -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://api.civinfo.net">
+    <link rel="dns-prefetch" href="https://mc-heads.net">
+    <link rel="dns-prefetch" href="https://minotar.net">
+    <link rel="dns-prefetch" href="https://d3js.org">
+    <!-- Preconnect for critical domains -->
+    <link rel="preconnect" href="https://api.civinfo.net" crossorigin>
+    <link rel="preconnect" href="https://mc-heads.net" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" defer></script>
+    <link rel="stylesheet" href="../../style.css" fetchpriority="high">
+    <style>
+        /* Custom scrollbar for leaderboard */
+        .leaderboard-scroll::-webkit-scrollbar { width: 6px; }
+        .leaderboard-scroll::-webkit-scrollbar-track { background: #1f2937; }
+        .leaderboard-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+        .leaderboard-scroll::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        .player-card { 
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .player-card:hover { transform: translateY(-2px); background-color: #1f2937; }
+        
+        .status-indicator {
+            position: absolute; bottom: -5px; right: -5px; width: 20px; height: 20px;
+            border-radius: 50%; border: 4px solid #111827; z-index: 10;
+        }
+        .status-online { background-color: #10b981; }
+        .status-offline { background-color: #ef4444; }
+
+        .time-tooltip {
+            visibility: hidden; opacity: 0; position: absolute; bottom: 100%; left: 50%;
+            transform: translateX(-50%); margin-bottom: 8px; padding: 6px 12px;
+            background: rgba(31, 41, 55, 0.95); border: 1px solid #374151; color: #f9fafb;
+            font-size: 0.85rem; font-weight: 500; border-radius: 6px; white-space: nowrap; z-index: 99999;
+            transition: opacity 0.2s; pointer-events: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+        }
+        .group:hover .time-tooltip { visibility: visible; opacity: 1; }
+
+        /* Calendar Styles */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .calendar-day { aspect-ratio: 1; border-radius: 2px; cursor: pointer; }
+        
+        #calendar-tooltip {
+            display: none; position: absolute; background: rgba(31, 41, 55, 0.95); border: 1px solid #374151;
+            color: #f9fafb; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 500;
+            pointer-events: none; z-index: 99999; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px); transform: translate(-50%, -100%); margin-top: -10px; white-space: nowrap;
+        }
+
+        /* D3 Chart Styles */
+        .chart-container text { fill: #9ca3af; font-size: 12px; font-family: sans-serif; }
+        .chart-container path, .chart-container line { stroke: #ef4444; }
+        .line-path { fill: none; stroke: #ef4444; stroke-width: 2px; }
+        .bar-rect { fill: #ef4444; }
+        .brush .selection { fill: #ef4444; fill-opacity: 0.3; stroke: #ef4444; stroke-width: 1px; }
+        .brush .handle { fill: #ef4444; width: 6px; }
+        
+        /* Invisible overlay for capturing mouse events on line chart */
+        .overlay { fill: none; pointer-events: all; }
+
+        /* D3 Tooltip */
+        #d3-tooltip {
+            position: absolute; opacity: 0; background: rgba(31, 41, 55, 0.95); border: 1px solid #374151;
+            color: #f9fafb; padding: 6px 12px; border-radius: 6px; pointer-events: none; font-size: 0.85rem; font-weight: 500;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3); z-index: 99999;
+            backdrop-filter: blur(4px); transform: translate(-50%, -100%); margin-top: -10px; white-space: nowrap;
+            transition: opacity 0.15s ease;
+        }
+
+        /* Rank Badge on Skin Viewer */
+        .rank-badge {
+            position: absolute; top: 8px; left: 8px; z-index: 20;
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px; color: #fff;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .rank-badge.rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-color: #fde68a; }
+        .rank-badge.rank-2 { background: linear-gradient(135deg, #9ca3af, #6b7280); border-color: #d1d5db; }
+        .rank-badge.rank-3 { background: linear-gradient(135deg, #d97706, #b45309); border-color: #fbbf24; }
+        .rank-badge.rank-other { background: linear-gradient(135deg, #374151, #1f2937); border-color: #4b5563; }
+
+        /* Username tile with online dot */
+        .username-tile {
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+        .online-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+            position: relative; cursor: default;
+        }
+        .online-dot::after {
+            content: attr(data-tooltip);
+            position: absolute; left: 50%; top: -32px; transform: translateX(-50%);
+            background: #1f2937; color: #e5e7eb; font-size: 11px; font-weight: 500;
+            padding: 3px 10px; border-radius: 6px; white-space: nowrap;
+            border: 1px solid #374151; pointer-events: none;
+            opacity: 0; transition: opacity 0.15s ease;
+        }
+        .online-dot:hover::after { opacity: 1; }
+        .online-dot.is-online { background-color: #10b981; box-shadow: 0 0 6px #10b981; }
+        .online-dot.is-offline { background-color: #ef4444; }
+
+        /* Heatmap Range Slider */
+        .range-slider-container {
+            position: relative; width: 100%; height: 40px; margin: 12px 0 4px;
+        }
+        .range-slider-container input[type="range"] {
+            position: absolute; width: 100%; top: 0; height: 40px; margin: 0;
+            -webkit-appearance: none; appearance: none; background: none; pointer-events: none; z-index: 2;
+        }
+        .range-slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 16px; height: 16px; border-radius: 50%; background: #ef4444;
+            border: 2px solid #fff; cursor: pointer; pointer-events: all;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+        .range-slider-container input[type="range"]::-moz-range-thumb {
+            width: 16px; height: 16px; border-radius: 50%; background: #ef4444;
+            border: 2px solid #fff; cursor: pointer; pointer-events: all;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+        .range-slider-track {
+            position: absolute; top: 18px; height: 4px; background: #374151; width: 100%;
+            border-radius: 2px; z-index: 0;
+        }
+        .range-slider-highlight {
+            position: absolute; top: 18px; height: 4px; background: #ef4444;
+            border-radius: 2px; z-index: 1;
+        }
+        .range-slider-ticks {
+            display: flex; justify-content: space-between; position: relative;
+            margin-top: 2px; padding: 0 8px; height: 16px;
+        }
+        .range-slider-ticks span {
+            font-size: 9px; color: #6b7280; white-space: nowrap;
+        }
+
+        /* Heatmap Styles */
+        .heatmap-container { overflow-x: auto; }
+        .heatmap-grid { display: grid; gap: 2px; }
+        .heatmap-cell {
+            border-radius: 2px; cursor: pointer; min-width: 18px; min-height: 22px;
+        }
+        .heatmap-label {
+            font-size: 11px; color: #9ca3af; display: flex; align-items: center;
+            justify-content: flex-end; padding-right: 6px; white-space: nowrap;
+        }
+        .heatmap-hour-label {
+            font-size: 10px; color: #6b7280; text-align: center;
+        }
+
+        /* Daily Activity Chart Styles */
+        .activity-chart-container {
+            position: relative;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .activity-chart-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+        }
+        .activity-week-nav {
+            display: flex; align-items: center; gap: 6px;
+        }
+        .activity-week-nav button {
+            padding: 6px 12px; border-radius: 6px; font-size: 13px;
+            background: #1f2937; color: #9ca3af; border: 1px solid #374151;
+            cursor: pointer; transition: all 0.15s;
+            min-width: 36px; min-height: 36px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .activity-week-nav button:hover { background: #374151; color: #fff; }
+        .activity-week-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .activity-week-label {
+            font-size: 14px; font-weight: 600; color: #e5e7eb;
+            cursor: pointer; padding: 6px 12px; border-radius: 6px;
+            transition: background 0.15s; text-align: center;
+        }
+        .activity-week-label:hover { background: #1f2937; }
+        .activity-grid {
+            display: grid; gap: 0;
+        }
+        .activity-session-block {
+            position: absolute; left: 0; right: 0;
+            background: rgba(239, 68, 68, 0.6);
+            border-radius: 2px; min-height: 1px;
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+        .activity-session-block:hover {
+            background: rgba(239, 68, 68, 0.9);
+        }
+        .activity-online-now {
+            position: absolute; left: 0; right: 0; height: 3px;
+            background: #10b981; z-index: 5;
+            box-shadow: 0 0 6px #10b981;
+        }
+        .activity-online-label {
+            position: absolute; right: 4px; top: -16px;
+            font-size: 10px; color: #6b7280; white-space: nowrap;
+        }
+        .activity-day-col {
+            position: relative; border-right: 1px solid #1f2937;
+        }
+        .activity-day-col:last-child { border-right: none; }
+        .activity-hour-line {
+            position: absolute; left: 0; right: 0;
+            border-top: 1px solid rgba(55, 65, 81, 0.5);
+            pointer-events: none;
+        }
+        .activity-tooltip {
+            position: fixed; background: rgba(31, 41, 55, 0.95); border: 1px solid #374151;
+            color: #f9fafb; padding: 6px 12px; border-radius: 6px;
+            font-size: 0.85rem; font-weight: 500; pointer-events: none; z-index: 99999;
+            white-space: nowrap; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            opacity: 0; transition: opacity 0.12s; backdrop-filter: blur(4px);
+            transform: translate(-50%, -100%); margin-top: -10px;
+        }
+
+        /* Mobile tap tooltip */
+        .activity-tap-tooltip {
+            position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+            background: rgba(31, 41, 55, 0.95); border: 1px solid #374151;
+            color: #f9fafb; padding: 10px 16px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 500; z-index: 99999; text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            opacity: 0; transition: opacity 0.2s; pointer-events: none;
+            max-width: 90vw;
+        }
+        .activity-tap-tooltip.visible {
+            opacity: 1;
+        }
+
+        /* Mobile responsive for activity chart */
+        @media (max-width: 640px) {
+            .activity-chart-header {
+                flex-direction: column; align-items: flex-start;
+            }
+            .activity-week-label {
+                font-size: 12px; padding: 4px 8px;
+            }
+            .activity-week-nav {
+                width: 100%; justify-content: space-between;
+            }
+            .activity-online-label {
+                font-size: 8px; right: 1px; top: -13px;
+            }
+            .week-picker-dialog {
+                padding: 16px; max-height: 85vh; width: 95%;
+            }
+            .week-picker-item {
+                padding: 10px 10px; font-size: 14px;
+            }
+        }
+
+        /* Week Picker Dialog */
+        .week-picker-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        .week-picker-overlay.open {
+            opacity: 1; pointer-events: all;
+        }
+        .week-picker-dialog {
+            background: #111827; border: 1px solid #374151; border-radius: 12px;
+            padding: 24px; max-width: 420px; width: 90%; max-height: 80vh;
+            overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            transform: scale(0.95); transition: transform 0.2s;
+        }
+        .week-picker-overlay.open .week-picker-dialog {
+            transform: scale(1);
+        }
+        .week-picker-dialog h3 {
+            font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px;
+        }
+        .week-picker-month-group {
+            margin-bottom: 12px;
+        }
+        .week-picker-month-label {
+            font-size: 12px; font-weight: 600; color: #6b7280;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        .week-picker-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; border-radius: 6px; cursor: pointer;
+            transition: background 0.12s; font-size: 13px; color: #d1d5db;
+        }
+        .week-picker-item:hover { background: #1f2937; }
+        .week-picker-item.active {
+            background: rgba(239, 68, 68, 0.15); color: #ef4444; font-weight: 600;
+        }
+        .week-picker-item .wp-hours {
+            font-size: 12px; color: #6b7280; font-variant-numeric: tabular-nums;
+        }
+        .week-picker-item.active .wp-hours { color: #ef4444; }
+    </style>
+    
+<script src="../../components/analytics.js" defer></script>
+<script src="../../components/navbar.js" defer></script>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col">
+    <custom-navbar></custom-navbar>
+
+    <div id="calendar-tooltip"></div>
+    <div id="d3-tooltip"></div>
+
+    <div class="h-[100px]"></div>
+
+    <main class="flex-grow py-10 px-4">
+        
+        <!-- VIEW: LIST (Default) -->
+        <div id="view-list" class="max-w-[95%] mx-auto w-full flex flex-col lg:flex-row gap-8">
+            
+            <!-- Left Sidebar: Leaderboard (20%) -->
+            <div class="w-full lg:w-1/5 flex flex-col gap-6 lg:sticky lg:top-24">
+                <div class="bg-gray-900 rounded-lg border border-gray-800 p-4 h-fit">
+                    <h2 class="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
+                        <i data-feather="bar-chart-2"></i> Leaderboard
+                    </h2>
+                    
+                    <!-- Tabs -->
+                    <div class="flex gap-2 mb-4 bg-gray-800 p-1 rounded-lg">
+                        <button onclick="switchLeaderboard('weekly')" id="tab-weekly" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors bg-nara-red text-white font-bold">Weekly</button>
+                        <button onclick="switchLeaderboard('monthly')" id="tab-monthly" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Monthly</button>
+                        <button onclick="switchLeaderboard('alltime')" id="tab-alltime" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors text-gray-400 hover:text-white">All-Time</button>
+                    </div>
+
+                    <!-- List -->
+                    <div id="leaderboard-list" class="space-y-3 leaderboard-scroll max-h-[60vh] overflow-y-auto pr-2">
+                        <!-- Populated by JS -->
+                        <div class="text-center text-gray-500 py-4">Loading...</div>
+                    </div>
+                    
+                    <div class="mt-4 text-xs text-gray-500 text-center border-t border-gray-800 pt-3">
+                        Updated daily at 12am UTC
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300">
+                    <p class="font-semibold text-white">Sources</p>
+                    <p class="mt-2 leading-relaxed">Playtime stats are provided by <a href="https://api.civinfo.net" target="_blank" class="text-nara-red hover:underline">api.civinfo.net</a>. Please contact <span class="font-medium">Gjum</span> if you spot any data errors. Player heads are sourced from <a href="https://mc-heads.net" target="_blank" class="text-nara-red hover:underline">mc-heads.net</a> and <a href="https://minotar.net" target="_blank" class="text-nara-red hover:underline">minotar.net</a>.</p>
+                    
+                    <p class="">Performance errors are likely my fault.</p>
+                </div>
+            </div>
+
+            <!-- Right Content: Player Grid (80%) -->
+            <div class="w-full lg:w-4/5">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <h1 class="text-4xl font-bold text-primary flex items-center gap-3">
+                        Online Players 
+                        <span class="text-gray-400 text-2xl flex items-center gap-2">
+                            <i data-feather="users" class="w-6 h-6"></i> <span id="header-count">0</span>
+                        </span>
+                    </h1>
+                    
+                    <!-- Search -->
+                    <div class="relative w-full md:w-[30%]">
+                        <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                        <input type="text" id="player-search" placeholder="Search players..." 
+                               class="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-nara-red transition-colors">
+                    </div>
+                </div>
+
+                <!-- Grid -->
+                <div id="player-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                    <!-- Populated by JS -->
+                    <div class="col-span-full text-center py-12 text-gray-500">
+                        Loading player data...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: PROFILE (Hidden by default) -->
+        <div id="view-profile" class="hidden max-w-[95%] mx-auto w-full flex flex-col lg:flex-row gap-8">
+            
+            <!-- Left Sidebar: Profile Info (25%) -->
+            <div class="w-full lg:w-1/4 flex flex-col gap-6 lg:sticky lg:top-24 lg:self-start">
+                <!-- Added Box Container -->
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-6 h-fit flex flex-col items-center text-center">
+                    
+                    <!-- 3D Skin Viewer Container -->
+                    <div class="relative mb-4 w-full flex justify-center">
+                        <div id="rank-badge-container"></div>
+                        <canvas id="skin-canvas" class="rounded-lg"></canvas>
+                    </div>
+
+                    <div class="mb-6 flex justify-center">
+                        <div class="username-tile">
+                            <span id="profile-online-dot" class="online-dot is-offline" data-tooltip="Offline"></span>
+                            <h1 id="profile-username" class="text-3xl font-bold text-white"></h1>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full space-y-4 text-left text-sm">
+                        <div class="bg-gray-800/50 p-3 rounded-lg">
+                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Total Playtime</div>
+                            <div id="profile-playtime" class="text-xl font-mono text-primary">Loading...</div>
+                        </div>
+                        
+                        <div class="bg-gray-800/50 p-3 rounded-lg">
+                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">First Join</div>
+                            <div id="profile-first-join" class="text-white">Loading...</div>
+                        </div>
+                        
+                        <div class="bg-gray-800/50 p-3 rounded-lg">
+                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Last Join</div>
+                            <div id="profile-last-join" class="text-white">Loading...</div>
+                        </div>
+
+                        <div id="profile-status-container" class="bg-gray-800/50 p-3 rounded-lg hidden">
+                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Status</div>
+                            <div id="profile-status" class="text-green-400 font-semibold">Online</div>
+                        </div>
+
+                        <div id="profile-last-logout-container" class="bg-gray-800/50 p-3 rounded-lg hidden">
+                            <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Last Logout</div>
+                            <div id="profile-last-logout" class="text-white">Loading...</div>
+                        </div>
+
+                        <a id="profile-namemc" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-gray-300 hover:text-white">
+                            <i data-feather="external-link" class="w-4 h-4"></i> NameMC Profile
+                        </a>
+                        
+                        <button onclick="goBackToList()" class="flex items-center justify-center gap-2 w-full py-2 border border-gray-700 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-white mt-4">
+                            <i data-feather="arrow-left" class="w-4 h-4"></i> Back to List
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300">
+                    <p class="font-semibold text-white">Sources</p>
+                    <p class="mt-2 leading-relaxed">Playtime stats are provided by <a href="https://api.civinfo.net" target="_blank" class="text-nara-red hover:underline">api.civinfo.net</a>. Please contact <span class="font-medium">Gjum</span> if you spot any data errors. Player skins are sourced from <a href="https://mc-heads.net" target="_blank" class="text-nara-red hover:underline">mc-heads.net</a>.</p>
+                    <p class="">Performance errors are likely my fault.</p>
+                </div>
+            </div>
+
+            <!-- Right Content: Charts (75%) -->
+            <div class="w-full lg:w-3/4 flex flex-col gap-6">
+                
+                <!-- Chart Container -->
+                <div class="bg-gray-900 rounded-lg border border-gray-800 p-4 relative">
+                    <!-- Header / Controls -->
+                    <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+                        
+                        <!-- Tabs (Left) -->
+                        <div class="flex flex-wrap bg-gray-800 rounded-lg p-1 gap-1">
+                            <button onclick="switchChart('activity')" id="chart-tab-activity" class="px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold">Hourly Activity</button>
+                            <button onclick="switchChart('heatmap')" id="chart-tab-heatmap" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Heatmap</button>
+                            <button onclick="switchChart('calendar')" id="chart-tab-calendar" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Calendar</button>
+                            <button onclick="switchChart('bar')" id="chart-tab-bar" class="px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Bar</button>
+                        </div>
+
+                        <!-- Granularity Toggle (Right) - Only shown for line/bar charts -->
+                        <div id="granularity-controls" class="hidden flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Smoothing:</span>
+                            <div class="flex bg-gray-800 rounded-lg p-1">
+                                <button onclick="setGranularity('daily')" id="granularity-daily" class="px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white">Daily</button>
+                                <button onclick="setGranularity('weekly')" id="granularity-weekly" class="px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold">Weekly</button>
+                            </div>
+                        </div>
+
+                        <!-- Heatmap Display Mode (Right) - Only shown for heatmap -->
+                        <div id="heatmap-controls" class="hidden flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Display:</span>
+                            <div class="flex bg-gray-800 rounded-lg p-1">
+                                <button onclick="setHeatmapMode('percent')" id="heatmap-mode-percent" class="px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold">% Playtime</button>
+                                <button onclick="setHeatmapMode('total')" id="heatmap-mode-total" class="px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white">Total Time</button>
+                                <button onclick="setHeatmapMode('chance')" id="heatmap-mode-chance" class="px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white">% Log On Chance</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- D3 Chart Wrapper -->
+                    <div id="chart-wrapper" class="w-full">
+                        <div id="chart-calendar" class="w-full min-h-[400px]"></div>
+                        <div id="chart-d3-main" class="w-full h-[350px] hidden chart-container"></div>
+                        <div id="chart-d3-brush" class="w-full h-[60px] hidden mt-2 chart-container"></div>
+                        <div id="chart-heatmap" class="w-full min-h-[300px] hidden"></div>
+                        <div id="chart-activity" class="w-full min-h-[400px] hidden"></div>
+                    </div>
+
+                    <!-- Week Picker Dialog -->
+                    <div id="week-picker-overlay" class="week-picker-overlay">
+                        <div class="week-picker-dialog">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="!mb-0">Pick a Week</h3>
+                                <button onclick="closeWeekPicker()" class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+                            </div>
+                            <div id="week-picker-list"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-500 mt-2 text-center">
+                        <span id="chart-hint-zoom" class="hidden">Drag the bottom bar to filter range.</span>
+                    </div>
+                </div>
+
+                <!-- Monthly Data List -->
+                <div class="bg-gray-900 rounded-lg border border-gray-800 p-6">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-2">
+                        <h3 class="text-xl font-bold text-white">Monthly Playdata</h3>
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <span class="text-xs text-gray-400">Show Empty Months</span>
+                            <div class="relative inline-flex items-center">
+                                <input type="checkbox" id="toggle-empty-months" class="sr-only peer" onchange="toggleShowEmptyMonths()">
+                                <div class="w-9 h-5 bg-gray-700 rounded-full peer-checked:bg-red-500 transition-colors"></div>
+                                <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                            </div>
+                        </label>
+                    </div>
+                    <div id="monthly-data-container" class="flex flex-wrap gap-6"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <custom-footer></custom-footer>
+    <script src="../../components/footer.js"></script>
+    
+    <script>
+        // --- Global State ---
+        let allPlayers = [];
+        let leaderboardData = [];
+        let currentLeaderboardTab = 'weekly';
+        let profileData = null;
+        let skinViewer = null;
+        let currentChartType = 'calendar';
+        let currentGranularity = 'weekly'; 
+        let userGranularityPreference = 'weekly'; // User's preferred granularity (daily or weekly)
+        let durationIntervalId = null;
+        let showEmptyMonths = false;
+        const INITIAL_OFFLINE_LIMIT = 50; // Only render what fits on screen initially
+        const OFFLINE_BATCH_SIZE = 30;
+        const PREFETCH_AHEAD = 100;
+        
+        // Cache DOM elements
+        let cachedElements = {
+            playerGrid: null,
+            playerSearch: null,
+            headerCount: null,
+            viewList: null,
+            viewProfile: null
+        };
+
+        let filteredPlayers = [];
+        let onlinePlayers = [];
+        let offlinePlayers = [];
+        let offlineIndex = 0;
+        let loadMoreObserver = null;
+        const loadMoreSentinel = document.createElement('div');
+        loadMoreSentinel.id = 'player-grid-sentinel';
+        loadMoreSentinel.className = 'h-8 col-span-full';
+        const prefetchedAvatars = new Set();
+
+        const pathSegments = window.location.pathname.split('/').filter(p => p);
+        const statsIndex = pathSegments.indexOf('stats');
+        const baseStatsPath = statsIndex === -1
+            ? window.location.pathname
+            : '/' + pathSegments.slice(0, statsIndex + 1).join('/') + '/';
+
+        const ICON_CLOCK = '<svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+        const ICON_LOGOUT = '<svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>';
+
+        let avatarObserver = null;
+        
+        const SERVER_START_DATE = 1654041600000; 
+        const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+        const MAX_SESSION_MS = 23.8 * 60 * 60 * 1000; 
+        const MAX_DATALABELS_RANGE = 14 * 24 * 60 * 60 * 1000;
+
+        // Custom fetch wrapper to add identifying header
+        const API_HEADERS = { 'X-Client-Source': 'nara.rocks/stats' };
+        function fetchAPI(url) {
+            return fetch(url, { headers: API_HEADERS });
+        }
+
+        // Avatar hash checking
+        let badAvatarHashes = new Set();
+        let hashCheckInitialized = false;
+
+        // Calculate image hash
+        async function getImageHash(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        
+                        // Simple hash: sum of all pixel values
+                        let hash = 0;
+                        for (let i = 0; i < imageData.data.length; i++) {
+                            hash = ((hash << 5) - hash) + imageData.data[i];
+                            hash = hash & hash; // Convert to 32bit integer
+                        }
+                        resolve(hash.toString());
+                    } catch (e) {
+                        reject(e);
+                    }
+                };
+                img.onerror = () => reject(new Error('Failed to load image'));
+                img.src = url;
+            });
+        }
+
+        // Initialize bad avatar hashes
+        async function initializeBadHashes() {
+            if (hashCheckInitialized) return;
+            try {
+                const blackHash = await getImageHash('../../static/black.png');
+                const steveHash = await getImageHash('../../static/steve.png');
+                badAvatarHashes.add(blackHash);
+                badAvatarHashes.add(steveHash);
+                console.log('Bad avatar hashes initialized:', Array.from(badAvatarHashes));
+                hashCheckInitialized = true;
+            } catch (e) {
+                console.error('Failed to initialize bad hashes:', e);
+            }
+        }
+
+        // Check if an avatar URL returns a bad hash
+        async function isAvatarBad(url) {
+            if (!hashCheckInitialized) await initializeBadHashes();
+            try {
+                const hash = await getImageHash(url);
+                const isBad = badAvatarHashes.has(hash);
+                return isBad;
+            } catch (e) {
+                return false; // If we can't check, assume it's okay
+            }
+        }
+
+        // --- External Script Loading ---
+        const scriptCache = {};
+
+        function loadExternalScript(src) {
+            if (!scriptCache[src]) {
+                scriptCache[src] = new Promise((resolve, reject) => {
+                    const existing = document.querySelector(`script[src="${src}"]`);
+                    if (existing) {
+                        if (existing.dataset.loaded === 'true') {
+                            resolve();
+                            return;
+                        }
+                        existing.addEventListener('load', () => resolve());
+                        existing.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)));
+                        return;
+                    }
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.async = true;
+                    script.dataset.loading = 'true';
+                    script.onload = () => {
+                        script.dataset.loaded = 'true';
+                        delete script.dataset.loading;
+                        resolve();
+                    };
+                    script.onerror = () => {
+                        script.remove();
+                        delete scriptCache[src];
+                        reject(new Error(`Failed to load ${src}`));
+                    };
+                    document.head.appendChild(script);
+                });
+            }
+            return scriptCache[src];
+        }
+
+        async function ensureD3() {
+            if (!window.d3) {
+                await loadExternalScript('https://d3js.org/d3.v7.min.js');
+            }
+        }
+
+        async function ensureSkinview() {
+            if (!window.skinview3d) {
+                await loadExternalScript('https://bs-community.github.io/skinview3d/js/skinview3d.bundle.js');
+            }
+        }
+
+        function refreshIcons() {
+            if (window.feather) {
+                feather.replace();
+            }
+        }
+
+        function ensureAvatarObserver() {
+            if (!('IntersectionObserver' in window)) {
+                return null;
+            }
+            if (!avatarObserver) {
+                avatarObserver = new IntersectionObserver((entries) => {
+                    for (let i = 0; i < entries.length; i++) {
+                        const entry = entries[i];
+                        if (!entry.isIntersecting) continue;
+                        const img = entry.target;
+                        avatarObserver.unobserve(img);
+                        const username = img.dataset.username;
+                        if (username) resolveAvatarUrl(username, img);
+                    }
+                }, { rootMargin: '500px' }); // Load avatars 500px before they enter viewport
+            }
+            return avatarObserver;
+        }
+
+        function ensureLoadMoreObserver() {
+            if (!('IntersectionObserver' in window)) {
+                return null;
+            }
+            if (!loadMoreObserver) {
+                loadMoreObserver = new IntersectionObserver((entries) => {
+                    if (entries.some(entry => entry.isIntersecting)) {
+                        loadMoreOfflinePlayers();
+                    }
+                }, { rootMargin: '200px' });
+            }
+            return loadMoreObserver;
+        }
+
+        function setupInfiniteScroll(grid) {
+            const observer = ensureLoadMoreObserver();
+            if (!observer) return;
+            if (!grid.contains(loadMoreSentinel)) {
+                grid.appendChild(loadMoreSentinel);
+            }
+            observer.observe(loadMoreSentinel);
+        }
+
+        function teardownInfiniteScroll() {
+            if (loadMoreObserver) {
+                loadMoreObserver.disconnect();
+            }
+            if (loadMoreSentinel.parentElement) {
+                loadMoreSentinel.parentElement.removeChild(loadMoreSentinel);
+            }
+        }
+
+        function appendPlayerCards(grid, players, isEager = false) {
+            if (!players.length) return;
+            const now = Date.now();
+            const fragment = document.createDocumentFragment();
+            const observer = isEager ? null : ensureAvatarObserver();
+            const imagesToLoad = [];
+            
+            for (let i = 0; i < players.length; i++) {
+                const player = players[i];
+                const statusClass = player.isOnline ? 'status-online' : 'status-offline';
+                const referenceTime = player.isOnline ? player.loginTime : player.logoutTime;
+                const tooltipTime = referenceTime ? new Date(referenceTime).toLocaleString() : 'Unknown';
+
+                let statusContent;
+                if (player.isOnline) {
+                    statusContent = `${ICON_CLOCK}<span>Online for <span class="duration-text" data-login="${player.loginTime}">${player.durationHours}h ${player.durationMinutes}m</span></span>`;
+                } else {
+                    const diffMs = referenceTime ? now - referenceTime : 0;
+                    const diffDays = Math.floor(diffMs / 86400000);
+                    statusContent = `${ICON_LOGOUT}<span>${diffDays < 1 ? 'Offline < 1 day' : `Offline for ${diffDays} days`}</span>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'player-card bg-gray-900 border border-gray-800 rounded-lg p-4 flex flex-col items-center gap-3 relative cursor-pointer';
+                card.dataset.username = player.username;
+                
+                card.innerHTML = `<div class="relative"><img class="w-20 h-20 rounded-md shadow-lg bg-gray-800" alt="" data-username="${player.username}"><div class="${statusClass} status-indicator"></div></div><div class="font-bold text-white text-lg truncate w-full text-center mt-2">${player.username}</div><div class="text-center w-full mt-1"><div class="relative group cursor-help flex items-center justify-center gap-2 text-sm text-gray-400 font-medium">${statusContent}<div class="time-tooltip">${tooltipTime}</div></div></div>`;
+                
+                // Collect image reference directly
+                const img = card.querySelector('img');
+                if (img) imagesToLoad.push({ img, username: player.username });
+                
+                fragment.appendChild(card);
+            }
+
+            // Insert all cards at once
+            const insertionPoint = loadMoreSentinel.parentElement === grid ? loadMoreSentinel : null;
+            if (insertionPoint) {
+                grid.insertBefore(fragment, insertionPoint);
+            } else {
+                grid.appendChild(fragment);
+            }
+
+            // Load avatars from collected references (no DOM query needed)
+            for (let i = 0; i < imagesToLoad.length; i++) {
+                const { img, username } = imagesToLoad[i];
+                if (isEager) {
+                    resolveAvatarUrl(username, img, true);
+                } else if (observer) {
+                    observer.observe(img);
+                } else {
+                    resolveAvatarUrl(username, img);
+                }
+            }
+        }
+
+        function cacheAvatar(username) {
+            if (!username || prefetchedAvatars.has(username)) return;
+            prefetchedAvatars.add(username);
+            const img = new Image();
+            img.src = `https://mc-heads.net/avatar/${username}/32`;
+        }
+
+        function cacheUpcomingAvatars(startIndex) {
+            const endIndex = Math.min(startIndex + PREFETCH_AHEAD, offlinePlayers.length);
+            for (let i = startIndex; i < endIndex; i++) {
+                cacheAvatar(offlinePlayers[i].username);
+            }
+        }
+
+        function loadMoreOfflinePlayers() {
+            if (offlineIndex >= offlinePlayers.length) {
+                teardownInfiniteScroll();
+                return;
+            }
+            const grid = document.getElementById('player-grid');
+            if (!grid) return;
+            const nextCount = Math.min(OFFLINE_BATCH_SIZE, offlinePlayers.length - offlineIndex);
+            const nextBatch = offlinePlayers.slice(offlineIndex, offlineIndex + nextCount);
+            offlineIndex += nextCount;
+            appendPlayerCards(grid, nextBatch);
+            cacheUpcomingAvatars(offlineIndex);
+
+            if (offlineIndex >= offlinePlayers.length) {
+                teardownInfiniteScroll();
+            }
+        }
+
+        // Debounce function for search
+        let searchTimeout = null;
+        function debouncedRenderPlayers(searchValue) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                renderPlayers();
+                updateURL(searchValue, null);
+                // Check avatars after search filter
+                scheduleAvatarCheck();
+            }, 200);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cache shared elements because profile logic references them.
+            cachedElements.playerGrid = document.getElementById('player-grid');
+            cachedElements.playerSearch = document.getElementById('player-search');
+            cachedElements.headerCount = document.getElementById('header-count');
+            cachedElements.viewList = document.getElementById('view-list');
+            cachedElements.viewProfile = document.getElementById('view-profile');
+
+            const requestedPlayer = getRequestedPlayerFromLocation();
+            if (!requestedPlayer) {
+                window.location.replace(baseStatsPath);
+                return;
+            }
+
+            cachedElements.viewList.classList.add('hidden');
+            cachedElements.viewProfile.classList.remove('hidden');
+
+            document.addEventListener('click', (e) => {
+                const menu = document.getElementById('settings-menu');
+                const btn = document.getElementById('settings-btn');
+                if (!menu || !btn) return;
+                if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+
+            const settingsBtn = document.getElementById('settings-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', () => {
+                    document.getElementById('settings-menu').classList.toggle('hidden');
+                });
+            }
+
+            loadLeaderboard();
+            handleRouting();
+        });
+
+        window.addEventListener('popstate', handleRouting);
+        let resizeDebounceTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeDebounceTimer);
+            resizeDebounceTimer = setTimeout(async () => {
+                if (currentChartType !== 'calendar' && profileData) {
+                    await ensureD3();
+                    renderD3Chart(currentChartType);
+                }
+            }, 150);
+        });
+
+        function getRequestedPlayerFromLocation() {
+            const params = new URLSearchParams(window.location.search);
+            const queryPlayer = params.get('player');
+            if (queryPlayer) return queryPlayer;
+
+            const pathParts = window.location.pathname.split('/').filter(p => p);
+            const statsPathIndex = pathParts.indexOf('stats');
+            if (statsPathIndex === -1) return null;
+            const trailingSegments = pathParts.slice(statsPathIndex + 1);
+            if (trailingSegments.length !== 1) return null;
+
+            const slug = trailingSegments[0];
+            if (!slug || slug === 'user' || slug === 'index.html') return null;
+            return decodeURIComponent(slug);
+        }
+
+        function handleRouting() {
+            const player = getRequestedPlayerFromLocation();
+            if (!player) {
+                window.location.replace(baseStatsPath);
+                return;
+            }
+            showProfileView(player);
+        }
+
+        function goBackToList() {
+            window.location.href = baseStatsPath;
+        }
+
+        function showListView(searchTerm, scrollToTop = false) {
+            cachedElements.viewList.classList.remove('hidden');
+            cachedElements.viewProfile.classList.add('hidden');
+            if (searchTerm) cachedElements.playerSearch.value = searchTerm;
+            if (allPlayers.length === 0) { loadLeaderboard(); fetchPlayers(); }
+            else renderPlayers();
+            refreshIcons();
+            if (skinViewer) { skinViewer.dispose(); skinViewer = null; }
+            if (scrollToTop) window.scrollTo(0, 0);
+        }
+
+        // --- Player Names Cache (for case-sensitivity spell checking + UUID lookup) ---
+        let playerNamesMap = null; // Map<lowercaseName, { name, uuid }>
+
+        async function loadPlayerNamesCache() {
+            if (playerNamesMap) return playerNamesMap;
+            try {
+                const resp = await fetch('../../data/player_names.json');
+                if (resp.ok) {
+                    const data = await resp.json();
+                    playerNamesMap = new Map();
+                    // Format: { "PlayerName": "uuid", ... }
+                    for (const [name, uuid] of Object.entries(data)) {
+                        playerNamesMap.set(name.toLowerCase(), { name, uuid });
+                    }
+                } else {
+                    playerNamesMap = new Map();
+                }
+            } catch (e) {
+                console.warn('Failed to load player_names.json:', e);
+                playerNamesMap = new Map();
+            }
+            return playerNamesMap;
+        }
+
+        // Resolve correct-case username and UUID via local cache first, then Mojang API
+        async function resolveCorrectUsername(inputName) {
+            // Step 1: Check local player_names.json cache (fast, includes UUID)
+            const cache = await loadPlayerNamesCache();
+            const cached = cache.get(inputName.toLowerCase());
+            if (cached) {
+                // Player exists in our cache — use correct case + UUID, skip Mojang entirely
+                return { username: cached.name, uuid: cached.uuid || null };
+            }
+
+            // Step 2: Not in cache — try Ashcon Mojang proxy (CORS-friendly, case-insensitive)
+            try {
+                const resp = await fetch(`https://api.ashcon.app/mojang/v2/user/${encodeURIComponent(inputName)}`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data.username && data.uuid) {
+                        return { username: data.username, uuid: data.uuid.replace(/-/g, '') };
+                    }
+                }
+            } catch (e) {
+                console.warn('Ashcon lookup failed, trying fallbacks:', e);
+            }
+
+            // Step 3: Fallback — PlayerDB (another CORS-friendly Mojang proxy)
+            try {
+                const resp = await fetch(`https://playerdb.co/api/player/minecraft/${encodeURIComponent(inputName)}`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data.success && data.data?.player?.username) {
+                        return {
+                            username: data.data.player.username,
+                            uuid: data.data.player.raw_id || null,
+                        };
+                    }
+                }
+            } catch (e) {
+                console.warn('PlayerDB lookup failed:', e);
+            }
+
+            // Last resort: return input as-is
+            return { username: inputName, uuid: null };
+        }
+
+        async function showProfileView(username) {
+            cachedElements.viewList.classList.add('hidden');
+            cachedElements.viewProfile.classList.remove('hidden');
+            document.getElementById('profile-username').textContent = username;
+            document.getElementById('profile-playtime').textContent = 'Loading...';
+            document.getElementById('chart-calendar').innerHTML = '<div class="text-center py-20 text-gray-500">Loading history...</div>';
+            document.getElementById('monthly-data-container').innerHTML = '';
+            document.getElementById('profile-status-container').classList.add('hidden');
+            document.getElementById('profile-last-logout-container').classList.add('hidden');
+            document.getElementById('rank-badge-container').innerHTML = '';
+            document.getElementById('profile-online-dot').className = 'online-dot is-offline';
+            document.getElementById('profile-online-dot').setAttribute('data-tooltip', 'Offline');
+            heatmapSliderState = null;
+            activityCurrentWeekStart = null;
+            
+            // Resolve correct-case username via Mojang API (case-insensitive lookup)
+            const resolved = await resolveCorrectUsername(username);
+            username = resolved.username;
+            let playerUuid = resolved.uuid;
+
+            // Update display and URL if the case was corrected
+            document.getElementById('profile-username').textContent = username;
+            updateRankBadge(username);
+            const currentPath = window.location.pathname;
+            const expectedSuffix = '/' + encodeURIComponent(username);
+            if (!currentPath.endsWith(expectedSuffix)) {
+                const url = new URL(window.location);
+                url.pathname = baseStatsPath + encodeURIComponent(username);
+                url.searchParams.delete('player');
+                window.history.replaceState({}, '', url);
+            }
+
+            // If Mojang lookup didn't return a UUID, try civinfo mc-accounts
+            if (!playerUuid) {
+                try {
+                    const accountResponse = await fetchAPI(`https://api.civinfo.net/mc-accounts/all?mcName=${encodeURIComponent(username)}`);
+                    if (accountResponse.ok) {
+                        const accountData = await accountResponse.json();
+                        if (accountData.uuids && accountData.uuids.length > 0) {
+                            playerUuid = accountData.uuids[0];
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to fetch UUID:', e);
+                }
+            }
+            
+            let viewerAvailable = true;
+            try {
+                await ensureSkinview();
+            } catch (error) {
+                console.error(error);
+                viewerAvailable = false;
+            }
+            if (skinViewer) { skinViewer.dispose(); skinViewer = null; }
+            const canvas = document.getElementById("skin-canvas");
+            if (viewerAvailable && window.skinview3d) {
+                // Try UUID skin first, fall back to username if it fails
+                const primarySkinUrl = playerUuid ? `https://mc-heads.net/skin/${playerUuid}` : null;
+                const fallbackSkinUrl = `https://mc-heads.net/skin/${username}`;
+                const skinUrl = primarySkinUrl || fallbackSkinUrl;
+
+                skinViewer = new skinview3d.SkinViewer({ canvas: canvas, width: 250, height: 350, skin: skinUrl });
+                skinViewer.controls.enableZoom = true; skinViewer.controls.enableRotate = true;
+                skinViewer.animation = new skinview3d.WalkingAnimation(); skinViewer.animation.speed = 0.5;
+
+                // If using UUID skin, set up fallback to username on load failure
+                if (primarySkinUrl) {
+                    skinViewer.loadSkin(primarySkinUrl).catch(() => {
+                        console.warn(`UUID skin failed for ${playerUuid}, falling back to username`);
+                        skinViewer.loadSkin(fallbackSkinUrl).catch(() => {});
+                    });
+                }
+            }
+            document.getElementById('profile-namemc').href = `https://namemc.com/profile/${playerUuid ? playerUuid.replace(/-/g, '') : username}`;
+
+            try {
+                const response = await fetchAPI(`https://api.civinfo.net/mc-sessions/all?mcName=${encodeURIComponent(username)}`);
+                if (!response.ok) throw new Error('Failed to fetch history');
+                const data = await response.json();
+                processProfileData(data);
+            } catch (error) {
+                console.error(error);
+                document.getElementById('chart-calendar').innerHTML = '<div class="text-center py-20 text-red-500">Failed to load player history.</div>';
+            }
+            refreshIcons();
+        }
+
+        // --- Image Handling ---
+        function resolveAvatarUrl(username, imgElement, isEager = false) {
+            const primaryUrl = `https://mc-heads.net/avatar/${username}/32`;
+            const fallbackUrl = `https://minotar.net/avatar/${username}/32`;
+            
+            imgElement.loading = isEager ? 'eager' : 'lazy';
+            imgElement.decoding = 'async';
+            imgElement.src = primaryUrl;
+            
+            imgElement.onerror = () => {
+                if (imgElement.src !== fallbackUrl) {
+                    imgElement.onerror = null;
+                    imgElement.src = fallbackUrl;
+                }
+            };
+        }
+
+        // Schedule avatar check with delay to let images load first
+        let avatarCheckTimeout = null;
+        function scheduleAvatarCheck() {
+            clearTimeout(avatarCheckTimeout);
+            avatarCheckTimeout = setTimeout(() => {
+                checkAndFixBadAvatars();
+            }, 800); // Wait for images to load
+        }
+
+        // Check visible avatars for bad hashes and switch to fallback if needed
+        async function checkAndFixBadAvatars() {
+            if (!hashCheckInitialized) {
+                await initializeBadHashes();
+            }
+            if (!hashCheckInitialized) return; // Failed to initialize
+
+            const images = document.querySelectorAll('img[data-username][src*="mc-heads.net"]');
+            if (images.length === 0) return;
+
+            // Process in small batches to avoid blocking
+            const BATCH_SIZE = 10;
+            let index = 0;
+
+            async function processBatch() {
+                const endIndex = Math.min(index + BATCH_SIZE, images.length);
+                
+                for (let i = index; i < endIndex; i++) {
+                    const img = images[i];
+                    const username = img.dataset.username;
+                    if (!username || !img.complete) continue;
+                    
+                    try {
+                        const isBad = await isAvatarBad(img.src);
+                        if (isBad) {
+                            img.src = `https://minotar.net/avatar/${username}/32`;
+                        }
+                    } catch (e) {
+                        // Skip if we can't check
+                    }
+                }
+                
+                index = endIndex;
+                if (index < images.length) {
+                    // Process next batch on next idle or with timeout
+                    if ('requestIdleCallback' in window) {
+                        requestIdleCallback(processBatch, { timeout: 500 });
+                    } else {
+                        setTimeout(processBatch, 50);
+                    }
+                }
+            }
+
+            processBatch();
+        }
+
+        // --- Profile Logic ---
+        function ym(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function computeStats(payload) {
+            const login = payload?.loginTimestamps || [];
+            const logout = payload?.logoutTimestamps || [];
+
+            let totalHours = 0;
+            let sessions = 0;
+            const monthly = new Map(); // key -> hours
+            let firstSeen = null;
+            let lastSeen = null;
+
+            if (!login.length) {
+                return {
+                    totalHours: 0,
+                    sessions: 0,
+                    monthly: {},
+                    firstSeen: null,
+                    lastSeen: null,
+                    isOnline: false,
+                    onlineSince: null,
+                    currentSessionHours: 0,
+                };
+            }
+
+            // Determine most recent session by max login timestamp
+            let latestIdx = 0;
+            let latestLogin = login[0] || 0;
+            for (let i = 1; i < login.length; i++) {
+                if (login[i] && login[i] > latestLogin) {
+                    latestLogin = login[i];
+                    latestIdx = i;
+                }
+            }
+
+            const isOnline = Array.isArray(logout) && logout[latestIdx] === null;
+            const onlineSince = isOnline ? new Date(login[latestIdx]) : null;
+
+            let currentSessionHours = 0;
+            if (isOnline && onlineSince && !isNaN(onlineSince)) {
+                const now = new Date();
+                currentSessionHours = Math.max(0, (now - onlineSince) / (1000 * 60 * 60));
+                lastSeen = now;
+            }
+
+            // Aggregate completed sessions only (exclude ongoing/null logout rows)
+            const pairs = Math.min(login.length, logout.length);
+            for (let i = 0; i < pairs; i++) {
+                const li = login[i];
+                const lo = logout[i];
+                if (!li || lo === null) continue; // skip ongoing
+
+                const start = new Date(li);
+                const end = new Date(lo);
+                if (isNaN(start) || isNaN(end) || end <= start) continue;
+
+                const hours = (end - start) / (1000 * 60 * 60);
+                totalHours += hours;
+                sessions += 1;
+
+                const key = ym(start);
+                monthly.set(key, (monthly.get(key) || 0) + hours);
+
+                if (!firstSeen || start < firstSeen) firstSeen = start;
+                if (!lastSeen || end > lastSeen) lastSeen = end;
+            }
+
+            const monthlyObj = Object.fromEntries(
+                [...monthly.entries()].sort(([a], [b]) => (a < b ? -1 : 1))
+            );
+
+            return {
+                totalHours,
+                sessions,
+                monthly: monthlyObj,
+                firstSeen,
+                lastSeen,
+                isOnline,
+                onlineSince,
+                currentSessionHours,
+            };
+        }
+
+        function processProfileData(data) {
+            const stats = computeStats(data);
+
+            const logins = data.loginTimestamps || [];
+            const logouts = data.logoutTimestamps || [];
+
+            // Build daily playtime + raw sessions in a single pass
+            const dailyPlaytime = {};
+            const rawSessions = [];
+            const pairs = Math.min(logins.length, logouts.length);
+            for (let i = 0; i < pairs; i++) {
+                const li = logins[i];
+                const lo = logouts[i];
+                if (!li || lo == null || lo <= li) continue;
+
+                rawSessions.push({ login: li, logout: lo });
+
+                let currentTime = li;
+                while (currentTime < lo) {
+                    const d = new Date(currentTime);
+                    const dayStart = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+                    const dayEnd = dayStart + 86400000;
+                    const sessionEndOnThisDay = Math.min(lo, dayEnd);
+                    dailyPlaytime[dayStart] = (dailyPlaytime[dayStart] || 0) + (sessionEndOnThisDay - currentTime);
+                    currentTime = dayEnd;
+                }
+            }
+
+            // Convert monthly hours to ms for backward compat with chart rendering
+            const monthlyPlaytime = {};
+            for (const [key, hours] of Object.entries(stats.monthly)) {
+                monthlyPlaytime[key] = hours * 3600000;
+            }
+
+            // Prepare D3 Data (capped at 24h)
+            const MAX_DAILY_MS = 24 * 3600000;
+            const dailyData = [];
+            Object.keys(dailyPlaytime).sort((a, b) => a - b).forEach(ts => {
+                const capped = Math.min(dailyPlaytime[ts], MAX_DAILY_MS);
+                const hours = Math.min(24, capped / 3600000);
+                dailyData.push({ date: new Date(parseInt(ts)), value: hours });
+            });
+
+            const weeklyMap = {};
+            Object.keys(dailyPlaytime).forEach(ts => {
+                const d = new Date(parseInt(ts));
+                const day = d.getUTCDay(), diff = d.getUTCDate() - day + (day == 0 ? -6 : 1);
+                const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), diff));
+                const validMonday = Math.max(monday.getTime(), SERVER_START_DATE);
+                weeklyMap[validMonday] = (weeklyMap[validMonday] || 0) + Math.min(dailyPlaytime[ts], MAX_DAILY_MS);
+            });
+            const MAX_WEEKLY_H = 24 * 7;
+            const weeklyData = [];
+            Object.keys(weeklyMap).sort((a, b) => a - b).forEach(ts => {
+                const hours = Math.min(MAX_WEEKLY_H, weeklyMap[ts] / 3600000);
+                weeklyData.push({ date: new Date(parseInt(ts)), value: hours });
+            });
+
+            const totalMs = stats.totalHours * 3600000;
+            const firstJoin = stats.firstSeen ? stats.firstSeen.getTime() : 0;
+            const lastJoin = stats.lastSeen ? stats.lastSeen.getTime() : 0;
+
+            // Find the ongoing session login time if player is online
+            let ongoingLoginTime = null;
+            if (stats.isOnline && stats.onlineSince) {
+                ongoingLoginTime = stats.onlineSince.getTime();
+            }
+
+            profileData = { totalMs, firstJoin, lastJoin, dailyPlaytime, monthlyPlaytime, dailyData, weeklyData, rawSessions, isOnline: stats.isOnline, ongoingLoginTime };
+
+            document.getElementById('profile-playtime').textContent = stats.totalHours.toFixed(1) + 'h';
+
+            // Update online status dot
+            const onlineDot = document.getElementById('profile-online-dot');
+            onlineDot.className = 'online-dot ' + (stats.isOnline ? 'is-online' : 'is-offline');
+            onlineDot.setAttribute('data-tooltip', stats.isOnline ? 'Online' : 'Offline');
+
+            const dateTimeOpts = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' };
+
+            const statusContainer = document.getElementById('profile-status-container');
+            const lastLogoutContainer = document.getElementById('profile-last-logout-container');
+
+            if (stats.firstSeen) {
+                document.getElementById('profile-first-join').textContent = stats.firstSeen.toLocaleString(undefined, dateTimeOpts);
+                document.getElementById('profile-last-join').textContent = stats.lastSeen.toLocaleString(undefined, dateTimeOpts);
+
+                if (stats.isOnline) {
+                    statusContainer.classList.remove('hidden');
+                    lastLogoutContainer.classList.add('hidden');
+                } else {
+                    statusContainer.classList.add('hidden');
+                    // Find last logout time for display
+                    let lastLogoutTime = 0;
+                    for (let i = 0; i < logouts.length; i++) {
+                        if (logouts[i] && logouts[i] > lastLogoutTime) lastLogoutTime = logouts[i];
+                    }
+                    if (lastLogoutTime > 0) {
+                        document.getElementById('profile-last-logout').textContent = new Date(lastLogoutTime).toLocaleString(undefined, dateTimeOpts);
+                        lastLogoutContainer.classList.remove('hidden');
+                    } else {
+                        lastLogoutContainer.classList.add('hidden');
+                    }
+                }
+            } else {
+                document.getElementById('profile-first-join').textContent = "N/A";
+                document.getElementById('profile-last-join').textContent = "N/A";
+                statusContainer.classList.add('hidden');
+                lastLogoutContainer.classList.add('hidden');
+            }
+            renderMonthlyList();
+            const urlGraphType = new URLSearchParams(window.location.search).get('graph_type');
+            const validTypes = ['calendar', 'bar', 'heatmap', 'activity'];
+            switchChart(validTypes.includes(urlGraphType) ? urlGraphType : 'activity');
+        }
+
+        function renderMonthlyList() {
+            const container = document.getElementById('monthly-data-container');
+            container.innerHTML = '';
+            if (profileData.firstJoin === 0) return;
+            const start = new Date(profileData.firstJoin); const end = new Date();
+            let current = new Date(start.getFullYear(), start.getMonth(), 1);
+            let monthBuffer = [];
+            while (current <= end) {
+                const year = current.getFullYear(); const month = current.getMonth() + 1;
+                const key = `${year}-${String(month).padStart(2, '0')}`;
+                const ms = profileData.monthlyPlaytime[key] || 0;
+                if (!showEmptyMonths && ms === 0) { current.setMonth(current.getMonth() + 1); continue; }
+                const hours = (ms / 3600000).toFixed(1);
+                const monthName = current.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
+                monthBuffer.push(`<div class="flex justify-between text-sm"><span class="text-gray-400">${monthName}:</span> <span class="font-mono text-white">${hours}h</span></div>`);
+                if (monthBuffer.length === 6) {
+                    const col = document.createElement('div'); col.className = 'flex flex-col gap-1 min-w-[160px]';
+                    col.innerHTML = monthBuffer.join(''); container.appendChild(col); monthBuffer = [];
+                }
+                current.setMonth(current.getMonth() + 1);
+            }
+            if (monthBuffer.length > 0) {
+                const col = document.createElement('div'); col.className = 'flex flex-col gap-1 min-w-[160px]';
+                col.innerHTML = monthBuffer.join(''); container.appendChild(col);
+            }
+        }
+
+        function toggleShowEmptyMonths() {
+            showEmptyMonths = document.getElementById('toggle-empty-months').checked;
+            renderMonthlyList();
+            if (currentChartType === 'calendar') renderCalendarChart();
+        }
+
+        // --- D3 Charting Logic ---
+        async function switchChart(type) {
+            currentChartType = type;
+            // Update graph_type URL param
+            const url = new URL(window.location);
+            url.searchParams.set('graph_type', type);
+            window.history.replaceState({}, '', url);
+            ['calendar', 'bar', 'heatmap', 'activity'].forEach(t => {
+                const btn = document.getElementById(`chart-tab-${t}`);
+                if (btn) btn.className = t === type ? 'px-4 py-1.5 text-sm rounded-md transition-colors bg-nara-red text-white font-bold' : 'px-4 py-1.5 text-sm rounded-md transition-colors text-gray-400 hover:text-white';
+            });
+
+            const calDiv = document.getElementById('chart-calendar');
+            const mainDiv = document.getElementById('chart-d3-main');
+            const brushDiv = document.getElementById('chart-d3-brush');
+            const heatmapDiv = document.getElementById('chart-heatmap');
+            const activityDiv = document.getElementById('chart-activity');
+            const hint = document.getElementById('chart-hint-zoom');
+            const granularityControls = document.getElementById('granularity-controls');
+            const heatmapControls = document.getElementById('heatmap-controls');
+
+            // Hide all first
+            calDiv.classList.add('hidden'); mainDiv.classList.add('hidden'); brushDiv.classList.add('hidden');
+            heatmapDiv.classList.add('hidden'); activityDiv.classList.add('hidden');
+            hint.classList.add('hidden'); granularityControls.classList.add('hidden');
+            heatmapControls.classList.add('hidden');
+
+            if (type === 'calendar') {
+                calDiv.classList.remove('hidden');
+                renderCalendarChart();
+            } else if (type === 'heatmap') {
+                heatmapDiv.classList.remove('hidden');
+                heatmapControls.classList.remove('hidden');
+                heatmapControls.classList.add('flex');
+                updateHeatmapModeButtons();
+                renderPlaytimeHeatmap();
+            } else if (type === 'activity') {
+                activityDiv.classList.remove('hidden');
+                renderActivityChart();
+            } else {
+                await ensureD3();
+                mainDiv.classList.remove('hidden'); brushDiv.classList.remove('hidden'); hint.classList.remove('hidden');
+                granularityControls.classList.remove('hidden');
+                granularityControls.classList.add('flex');
+                updateGranularityButtons();
+                renderD3Chart(type);
+            }
+        }
+
+        function updateGranularityButtons() {
+            const dailyBtn = document.getElementById('granularity-daily');
+            const weeklyBtn = document.getElementById('granularity-weekly');
+            if (userGranularityPreference === 'daily') {
+                dailyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
+                weeklyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white';
+            } else {
+                dailyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white';
+                weeklyBtn.className = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
+            }
+        }
+
+        function setGranularity(granularity) {
+            userGranularityPreference = granularity;
+            updateGranularityButtons();
+            if (currentChartType !== 'calendar' && profileData) {
+                renderD3Chart(currentChartType);
+            }
+        }
+
+        function renderCalendarChart() {
+            const container = document.getElementById('chart-calendar');
+            container.innerHTML = '';
+
+            // Legend at top center
+            const legend = document.createElement('div');
+            legend.className = 'flex items-center justify-center gap-2 mb-4 text-xs text-gray-500';
+            legend.innerHTML = '<span>Less</span>';
+            for (let i = 0; i < 5; i++) {
+                const op = i === 0 ? 0.1 : (0.2 + 0.8 * i / 4);
+                legend.innerHTML += `<div style="width:14px;height:14px;border-radius:2px;background:rgba(239,68,68,${op})"></div>`;
+            }
+            legend.innerHTML += '<span>More</span>';
+            container.appendChild(legend);
+
+            const months = {};
+            Object.entries(profileData.dailyPlaytime).forEach(([ts, ms]) => {
+                const d = new Date(parseInt(ts));
+                // Use UTC methods to avoid timezone shifts
+                const key = `${d.getUTCFullYear()}-${d.getUTCMonth()}`;
+                if (!months[key]) months[key] = { name: d.toLocaleDateString(undefined, {month:'long', year:'numeric', timeZone: 'UTC'}), days: {}, max: 0 };
+                const day = d.getUTCDate();
+                months[key].days[day] = ms;
+                if (ms > months[key].max) months[key].max = ms;
+            });
+
+            // When showEmptyMonths is on, fill in all months from firstJoin to now
+            if (showEmptyMonths && profileData.firstJoin > 0) {
+                const startDate = new Date(profileData.firstJoin);
+                const now = new Date();
+                let cur = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), 1));
+                while (cur <= now) {
+                    const key = `${cur.getUTCFullYear()}-${cur.getUTCMonth()}`;
+                    if (!months[key]) {
+                        months[key] = { name: cur.toLocaleDateString(undefined, {month:'long', year:'numeric', timeZone: 'UTC'}), days: {}, max: 0 };
+                    }
+                    cur.setUTCMonth(cur.getUTCMonth() + 1);
+                }
+            }
+
+            const sortedKeys = Object.keys(months).sort((a,b) => {
+                const [y1, m1] = a.split('-'); const [y2, m2] = b.split('-');
+                return (parseInt(y1)*12 + parseInt(m1)) - (parseInt(y2)*12 + parseInt(m2));
+            });
+
+            // When showEmptyMonths is off, filter out months with no playtime data
+            const filteredKeys = showEmptyMonths ? sortedKeys : sortedKeys.filter(key => {
+                const mData = months[key];
+                return Object.keys(mData.days).length > 0;
+            });
+            
+            // Made grid much denser for smaller calendars
+            const gridWrapper = document.createElement('div');
+            gridWrapper.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2';
+            
+            filteredKeys.forEach(key => {
+                const mData = months[key];
+                const [y, m] = key.split('-').map(Number);
+                // Use UTC for consistent calendar rendering
+                const daysInMonth = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+                const firstDayOffset = new Date(Date.UTC(y, m, 1)).getUTCDay();
+                
+                const monthCard = document.createElement('div');
+                // Reduced padding
+                monthCard.className = 'bg-gray-800/30 p-1 rounded-lg';
+                
+                // Smaller font for title
+                let html = `<h4 class="text-xs font-bold text-gray-400 mb-1 text-center truncate">${mData.name}</h4><div class="calendar-grid">`;
+                for(let i=0; i<firstDayOffset; i++) html += `<div></div>`;
+                for(let d=1; d<=daysInMonth; d++) {
+                    const ms = Math.min(mData.days[d] || 0, 24 * 3600000);
+                    const hours = Math.min(24, ms / 3600000).toFixed(1);
+                    let opacity = 0.1;
+                    if (mData.max > 0) opacity = 0.2 + (0.8 * (ms / mData.max));
+                    const bg = ms > 0 ? `rgba(239, 68, 68, ${opacity})` : 'rgba(55, 65, 81, 0.3)';
+                    
+                    // Use UTC for consistent date display
+                    const dateObj = new Date(Date.UTC(y, m, d));
+                    const dateStr = dateObj.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+                    const title = `<strong>${dateStr}</strong><br/>${hours}h`;
+                    
+                    html += `<div class="calendar-day" style="background-color: ${bg}" onmouseenter="showTooltip(event, '${title}')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
+                }
+                html += `</div>`;
+                monthCard.innerHTML = html;
+                gridWrapper.appendChild(monthCard);
+            });
+            container.appendChild(gridWrapper);
+        }
+
+        // --- D3 Main Chart Implementation ---
+        function renderD3Chart(type) {
+            if (!window.d3) {
+                console.warn('D3 library unavailable; skipping chart render.');
+                return;
+            }
+            const mainContainer = document.getElementById('chart-d3-main');
+            const brushContainer = document.getElementById('chart-d3-brush');
+            mainContainer.innerHTML = ''; brushContainer.innerHTML = '';
+
+            const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+            const width = mainContainer.clientWidth - margin.left - margin.right;
+            const height = 350 - margin.top - margin.bottom;
+            const brushHeight = 60 - 20;
+
+            // Use user's granularity preference
+            currentGranularity = userGranularityPreference;
+            let data = currentGranularity === 'daily' ? profileData.dailyData : profileData.weeklyData;
+
+            // Scales - Use UTC to prevent local timezone shifts
+            const x = d3.scaleUtc().range([0, width]);
+            const y = d3.scaleLinear().range([height, 0]);
+            const xBrush = d3.scaleUtc().range([0, width]);
+            const yBrush = d3.scaleLinear().range([brushHeight, 0]);
+
+            // Domains
+            const xDomain = [new Date(profileData.firstJoin), new Date()];
+            const yMax = currentGranularity === 'daily' ? 24 : 24 * 7;
+            x.domain(xDomain);
+            y.domain([0, Math.min(yMax, d3.max(data, d => d.value) * 1.1)]);
+            xBrush.domain(xDomain);
+            yBrush.domain(y.domain());
+
+            // Main SVG
+            const svg = d3.select("#chart-d3-main").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Axes
+            const xAxis = svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
+            const yAxis = svg.append("g").call(d3.axisLeft(y).ticks(5).tickFormat(d => d + "h"));
+
+            // Clip Path
+            svg.append("defs").append("clipPath").attr("id", "clip")
+                .append("rect").attr("width", width).attr("height", height);
+
+            const chartArea = svg.append("g").attr("clip-path", "url(#clip)");
+
+            // Render Function
+            function drawChart(chartData, chartType) {
+                chartArea.selectAll("*").remove();
+                
+                if (chartType === 'line') {
+                    // MonotoneX smooths the line, but the tooltip below snaps to real data
+                    const line = d3.line().x(d => x(d.date)).y(d => y(d.value)).curve(d3.curveMonotoneX);
+                    chartArea.append("path").datum(chartData).attr("class", "line-path").attr("d", line);
+                    
+                    // Dots
+                    if (currentGranularity === 'daily' && (x.domain()[1] - x.domain()[0]) < MAX_DATALABELS_RANGE) {
+                        chartArea.selectAll(".dot").data(chartData).enter().append("circle")
+                            .attr("cx", d => x(d.date)).attr("cy", d => y(d.value)).attr("r", 3).attr("fill", "#ef4444");
+                    }
+
+                    // Invisible overlay for hover detection on Line Chart
+                    chartArea.append("rect")
+                        .attr("class", "overlay")
+                        .attr("width", width)
+                        .attr("height", height)
+                        .on("mousemove", (event) => {
+                            // Bisector finds the index of the specific date in the data array
+                            const bisect = d3.bisector(d => d.date).left;
+                            const x0 = x.invert(d3.pointer(event)[0]);
+                            const i = bisect(chartData, x0, 1);
+                            const d0 = chartData[i - 1];
+                            const d1 = chartData[i];
+                            // Snap to nearest actual data point
+                            const d = (d0 && d1) ? (x0 - d0.date > d1.date - x0 ? d1 : d0) : (d0 || d1);
+                            if (d) showD3Tooltip(event, d);
+                        })
+                        .on("mouseout", hideD3Tooltip);
+
+                } else {
+                    // Calculate bar width based on time interval (Daily vs Weekly)
+                    // This ensures bars resize correctly when zooming
+                    const intervalMs = currentGranularity === 'daily' ? 86400000 : 604800000;
+                    
+                    // Calculate pixel width of one interval at current zoom level
+                    const t0 = x.domain()[0];
+                    const t1 = new Date(t0.getTime() + intervalMs);
+                    const barWidthRaw = x(t1) - x(t0);
+                    // Ensure at least 1px width, subtract 1px for gap
+                    const barWidth = Math.max(1, barWidthRaw - 1);
+
+                    chartArea.selectAll(".bar-rect").data(chartData).enter().append("rect")
+                        .attr("class", "bar-rect")
+                        .attr("x", d => x(d.date))
+                        .attr("y", d => y(d.value))
+                        .attr("width", barWidth)
+                        .attr("height", d => height - y(d.value))
+                        .on("mouseover", (e, d) => showD3Tooltip(e, d))
+                        .on("mouseout", hideD3Tooltip);
+                }
+            }
+
+            drawChart(data, type);
+
+            // --- Brush Chart ---
+            const svgBrush = d3.select("#chart-d3-brush").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", brushHeight + 20)
+                .append("g")
+                .attr("transform", `translate(${margin.left},0)`);
+
+            // Brush Area (Gray background)
+            svgBrush.append("rect").attr("width", width).attr("height", brushHeight).attr("fill", "#1f2937");
+
+            // Brush Logic
+            const brush = d3.brushX()
+                .extent([[0, 0], [width, brushHeight]])
+                .on("brush end", brushed);
+
+            const brushG = svgBrush.append("g").attr("class", "brush").call(brush);
+            
+            // Set initial brush selection to full range
+            brushG.call(brush.move, x.range());
+
+            function brushed(event) {
+                const selection = event.selection;
+                if (!selection) return;
+                
+                const [minX, maxX] = selection.map(xBrush.invert);
+                x.domain([minX, maxX]);
+                
+                // Filter data for view (granularity is controlled by user preference, not zoom level)
+                const viewData = data.filter(d => d.date >= minX && d.date <= maxX);
+                
+                xAxis.call(d3.axisBottom(x));
+                drawChart(viewData, type);
+            }
+        }
+
+        // D3 Tooltip
+        function showD3Tooltip(event, d) {
+            const tooltip = document.getElementById('d3-tooltip');
+            let dateStr = '';
+            
+            // Use UTC formatting to match the axis
+            const utcOpts = { month: 'short', day: 'numeric', timeZone: 'UTC' };
+            const utcYearOpts = { year: 'numeric', timeZone: 'UTC' };
+
+            if (currentGranularity === 'weekly') {
+                const start = new Date(d.date);
+                const end = new Date(d.date.getTime() + (6 * 24 * 60 * 60 * 1000));
+                // "Jun 1 - Jun 7, 2022"
+                dateStr = `${start.toLocaleDateString(undefined, utcOpts)} - ${end.toLocaleDateString(undefined, utcOpts)}, ${end.toLocaleDateString(undefined, utcYearOpts)}`;
+            } else {
+                dateStr = d.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+            }
+
+            tooltip.innerHTML = `<strong>${dateStr}</strong><br>${d.value.toFixed(2)} hours`;
+            tooltip.style.opacity = 1;
+            tooltip.style.left = event.pageX + 'px';
+            
+            // Prevent tooltip from clipping off the top
+            if (event.clientY < 60) {
+                tooltip.style.transform = 'translate(-50%, 0)';
+                tooltip.style.marginTop = '15px';
+            } else {
+                tooltip.style.transform = '';
+                tooltip.style.marginTop = '';
+            }
+            
+            tooltip.style.top = event.pageY + 'px';
+        }
+        function hideD3Tooltip() {
+            document.getElementById('d3-tooltip').style.opacity = 0;
+        }
+
+        // Calendar Tooltip
+        function showTooltip(e, text) {
+            const el = document.getElementById('calendar-tooltip');
+            el.innerHTML = text; el.style.display = 'block'; moveTooltip(e);
+        }
+        function moveTooltip(e) {
+            const el = document.getElementById('calendar-tooltip');
+            el.style.left = e.pageX + 'px';
+            
+            // Prevent tooltip from clipping off the top of the viewport
+            if (e.clientY < 60) {
+                el.style.transform = 'translate(-50%, 0)';
+                el.style.marginTop = '15px';
+            } else {
+                el.style.transform = '';
+                el.style.marginTop = '';
+            }
+            
+            el.style.top = e.pageY + 'px';
+        }
+        function hideTooltip() { document.getElementById('calendar-tooltip').style.display = 'none'; }
+
+        // --- Playtime Heatmap ---
+        function buildHeatmapGrid(sessions) {
+            const grid = Array.from({ length: 7 }, () => new Float64Array(24));
+            for (const s of sessions) {
+                let cursor = s.login;
+                while (cursor < s.logout) {
+                    const d = new Date(cursor);
+                    const dow = d.getDay();
+                    const hour = d.getHours();
+                    // Compute next hour boundary arithmetically (avoids extra Date allocation)
+                    const msPastHour = d.getMinutes() * 60000 + d.getSeconds() * 1000 + d.getMilliseconds();
+                    const nextHourBoundary = cursor - msPastHour + 3600000;
+                    const chunkEnd = Math.min(s.logout, nextHourBoundary);
+                    grid[dow][hour] += (chunkEnd - cursor) / 60000;
+                    cursor = chunkEnd;
+                }
+            }
+            return grid;
+        }
+
+        function getSliderTicks(minDate, maxDate) {
+            const spanMs = maxDate - minDate;
+            const spanMonths = spanMs / (30.44 * 24 * 3600000);
+            let stepMonths;
+            if (spanMonths <= 6) stepMonths = 1;
+            else if (spanMonths <= 12) stepMonths = 2;
+            else if (spanMonths <= 24) stepMonths = 4;
+            else stepMonths = 6;
+            const ticks = [];
+            const start = new Date(minDate);
+            let current = new Date(start.getFullYear(), start.getMonth(), 1);
+            if (current < start) current.setMonth(current.getMonth() + stepMonths);
+            while (current.getTime() <= maxDate) {
+                ticks.push({ time: current.getTime(), label: current.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) });
+                current = new Date(current.getFullYear(), current.getMonth() + stepMonths, 1);
+            }
+            return ticks;
+        }
+
+        let heatmapSliderState = null;
+        let heatmapDisplayMode = 'percent'; // 'percent', 'total', or 'chance'
+        let heatmapUserModifiedSlider = false;
+
+        function updateHeatmapModeButtons() {
+            const active = 'px-3 py-1 text-xs rounded-md transition-colors bg-nara-red text-white font-bold';
+            const inactive = 'px-3 py-1 text-xs rounded-md transition-colors text-gray-400 hover:text-white';
+            const btnPct = document.getElementById('heatmap-mode-percent');
+            const btnTotal = document.getElementById('heatmap-mode-total');
+            const btnChance = document.getElementById('heatmap-mode-chance');
+            if (btnPct) btnPct.className = heatmapDisplayMode === 'percent' ? active : inactive;
+            if (btnTotal) btnTotal.className = heatmapDisplayMode === 'total' ? active : inactive;
+            if (btnChance) btnChance.className = heatmapDisplayMode === 'chance' ? active : inactive;
+        }
+
+        function setHeatmapMode(mode) {
+            heatmapDisplayMode = mode;
+            updateHeatmapModeButtons();
+            renderPlaytimeHeatmap();
+        }
+
+        function renderPlaytimeHeatmap() {
+            const container = document.getElementById('chart-heatmap');
+            container.innerHTML = '';
+            if (!profileData || !profileData.rawSessions || profileData.rawSessions.length === 0) {
+                container.innerHTML = '<div class="text-center py-20 text-gray-500">No heatmap data available.</div>';
+                return;
+            }
+
+            const sessions = profileData.rawSessions;
+            const allMinTime = sessions[0].login;
+            const allMaxTime = sessions[sessions.length - 1].logout;
+
+            // Initialize slider state
+            if (!heatmapSliderState || heatmapSliderState.allMin !== allMinTime) {
+                heatmapSliderState = { allMin: allMinTime, allMax: allMaxTime, curMin: allMinTime, curMax: allMaxTime };
+                heatmapUserModifiedSlider = false;
+            }
+
+            // Adjust default unmodified state based on mode
+            if (!heatmapUserModifiedSlider) {
+                if (heatmapDisplayMode === 'chance') {
+                    const twoMonthsMs = 60 * 24 * 60 * 60 * 1000;
+                    heatmapSliderState.curMin = Math.max(allMinTime, allMaxTime - twoMonthsMs);
+                } else {
+                    heatmapSliderState.curMin = allMinTime;
+                }
+                heatmapSliderState.curMax = allMaxTime;
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'heatmap-container';
+
+            // --- Range Slider ---
+            const sliderSection = document.createElement('div');
+            sliderSection.className = 'mt-4';
+
+            const sliderLabel = document.createElement('div');
+            sliderLabel.className = 'flex justify-between text-xs text-gray-400 mb-1';
+            const sliderLabelFrom = document.createElement('span');
+            const sliderLabelTo = document.createElement('span');
+            const formatSliderDate = (ts) => new Date(ts).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+            sliderLabelFrom.textContent = formatSliderDate(heatmapSliderState.curMin);
+            sliderLabelTo.textContent = formatSliderDate(heatmapSliderState.curMax);
+            sliderLabel.appendChild(sliderLabelFrom);
+            sliderLabel.appendChild(sliderLabelTo);
+            sliderSection.appendChild(sliderLabel);
+
+            const sliderContainer = document.createElement('div');
+            sliderContainer.className = 'range-slider-container';
+
+            const track = document.createElement('div');
+            track.className = 'range-slider-track';
+            sliderContainer.appendChild(track);
+
+            const highlight = document.createElement('div');
+            highlight.className = 'range-slider-highlight';
+            sliderContainer.appendChild(highlight);
+
+            const rangeMin = document.createElement('input');
+            rangeMin.type = 'range';
+            rangeMin.min = allMinTime;
+            rangeMin.max = allMaxTime;
+            rangeMin.value = heatmapSliderState.curMin;
+            rangeMin.step = 86400000; // 1 day
+
+            const rangeMax = document.createElement('input');
+            rangeMax.type = 'range';
+            rangeMax.min = allMinTime;
+            rangeMax.max = allMaxTime;
+            rangeMax.value = heatmapSliderState.curMax;
+            rangeMax.step = 86400000;
+
+            sliderContainer.appendChild(rangeMin);
+            sliderContainer.appendChild(rangeMax);
+            sliderSection.appendChild(sliderContainer);
+
+            // Tick marks
+            const ticks = getSliderTicks(allMinTime, allMaxTime);
+            if (ticks.length > 0) {
+                const tickRow = document.createElement('div');
+                tickRow.className = 'range-slider-ticks';
+                for (const tick of ticks) {
+                    const pct = ((tick.time - allMinTime) / (allMaxTime - allMinTime)) * 100;
+                    const sp = document.createElement('span');
+                    sp.textContent = tick.label;
+                    sp.style.position = 'absolute';
+                    sp.style.left = pct + '%';
+                    sp.style.transform = 'translateX(-50%)';
+                    tickRow.appendChild(sp);
+                }
+                sliderSection.appendChild(tickRow);
+            }
+
+            // --- Heatmap Legend ---
+            const legendEl = document.createElement('div');
+            legendEl.className = 'flex items-center justify-center gap-1.5 text-xs text-gray-500 mb-3';
+            legendEl.innerHTML = '<span>Less</span>';
+            // Start with a zero-value grey color cell
+            legendEl.innerHTML += `<div style="width:12px;height:12px;border-radius:2px;background:rgba(55, 65, 81, 0.3)"></div>`;
+            // Add 6 colored intensity steps representing >0 values
+            for (let li = 1; li <= 6; li++) {
+                const ratio = li / 6;
+                const intensity = Math.pow(ratio, 0.5);
+                // Shift hue from 220 (blue) to 360 (red) for a cool-to-warm gradient that's less neon
+                const hue = Math.round(220 + 140 * intensity);
+                const bg = `hsla(${hue > 360 ? hue - 360 : hue}, 75%, 60%, ${0.25 + 0.75 * intensity})`;
+                legendEl.innerHTML += `<div style="width:12px;height:12px;border-radius:2px;background:${bg}"></div>`;
+            }
+            legendEl.innerHTML += '<span>More</span>';
+            wrapper.appendChild(legendEl);
+
+            // --- Heatmap Grid ---
+            const gridContainer = document.createElement('div');
+            gridContainer.id = 'heatmap-grid-inner';
+            wrapper.appendChild(gridContainer);
+
+            // --- Range Slider (below heatmap) ---
+            wrapper.appendChild(sliderSection);
+
+            // --- Chance mode explanation (below slider, full width) ---
+            const chanceExplanation = document.createElement('div');
+            chanceExplanation.id = 'heatmap-chance-explanation';
+            wrapper.appendChild(chanceExplanation);
+
+            container.appendChild(wrapper);
+
+            function updateHighlight() {
+                const lo = parseInt(rangeMin.value);
+                const hi = parseInt(rangeMax.value);
+                const range = allMaxTime - allMinTime;
+                const leftPct = range > 0 ? ((lo - allMinTime) / range) * 100 : 0;
+                const rightPct = range > 0 ? ((hi - allMinTime) / range) * 100 : 100;
+                highlight.style.left = leftPct + '%';
+                highlight.style.width = (rightPct - leftPct) + '%';
+            }
+            updateHighlight();
+
+            let heatmapDebounceTimer = null;
+            function onSliderChange() {
+                heatmapUserModifiedSlider = true;
+                let lo = parseInt(rangeMin.value);
+                let hi = parseInt(rangeMax.value);
+                if (lo > hi) { const tmp = lo; lo = hi; hi = tmp; }
+                heatmapSliderState.curMin = lo;
+                heatmapSliderState.curMax = hi;
+                sliderLabelFrom.textContent = formatSliderDate(lo);
+                sliderLabelTo.textContent = formatSliderDate(hi);
+                updateHighlight();
+                clearTimeout(heatmapDebounceTimer);
+                heatmapDebounceTimer = setTimeout(() => { renderHeatmapGrid(lo, hi); updateChanceExplanation(); }, 200);
+            }
+
+            rangeMin.addEventListener('input', onSliderChange);
+            rangeMax.addEventListener('input', onSliderChange);
+
+            // Custom tooltip for slider handles
+            function updateSliderTooltip(e, isMin) {
+                const val = isMin ? heatmapSliderState.curMin : heatmapSliderState.curMax;
+                showTooltip(e, '<strong>' + formatSliderDate(val) + '</strong>');
+            }
+            rangeMin.addEventListener('mouseenter', (e) => updateSliderTooltip(e, true));
+            rangeMin.addEventListener('mousemove', (e) => updateSliderTooltip(e, true));
+            rangeMin.addEventListener('mouseleave', hideTooltip);
+
+            rangeMax.addEventListener('mouseenter', (e) => updateSliderTooltip(e, false));
+            rangeMax.addEventListener('mousemove', (e) => updateSliderTooltip(e, false));
+            rangeMax.addEventListener('mouseleave', hideTooltip);
+
+            renderHeatmapGrid(heatmapSliderState.curMin, heatmapSliderState.curMax);
+            updateChanceExplanation();
+        }
+
+        function updateChanceExplanation() {
+            const el = document.getElementById('heatmap-chance-explanation');
+            if (!el) return;
+            if (heatmapDisplayMode === 'chance') {
+                const gridInner = document.getElementById('heatmap-grid-inner');
+                const totalWeeks = gridInner ? parseInt(gridInner.dataset.totalWeeks || '0') : 0;
+                el.className = 'text-xs text-gray-600 mt-4 leading-relaxed';
+                el.innerHTML = `<strong class="text-gray-500">How this is calculated:</strong> Only weeks within the selected range where the player logged at least 5 hours are included (${totalWeeks} qualifying week${totalWeeks !== 1 ? 's' : ''}). For each time slot, the chance is: <em>weeks played during this hour ÷ total qualifying weeks × 100</em>.`;
+            } else {
+                el.className = '';
+                el.innerHTML = '';
+            }
+        }
+
+        // Build a log-on chance grid: for each [day][hour], count how many distinct
+        // weeks the player was online during that slot vs how many weeks they could have been.
+        function buildChanceGrid(recent) {
+            // Group sessions by ISO week (Mon-Sun)
+            const weekMap = new Map(); // weekKey -> { totalMs, sessions[] }
+            for (const s of recent) {
+                // Get the Monday of the week for the session start
+                const d = new Date(s.login);
+                const day = d.getDay();
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
+                const monday = new Date(d.getFullYear(), d.getMonth(), diff);
+                monday.setHours(0, 0, 0, 0);
+                const weekKey = monday.getTime();
+                if (!weekMap.has(weekKey)) weekMap.set(weekKey, { totalMs: 0, sessions: [] });
+                const w = weekMap.get(weekKey);
+                w.totalMs += (s.logout - s.login);
+                w.sessions.push(s);
+            }
+
+            // Only keep weeks with >= 5 hours of playtime
+            const FIVE_HOURS_MS = 5 * 60 * 60 * 1000;
+            const qualifyingWeeks = [];
+            for (const [weekKey, w] of weekMap) {
+                if (w.totalMs >= FIVE_HOURS_MS) qualifyingWeeks.push(w);
+            }
+
+            const totalWeeks = qualifyingWeeks.length;
+
+            // For each [day][hour], count how many qualifying weeks had activity
+            const hitGrid = Array.from({ length: 7 }, () => new Float64Array(24));
+            for (const w of qualifyingWeeks) {
+                // Track which day/hour slots were hit in this week (dedupe per week)
+                const seen = Array.from({ length: 7 }, () => new Uint8Array(24));
+                for (const s of w.sessions) {
+                    // Walk through each hour the session overlaps
+                    let cursor = new Date(s.login);
+                    cursor.setMinutes(0, 0, 0);
+                    const end = s.logout;
+                    while (cursor.getTime() < end) {
+                        const dow = cursor.getDay(); // 0=Sun
+                        const hr = cursor.getHours();
+                        seen[dow][hr] = 1;
+                        cursor = new Date(cursor.getTime() + 3600000);
+                    }
+                }
+                for (let d = 0; d < 7; d++) {
+                    for (let h = 0; h < 24; h++) {
+                        hitGrid[d][h] += seen[d][h];
+                    }
+                }
+            }
+
+            // Convert to percentages
+            const chanceGrid = Array.from({ length: 7 }, () => new Float64Array(24));
+            if (totalWeeks > 0) {
+                for (let d = 0; d < 7; d++) {
+                    for (let h = 0; h < 24; h++) {
+                        chanceGrid[d][h] = (hitGrid[d][h] / totalWeeks) * 100;
+                    }
+                }
+            }
+            return { chanceGrid, totalWeeks };
+        }
+
+        // Cached locale helpers (computed once, reused across renders)
+        let _cachedLocale = null;
+        function getCachedLocale() {
+            if (!_cachedLocale) {
+                const use12h = new Date(2000, 0, 1, 13, 0).toLocaleTimeString(undefined, { hour: 'numeric' }).match(/[APap]/);
+                const dayNames = [];
+                for (let i = 0; i < 7; i++) dayNames.push(new Date(2000, 0, 2 + i).toLocaleDateString(undefined, { weekday: 'short' }));
+                const hourLabels = [];
+                for (let h = 0; h < 24; h++) hourLabels.push(new Date(2000, 0, 1, h, 0).toLocaleTimeString(undefined, { hour: 'numeric', hour12: !!use12h }));
+                const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || 'local';
+                _cachedLocale = { use12h, dayNames, hourLabels, tzName };
+            }
+            return _cachedLocale;
+        }
+
+        function renderHeatmapGrid(filterMin, filterMax) {
+            const gridContainer = document.getElementById('heatmap-grid-inner');
+            if (!gridContainer) return;
+            gridContainer.innerHTML = '';
+
+            // Filter sessions to range
+            const filtered = profileData.rawSessions.filter(s => s.logout >= filterMin && s.login <= filterMax)
+                .map(s => ({ login: Math.max(s.login, filterMin), logout: Math.min(s.logout, filterMax) }));
+
+            const grid = buildHeatmapGrid(filtered);
+
+            // Build chance grid dynamically based on selected range
+            const { chanceGrid, totalWeeks } = buildChanceGrid(filtered);
+
+            // Total minutes across all cells (for percentage)
+            let totalMinutes = 0;
+            for (let d = 0; d < 7; d++) {
+                for (let h = 0; h < 24; h++) totalMinutes += grid[d][h];
+            }
+
+            // Max value for color scaling
+            let maxVal = 0;
+            if (heatmapDisplayMode === 'chance') {
+                for (let d = 0; d < 7; d++) {
+                    for (let h = 0; h < 24; h++) if (chanceGrid[d][h] > maxVal) maxVal = chanceGrid[d][h];
+                }
+            } else {
+                for (let d = 0; d < 7; d++) {
+                    for (let h = 0; h < 24; h++) if (grid[d][h] > maxVal) maxVal = grid[d][h];
+                }
+            }
+
+            const { use12h, dayNames, hourLabels, tzName } = getCachedLocale();
+
+            // Build grid HTML as string array, then assign once (avoids 200× innerHTML re-parse)
+            const parts = ['<div></div>'];
+            for (let h = 0; h < 24; h++) parts.push(`<div class="heatmap-hour-label">${hourLabels[h]}</div>`);
+
+            for (let d = 0; d < 7; d++) {
+                parts.push(`<div class="heatmap-label">${dayNames[d]}</div>`);
+                for (let h = 0; h < 24; h++) {
+                    let val, title, colorVal;
+                    if (heatmapDisplayMode === 'chance') {
+                        val = chanceGrid[d][h];
+                        colorVal = val;
+                        const chancePct = Math.round(val);
+                        const chanceStr = chancePct < 1 ? '<1' : String(chancePct);
+                        title = `<strong>${dayNames[d]} ${hourLabels[h]}</strong><br/>${chanceStr}% chance`;
+                    } else if (heatmapDisplayMode === 'total') {
+                        val = grid[d][h];
+                        colorVal = val;
+                        const totalHours = val / 60;
+                        title = `<strong>${dayNames[d]} ${hourLabels[h]}</strong><br/>${totalHours < 0.01 && val > 0 ? '&lt;0.01' : totalHours.toFixed(1)}h total`;
+                    } else {
+                        val = grid[d][h];
+                        colorVal = val;
+                        const pct = totalMinutes > 0 ? ((val / totalMinutes) * 100) : 0;
+                        const pctStr = pct > 0 && pct < 0.1 ? '&lt;0.1' : pct.toFixed(1);
+                        title = `<strong>${dayNames[d]} ${hourLabels[h]}</strong><br/>${pctStr}% of total playtime`;
+                    }
+                    let bg = 'rgba(55, 65, 81, 0.3)';
+                    if (maxVal > 0 && colorVal > 0) {
+                        const ratio = colorVal / maxVal;
+                        // Root scale to spread values
+                        const intensity = Math.pow(ratio, 0.5);
+                        const hue = Math.round(220 + 140 * intensity);
+                        // Multi-color spread from blue to red, using lower saturation to avoid neon clash
+                        bg = `hsla(${hue > 360 ? hue - 360 : hue}, 75%, 60%, ${0.25 + 0.75 * intensity})`;
+                    }
+                    const cellText = (heatmapDisplayMode === 'chance' && val > 0 && Math.round(val) < 1) ? '<span style="font-size:9px;color:#f87171">&lt;1%</span>' : '';
+                    parts.push(`<div class="heatmap-cell" style="background-color: ${bg};display:flex;align-items:center;justify-content:center" onmouseenter="showTooltip(event, '${title}')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">${cellText}</div>`);
+                }
+            }
+
+            const gridEl = document.createElement('div');
+            gridEl.className = 'heatmap-grid';
+            gridEl.style.gridTemplateColumns = '60px repeat(24, 1fr)';
+            gridEl.innerHTML = parts.join('');
+            gridContainer.appendChild(gridEl);
+
+            // Timezone note
+            const tzNote = document.createElement('div');
+            tzNote.className = 'text-center text-xs text-gray-600 mt-2';
+            tzNote.textContent = `Times shown in your local timezone (${tzName})`;
+            gridContainer.appendChild(tzNote);
+
+            // Store totalWeeks on the container for the explanation text
+            gridContainer.dataset.totalWeeks = totalWeeks;
+        }
+
+        // --- Daily Activity Chart ---
+        let activityCurrentWeekStart = null; // timestamp of week-start day 00:00 local
+        let activityAllWeeks = []; // sorted array of { weekStart, weekEnd, totalMs, sessions[] }
+
+        // Detect if locale uses Sunday-start weeks (US, Canada, Japan, etc.)
+        let _sundayStartCache = null;
+        function activityWeekStartsOnSunday() {
+            if (_sundayStartCache !== null) return _sundayStartCache;
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            // US timezones start with America/ and are in the US, plus Pacific/Honolulu
+            const usTzPrefixes = ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+                'America/Phoenix', 'America/Anchorage', 'America/Adak', 'America/Boise', 'America/Detroit',
+                'America/Indiana', 'America/Kentucky', 'America/Menominee', 'America/Nome', 'America/North_Dakota',
+                'America/Sitka', 'America/Yakutat', 'America/Juneau', 'America/Metlakatla',
+                'Pacific/Honolulu', 'America/Puerto_Rico', 'America/Virgin'];
+            _sundayStartCache = usTzPrefixes.some(p => tz.startsWith(p));
+            return _sundayStartCache;
+        }
+
+        function getLocalWeekStart(ts) {
+            const d = new Date(ts);
+            const day = d.getDay(); // 0=Sun
+            let diff;
+            if (activityWeekStartsOnSunday()) {
+                // Sunday = 0, so diff = -day
+                diff = -day;
+            } else {
+                // Monday start: diff to get back to Monday
+                diff = day === 0 ? -6 : 1 - day;
+            }
+            const weekStart = new Date(d.getFullYear(), d.getMonth(), d.getDate() + diff, 0, 0, 0, 0);
+            return weekStart.getTime();
+        }
+
+        function buildActivityWeeks() {
+            if (!profileData || !profileData.rawSessions || profileData.rawSessions.length === 0) return [];
+            const weekMap = new Map();
+            // Include completed sessions
+            for (const s of profileData.rawSessions) {
+                const wsTs = getLocalWeekStart(s.login);
+                if (!weekMap.has(wsTs)) weekMap.set(wsTs, { weekStart: wsTs, weekEnd: wsTs + 7 * 86400000, totalMs: 0, sessions: [] });
+                const w = weekMap.get(wsTs);
+                w.totalMs += (s.logout - s.login);
+                w.sessions.push(s);
+            }
+            // If player is currently online, ensure the current week exists in the map
+            if (profileData.isOnline && profileData.ongoingLoginTime) {
+                const onlineLogin = profileData.ongoingLoginTime;
+                const wsTs = getLocalWeekStart(onlineLogin);
+                if (!weekMap.has(wsTs)) {
+                    weekMap.set(wsTs, { weekStart: wsTs, weekEnd: wsTs + 7 * 86400000, totalMs: 0, sessions: [] });
+                }
+                // Add the ongoing playtime to the total for display
+                const w = weekMap.get(wsTs);
+                w.totalMs += (Date.now() - onlineLogin);
+            }
+            const weeks = Array.from(weekMap.values()).sort((a, b) => a.weekStart - b.weekStart);
+            return weeks;
+        }
+
+        function renderActivityChart(targetWeekStart) {
+            const container = document.getElementById('chart-activity');
+            container.innerHTML = '';
+            if (!profileData || !profileData.rawSessions || profileData.rawSessions.length === 0) {
+                container.innerHTML = '<div class="text-center py-20 text-gray-500">No activity data available.</div>';
+                return;
+            }
+
+            activityAllWeeks = buildActivityWeeks();
+            if (activityAllWeeks.length === 0) {
+                container.innerHTML = '<div class="text-center py-20 text-gray-500">No activity data available.</div>';
+                return;
+            }
+
+            // Determine which week to show
+            if (targetWeekStart !== undefined && targetWeekStart !== null) {
+                activityCurrentWeekStart = targetWeekStart;
+            } else if (!activityCurrentWeekStart) {
+                // Default to the most recent week
+                activityCurrentWeekStart = activityAllWeeks[activityAllWeeks.length - 1].weekStart;
+            }
+
+            const currentWeekIdx = activityAllWeeks.findIndex(w => w.weekStart === activityCurrentWeekStart);
+            const weekData = currentWeekIdx >= 0 ? activityAllWeeks[currentWeekIdx] : activityAllWeeks[activityAllWeeks.length - 1];
+            if (currentWeekIdx < 0) activityCurrentWeekStart = weekData.weekStart;
+
+            const weekStart = weekData.weekStart;
+            const weekEnd = weekData.weekEnd;
+            const now = Date.now();
+
+            // --- Header with navigation ---
+            const header = document.createElement('div');
+            header.className = 'activity-chart-header';
+
+            const nav = document.createElement('div');
+            nav.className = 'activity-week-nav';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.innerHTML = '&#8249;';
+            prevBtn.title = 'Previous week';
+            prevBtn.disabled = currentWeekIdx <= 0;
+            prevBtn.onclick = () => {
+                if (currentWeekIdx > 0) renderActivityChart(activityAllWeeks[currentWeekIdx - 1].weekStart);
+            };
+
+            const weekLabel = document.createElement('span');
+            weekLabel.className = 'activity-week-label';
+            const wStart = new Date(weekStart);
+            const wEnd = new Date(weekEnd - 1);
+            const fmtOpts = { month: 'short', day: 'numeric' };
+            const yearOpts = { year: 'numeric' };
+            weekLabel.textContent = `${wStart.toLocaleDateString(undefined, fmtOpts)} – ${wEnd.toLocaleDateString(undefined, fmtOpts)}, ${wEnd.toLocaleDateString(undefined, yearOpts)}`;
+            weekLabel.title = 'Pick a week';
+            weekLabel.onclick = () => openWeekPicker();
+
+            const nextBtn = document.createElement('button');
+            nextBtn.innerHTML = '&#8250;';
+            nextBtn.title = 'Next week';
+            nextBtn.disabled = currentWeekIdx >= activityAllWeeks.length - 1;
+            nextBtn.onclick = () => {
+                if (currentWeekIdx < activityAllWeeks.length - 1) renderActivityChart(activityAllWeeks[currentWeekIdx + 1].weekStart);
+            };
+
+            // Today button
+            const todayWeekStart = getLocalWeekStart(Date.now());
+            const todayBtn = document.createElement('button');
+            todayBtn.textContent = 'Today';
+            todayBtn.title = 'Jump to current week';
+            todayBtn.style.cssText = 'padding:4px 12px;border-radius:6px;font-size:12px;background:#1f2937;color:#9ca3af;border:1px solid #374151;cursor:pointer;transition:all 0.15s;font-weight:500;';
+            todayBtn.addEventListener('mouseenter', () => { todayBtn.style.background = '#374151'; todayBtn.style.color = '#fff'; });
+            todayBtn.addEventListener('mouseleave', () => { todayBtn.style.background = '#1f2937'; todayBtn.style.color = '#9ca3af'; });
+            // Find the actual today week or closest to it
+            const todayWeekExists = activityAllWeeks.some(w => w.weekStart === todayWeekStart);
+            const todayTarget = todayWeekExists ? todayWeekStart : activityAllWeeks[activityAllWeeks.length - 1].weekStart;
+            // Disable if already on the today/latest week
+            if (activityCurrentWeekStart === todayTarget) {
+                todayBtn.style.opacity = '0.3';
+                todayBtn.style.cursor = 'not-allowed';
+            } else {
+                todayBtn.onclick = () => renderActivityChart(todayTarget);
+            }
+
+            nav.appendChild(prevBtn);
+            nav.appendChild(weekLabel);
+            nav.appendChild(nextBtn);
+            nav.appendChild(todayBtn);
+            header.appendChild(nav);
+
+            // Total hours for the week
+            const weekHours = document.createElement('span');
+            weekHours.className = 'text-sm text-gray-400';
+            const totalH = weekData.totalMs / 3600000;
+            weekHours.textContent = `${totalH.toFixed(1)}h this week`;
+            header.appendChild(weekHours);
+
+            container.appendChild(header);
+
+            // --- Chart Area ---
+            const isMobile = window.innerWidth < 640;
+            const CHART_HEIGHT = isMobile ? 340 : 400;
+            const HOUR_HEIGHT = CHART_HEIGHT / 24;
+            const LABEL_WIDTH = isMobile ? 36 : 55;
+            const MIN_COL_WIDTH = isMobile ? 44 : 0; // minimum px per day column on mobile
+
+            const chartWrapper = document.createElement('div');
+            chartWrapper.className = 'activity-chart-container';
+            chartWrapper.style.position = 'relative';
+
+            // Create grid: y-axis labels + 7 day columns
+            const chartGrid = document.createElement('div');
+            chartGrid.style.display = 'grid';
+            // On mobile, enforce a minimum width so columns aren't too tiny
+            if (isMobile) {
+                const totalMinWidth = LABEL_WIDTH + (MIN_COL_WIDTH * 7);
+                chartGrid.style.minWidth = totalMinWidth + 'px';
+            }
+            chartGrid.style.gridTemplateColumns = `${LABEL_WIDTH}px repeat(7, 1fr)`;
+            chartGrid.style.position = 'relative';
+
+            // Day headers
+            const dayHeaderSpacer = document.createElement('div');
+            dayHeaderSpacer.style.height = isMobile ? '32px' : '36px';
+            chartGrid.appendChild(dayHeaderSpacer);
+
+            const dayNames = [];
+            for (let i = 0; i < 7; i++) {
+                const dayDate = new Date(weekStart + i * 86400000);
+                const dayHeader = document.createElement('div');
+                dayHeader.style.textAlign = 'center';
+                dayHeader.style.fontSize = isMobile ? '9px' : '11px';
+                dayHeader.style.fontWeight = '600';
+                dayHeader.style.color = '#9ca3af';
+                dayHeader.style.height = isMobile ? '32px' : '36px';
+                dayHeader.style.lineHeight = isMobile ? '16px' : '18px';
+                dayHeader.style.overflow = 'hidden';
+                dayHeader.style.display = 'flex';
+                dayHeader.style.flexDirection = 'column';
+                dayHeader.style.alignItems = 'center';
+                dayHeader.style.justifyContent = 'center';
+                const dayName = dayDate.toLocaleDateString(undefined, { weekday: 'short' });
+                const monthDay = dayDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                if (isMobile) {
+                    dayHeader.innerHTML = `<span>${dayName}</span><span style="font-size:8px;color:#6b7280">${monthDay}</span>`;
+                } else {
+                    dayHeader.innerHTML = `<span>${dayName}</span><span style="font-size:10px;color:#6b7280;font-weight:400">${monthDay}</span>`;
+                }
+                dayNames.push(dayName);
+                chartGrid.appendChild(dayHeader);
+            }
+
+            // Y-axis (hours) + day columns
+            const use12h = new Date(2000, 0, 1, 13, 0).toLocaleTimeString(undefined, { hour: 'numeric' }).match(/[APap]/);
+
+            // Y-axis labels column
+            const yAxis = document.createElement('div');
+            yAxis.style.position = 'relative';
+            yAxis.style.height = CHART_HEIGHT + 'px';
+
+            // Show fewer labels on mobile (every 3 hours), desktop every 2 hours for smaller chart
+            const hourStep = isMobile ? 3 : 2;
+            for (let h = 0; h <= 24; h += hourStep) {
+                const label = document.createElement('div');
+                label.style.position = 'absolute';
+                label.style.top = (h * HOUR_HEIGHT - 6) + 'px';
+                label.style.right = isMobile ? '4px' : '4px';
+                label.style.fontSize = isMobile ? '8px' : '10px';
+                label.style.color = '#6b7280';
+                label.style.lineHeight = '12px';
+                label.style.whiteSpace = 'nowrap';
+                if (h === 24) {
+                    // Bottom label: show full 12:00 AM
+                    label.textContent = use12h ? '12:00 AM' : '0:00';
+                } else if (h === 0) {
+                    // Top label: also 12:00 AM
+                    label.textContent = use12h ? '12:00 AM' : '0:00';
+                } else if (isMobile) {
+                    // Short format on mobile
+                    if (use12h) {
+                        const hr = h > 12 ? h - 12 : h;
+                        const suffix = h < 12 ? 'AM' : 'PM';
+                        label.textContent = `${hr} ${suffix}`;
+                    } else {
+                        label.textContent = `${h}:00`;
+                    }
+                } else {
+                    const timeDate = new Date(2000, 0, 1, h, 0);
+                    label.textContent = timeDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: !!use12h });
+                }
+                yAxis.appendChild(label);
+            }
+            // Always add the h=24 bottom label if not already included by step
+            if (24 % hourStep !== 0) {
+                const bottomLabel = document.createElement('div');
+                bottomLabel.style.position = 'absolute';
+                bottomLabel.style.top = (24 * HOUR_HEIGHT - 6) + 'px';
+                bottomLabel.style.right = isMobile ? '4px' : '4px';
+                bottomLabel.style.fontSize = isMobile ? '8px' : '10px';
+                bottomLabel.style.color = '#6b7280';
+                bottomLabel.style.lineHeight = '12px';
+                bottomLabel.style.whiteSpace = 'nowrap';
+                bottomLabel.textContent = use12h ? '12:00 AM' : '0:00';
+                yAxis.appendChild(bottomLabel);
+            }
+            chartGrid.appendChild(yAxis);
+
+            // Tooltip element (desktop hover)
+            const tooltip = document.createElement('div');
+            tooltip.className = 'activity-tooltip';
+            container.appendChild(tooltip);
+
+            // Mobile tap tooltip (fixed bottom bar)
+            const mobileTooltip = document.createElement('div');
+            mobileTooltip.className = 'activity-tap-tooltip';
+            let mobileTooltipTimer = null;
+
+            function showMobileTooltip(html) {
+                clearTimeout(mobileTooltipTimer);
+                mobileTooltip.innerHTML = html;
+                mobileTooltip.classList.add('visible');
+                mobileTooltipTimer = setTimeout(() => {
+                    mobileTooltip.classList.remove('visible');
+                }, 3000);
+            }
+
+            const timeOpts = { hour: 'numeric', minute: '2-digit', hour12: !!use12h };
+
+            // Day columns with session blocks
+            for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
+                const dayStart = weekStart + dayIdx * 86400000;
+                const dayEnd = dayStart + 86400000;
+
+                const col = document.createElement('div');
+                col.className = 'activity-day-col';
+                col.style.position = 'relative';
+                col.style.height = CHART_HEIGHT + 'px';
+                col.style.background = dayIdx % 2 === 0 ? 'rgba(17, 24, 39, 0.5)' : 'rgba(31, 41, 55, 0.3)';
+
+                // Hour grid lines
+                for (let h = 0; h < 24; h++) {
+                    const line = document.createElement('div');
+                    line.className = 'activity-hour-line';
+                    line.style.top = (h * HOUR_HEIGHT) + 'px';
+                    if (h % 6 === 0) line.style.borderTopColor = 'rgba(75, 85, 99, 0.6)';
+                    col.appendChild(line);
+                }
+
+                // Session blocks for this day
+                const daySessions = weekData.sessions.filter(s => s.login < dayEnd && s.logout > dayStart);
+                for (const session of daySessions) {
+                    const sStart = Math.max(session.login, dayStart);
+                    const sEnd = Math.min(session.logout, dayEnd);
+
+                    const startOffsetMs = sStart - dayStart;
+                    const endOffsetMs = sEnd - dayStart;
+                    const topPx = (startOffsetMs / 86400000) * CHART_HEIGHT;
+                    const heightPx = Math.max(2, ((endOffsetMs - startOffsetMs) / 86400000) * CHART_HEIGHT);
+
+                    const block = document.createElement('div');
+                    block.className = 'activity-session-block';
+                    block.style.top = topPx + 'px';
+                    block.style.height = heightPx + 'px';
+                    block.style.left = '2px';
+                    block.style.right = '2px';
+
+                    // Tooltip on hover
+                    const loginTime = new Date(session.login);
+                    const logoutTime = new Date(session.logout);
+                    const durationMin = Math.round((session.logout - session.login) / 60000);
+                    const durH = Math.floor(durationMin / 60);
+                    const durM = durationMin % 60;
+
+                    block.addEventListener('mouseenter', (e) => {
+                        tooltip.innerHTML = `<strong>${loginTime.toLocaleTimeString(undefined, timeOpts)} – ${logoutTime.toLocaleTimeString(undefined, timeOpts)}</strong><br><span style="color:#9ca3af">${durH}h ${durM}m</span>`;
+                        tooltip.style.opacity = '1';
+                    });
+                    block.addEventListener('mousemove', (e) => {
+                        tooltip.style.left = e.clientX + 'px';
+                        if (e.clientY < 100) {
+                            tooltip.style.transform = 'translate(-50%, 0)';
+                            tooltip.style.marginTop = '15px';
+                        } else {
+                            tooltip.style.transform = '';
+                            tooltip.style.marginTop = '';
+                        }
+                        tooltip.style.top = e.clientY + 'px';
+                    });
+                    block.addEventListener('mouseleave', () => {
+                        tooltip.style.opacity = '0';
+                    });
+                    // Touch support for mobile
+                    block.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        showMobileTooltip(`<strong>${loginTime.toLocaleTimeString(undefined, timeOpts)} – ${logoutTime.toLocaleTimeString(undefined, timeOpts)}</strong><br><span style="color:#9ca3af">${durH}h ${durM}m</span>`);
+                    }, { passive: false });
+
+                    col.appendChild(block);
+                }
+
+                // If player is currently online, draw up to now with green indicator
+                if (profileData.isOnline && profileData.ongoingLoginTime) {
+                    const onlineLoginTime = profileData.ongoingLoginTime;
+                    if (onlineLoginTime) {
+                        const onlineStart = onlineLoginTime;
+                        const onlineNow = Math.min(now, dayEnd);
+                        if (onlineStart < dayEnd && onlineNow > dayStart) {
+                            const sStart = Math.max(onlineStart, dayStart);
+                            const sEnd = Math.min(onlineNow, dayEnd);
+                            const topPx = ((sStart - dayStart) / 86400000) * CHART_HEIGHT;
+                            const heightPx = Math.max(2, ((sEnd - sStart) / 86400000) * CHART_HEIGHT);
+
+                            // Check if this ongoing block overlaps an existing completed session block
+                            const alreadyRendered = daySessions.some(s => s.login <= onlineStart && s.logout >= onlineNow);
+                            if (!alreadyRendered) {
+                                const onlineBlock = document.createElement('div');
+                                onlineBlock.className = 'activity-session-block';
+                                onlineBlock.style.top = topPx + 'px';
+                                onlineBlock.style.height = heightPx + 'px';
+                                onlineBlock.style.left = '2px';
+                                onlineBlock.style.right = '2px';
+                                onlineBlock.style.background = 'rgba(16, 185, 129, 0.4)';
+                                onlineBlock.style.border = '1px solid rgba(16, 185, 129, 0.6)';
+
+                                const onlineLoginDate = new Date(onlineStart);
+                                const onlineNowDate = new Date(onlineNow);
+                                const onlineDurMin = Math.round((onlineNow - onlineStart) / 60000);
+                                const onlineDurH = Math.floor(onlineDurMin / 60);
+                                const onlineDurM = onlineDurMin % 60;
+
+                                onlineBlock.addEventListener('mouseenter', () => {
+                                    tooltip.innerHTML = `<strong style="color:#10b981">Online since ${onlineLoginDate.toLocaleTimeString(undefined, timeOpts)}</strong><br><span style="color:#9ca3af">${onlineDurH}h ${onlineDurM}m so far</span>`;
+                                    tooltip.style.opacity = '1';
+                                });
+                                onlineBlock.addEventListener('mousemove', (e) => {
+                                    tooltip.style.left = e.clientX + 'px';
+                                    if (e.clientY < 100) {
+                                        tooltip.style.transform = 'translate(-50%, 0)';
+                                        tooltip.style.marginTop = '15px';
+                                    } else {
+                                        tooltip.style.transform = '';
+                                        tooltip.style.marginTop = '';
+                                    }
+                                    tooltip.style.top = e.clientY + 'px';
+                                });
+                                onlineBlock.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; });
+                                // Touch support for mobile
+                                onlineBlock.addEventListener('touchstart', (e) => {
+                                    e.preventDefault();
+                                    showMobileTooltip(`<strong style="color:#10b981">Online since ${onlineLoginDate.toLocaleTimeString(undefined, timeOpts)}</strong><br><span style="color:#9ca3af">${onlineDurH}h ${onlineDurM}m so far</span>`);
+                                }, { passive: false });
+                                col.appendChild(onlineBlock);
+                            }
+
+                            // Green line at the current time position
+                            if (sEnd === onlineNow && now >= dayStart && now < dayEnd) {
+                                const lineTop = ((onlineNow - dayStart) / 86400000) * CHART_HEIGHT;
+                                const greenLine = document.createElement('div');
+                                greenLine.className = 'activity-online-now';
+                                greenLine.style.top = lineTop + 'px';
+
+                                const onlineLabel = document.createElement('span');
+                                onlineLabel.className = 'activity-online-label';
+                                onlineLabel.textContent = 'currently online';
+                                greenLine.appendChild(onlineLabel);
+
+                                col.appendChild(greenLine);
+                            }
+                        }
+                    }
+                }
+
+                chartGrid.appendChild(col);
+            }
+
+            chartWrapper.appendChild(chartGrid);
+            container.appendChild(chartWrapper);
+
+            // Append mobile tooltip to body (fixed position needs to be outside scrollable container)
+            document.body.appendChild(mobileTooltip);
+            // Clean up mobile tooltip when chart is re-rendered
+            const existingMobileTooltips = document.querySelectorAll('.activity-tap-tooltip');
+            existingMobileTooltips.forEach((el, i) => {
+                if (i < existingMobileTooltips.length - 1) el.remove();
+            });
+
+            // Timezone note
+            const tzNote = document.createElement('div');
+            const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || 'local';
+            tzNote.className = 'text-center text-xs text-gray-600 mt-3';
+            tzNote.textContent = `Times shown in your local timezone (${tzName})`;
+            container.appendChild(tzNote);
+        }
+
+        function openWeekPicker() {
+            const overlay = document.getElementById('week-picker-overlay');
+            const list = document.getElementById('week-picker-list');
+            list.innerHTML = '';
+
+            if (!activityAllWeeks || activityAllWeeks.length === 0) return;
+
+            // Group weeks by month (use week start date's month)
+            const monthGroups = new Map();
+            for (const week of activityAllWeeks) {
+                const d = new Date(week.weekStart);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const label = d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+                if (!monthGroups.has(key)) monthGroups.set(key, { label, weeks: [] });
+                monthGroups.get(key).weeks.push(week);
+            }
+
+            // Render in reverse chronological order
+            const sortedMonths = Array.from(monthGroups.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+            for (const [, group] of sortedMonths) {
+                const monthDiv = document.createElement('div');
+                monthDiv.className = 'week-picker-month-group';
+
+                const monthLabel = document.createElement('div');
+                monthLabel.className = 'week-picker-month-label';
+                monthLabel.textContent = group.label;
+                monthDiv.appendChild(monthLabel);
+
+                // Weeks in reverse order within month
+                const reversedWeeks = [...group.weeks].reverse();
+                for (const week of reversedWeeks) {
+                    const item = document.createElement('div');
+                    item.className = 'week-picker-item' + (week.weekStart === activityCurrentWeekStart ? ' active' : '');
+
+                    const wStart = new Date(week.weekStart);
+                    const wEnd = new Date(week.weekEnd - 1);
+                    const fmtOpts = { weekday: 'short', month: 'short', day: 'numeric' };
+
+                    const label = document.createElement('span');
+                    label.textContent = `${wStart.toLocaleDateString(undefined, fmtOpts)} – ${wEnd.toLocaleDateString(undefined, fmtOpts)}`;
+
+                    const hours = document.createElement('span');
+                    hours.className = 'wp-hours';
+                    hours.textContent = `${(week.totalMs / 3600000).toFixed(1)}h`;
+
+                    item.appendChild(label);
+                    item.appendChild(hours);
+                    item.onclick = () => {
+                        closeWeekPicker();
+                        renderActivityChart(week.weekStart);
+                    };
+                    monthDiv.appendChild(item);
+                }
+
+                list.appendChild(monthDiv);
+            }
+
+            overlay.classList.add('open');
+
+            // Scroll to the active week
+            requestAnimationFrame(() => {
+                const active = list.querySelector('.week-picker-item.active');
+                if (active) active.scrollIntoView({ block: 'center', behavior: 'instant' });
+            });
+        }
+
+        function closeWeekPicker() {
+            document.getElementById('week-picker-overlay').classList.remove('open');
+        }
+
+        // Close week picker on overlay click
+        document.addEventListener('click', (e) => {
+            const overlay = document.getElementById('week-picker-overlay');
+            if (e.target === overlay) closeWeekPicker();
+        });
+
+        // Close week picker on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeWeekPicker();
+        });
+
+        // --- Rank Badge Logic ---
+        function getPlayerRank(username) {
+            if (!leaderboardData || leaderboardData.length === 0) return -1;
+            const keys = Object.keys(leaderboardData[0]);
+            const userKey = keys.find(k => k.toLowerCase().includes('user') || k.toLowerCase().includes('name')) || keys[0];
+            const timeKey = keys.find(k => k.toLowerCase().includes('alltime')) || keys[1];
+            const sorted = [...leaderboardData].sort((a, b) => (parseFloat(b[timeKey]) || 0) - (parseFloat(a[timeKey]) || 0)).slice(0, 10);
+            const idx = sorted.findIndex(row => row[userKey] && row[userKey].toLowerCase() === username.toLowerCase());
+            return idx; // 0-based, -1 if not in top 10
+        }
+
+        function updateRankBadge(username) {
+            const container = document.getElementById('rank-badge-container');
+            container.innerHTML = '';
+            const rank = getPlayerRank(username);
+            if (rank < 0 || rank >= 10) return;
+            const badge = document.createElement('div');
+            let rankClass = 'rank-other';
+            if (rank === 0) rankClass = 'rank-1';
+            else if (rank === 1) rankClass = 'rank-2';
+            else if (rank === 2) rankClass = 'rank-3';
+            badge.className = `rank-badge ${rankClass}`;
+            badge.textContent = `#${rank + 1}`;
+            badge.title = `#${rank + 1} All-Time`;
+            container.appendChild(badge);
+        }
+
+        function setFontSize(sizeClass) {
+            const container = document.getElementById('view-profile');
+            container.classList.remove('text-sm', 'text-base', 'text-lg');
+            container.classList.add(sizeClass);
+            document.getElementById('settings-menu').classList.add('hidden');
+        }
+
+        // --- Leaderboard & List (Same as before) ---
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch('../../data/leaderboard.csv');
+                if (!response.ok) throw new Error('Failed');
+                const csvText = await response.text();
+                const results = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+                leaderboardData = results.data;
+                renderLeaderboard();
+                const currentProfileName = document.getElementById('profile-username')?.textContent?.trim();
+                if (currentProfileName) {
+                    updateRankBadge(currentProfileName);
+                }
+            } catch (error) { document.getElementById('leaderboard-list').innerHTML = '<div class="text-center text-gray-500 text-sm py-4">Unavailable</div>'; }
+        }
+        function switchLeaderboard(tab) {
+            currentLeaderboardTab = tab;
+            ['weekly', 'monthly', 'alltime'].forEach(t => {
+                document.getElementById(`tab-${t}`).className = t === tab ? 'flex-1 py-1 px-2 text-sm rounded-md transition-colors bg-nara-red text-white font-bold' : 'flex-1 py-1 px-2 text-sm rounded-md transition-colors text-gray-400 hover:text-white';
+            });
+            renderLeaderboard();
+        }
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboard-list'); container.innerHTML = '';
+            if (leaderboardData.length === 0) { container.innerHTML = '<div class="text-center text-gray-500 text-sm">No data</div>'; return; }
+            const keys = Object.keys(leaderboardData[0]);
+            const userKey = keys.find(k => k.toLowerCase().includes('user') || k.toLowerCase().includes('name')) || keys[0];
+            const timeKey = keys.find(k => k.toLowerCase().includes(currentLeaderboardTab)) || keys[1];
+            const sortedData = [...leaderboardData].sort((a, b) => (parseFloat(b[timeKey])||0) - (parseFloat(a[timeKey])||0)).slice(0, 10);
+            sortedData.forEach((row, index) => {
+                const username = row[userKey]; const timeVal = row[timeKey];
+                const item = document.createElement('div');
+                item.className = 'flex items-center gap-3 bg-gray-800/50 p-2 rounded hover:bg-gray-800 transition-colors cursor-pointer';
+                item.onclick = () => { updateURL(null, username); showProfileView(username); };
+                let rankClass = index === 0 ? 'text-yellow-400' : index === 1 ? 'text-gray-300' : index === 2 ? 'text-amber-600' : 'text-gray-400';
+                item.innerHTML = `<div class="font-bold w-6 text-center ${rankClass}">#${index + 1}</div><img src="https://minotar.net/avatar/${username}/32" class="w-8 h-8 rounded bg-gray-700"><div class="flex-1 min-w-0"><div class="text-sm font-medium truncate text-white">${username}</div><div class="text-xs text-gray-400">${timeVal} hrs</div></div>`;
+                container.appendChild(item);
+            });
+        }
+        // Helper function to process session data into player map
+        function processSessionData(data, playerMap, now) {
+            const logins = data.loginTimestamps || [];
+            const logouts = data.logoutTimestamps || [];
+            const names = data.mcNames || [];
+            
+            for (let i = 0; i < logins.length; i++) {
+                const username = names[i] || 'Unknown';
+                const loginTime = logins[i];
+                const logoutTime = logouts[i]; // null if still online
+                
+                // Only keep the most recent session per player
+                if (!playerMap.has(username) || loginTime > playerMap.get(username).loginTime) {
+                    let isOnline = logoutTime === null;
+                    let durationHours = 0;
+                    let durationMinutes = 0;
+                    
+                    if (isOnline && loginTime) {
+                        const diff = now - loginTime;
+                        durationHours = Math.floor(diff / 3600000);
+                        durationMinutes = Math.floor((diff % 3600000) / 60000);
+                        if (durationHours >= 24) isOnline = false;
+                    }
+                    
+                    playerMap.set(username, {
+                        username,
+                        lowerName: username.toLowerCase(),
+                        isOnline,
+                        loginTime,
+                        logoutTime: logoutTime || loginTime,
+                        durationHours,
+                        durationMinutes
+                    });
+                }
+            }
+        }
+        
+        // Helper function to process mc-accounts data into player map
+        function processAccountData(data, playerMap, now) {
+            const names = data.mcNames || [];
+            const lastLogins = data.lastLoginTimestamps || [];
+            const lastLogouts = data.lastLogoutTimestamps || [];
+            
+            for (let i = 0; i < names.length; i++) {
+                const username = names[i];
+                if (!username) continue;
+                
+                const lastLogin = lastLogins[i] || 0;
+                const lastLogout = lastLogouts[i] || 0;
+                
+                // Check if player already exists in map (from session data)
+                const existing = playerMap.get(username);
+                
+                if (existing) {
+                    // Player exists from session data - check if account data indicates they're online
+                    // If lastLogin > lastLogout from accounts API, they might be online
+                    if (lastLogin > lastLogout && !existing.isOnline) {
+                        // Account data suggests online, session data didn't catch it
+                        // Check if this login is more recent than what we have
+                        if (lastLogin > existing.loginTime) {
+                            const diff = now - lastLogin;
+                            const durationHours = Math.floor(diff / 3600000);
+                            const durationMinutes = Math.floor((diff % 3600000) / 60000);
+                            
+                            // Only mark as online if the session isn't stale (< 24 hours)
+                            if (durationHours < 24) {
+                                existing.isOnline = true;
+                                existing.loginTime = lastLogin;
+                                existing.durationHours = durationHours;
+                                existing.durationMinutes = durationMinutes;
+                            }
+                        }
+                    }
+                } else {
+                    // New player not in session data - add from accounts
+                    let isOnline = lastLogin > lastLogout;
+                    let durationHours = 0;
+                    let durationMinutes = 0;
+                    
+                    if (isOnline && lastLogin) {
+                        const diff = now - lastLogin;
+                        durationHours = Math.floor(diff / 3600000);
+                        durationMinutes = Math.floor((diff % 3600000) / 60000);
+                        // Don't mark as online if session is stale
+                        if (durationHours >= 24) isOnline = false;
+                    }
+                    
+                    playerMap.set(username, {
+                        username,
+                        lowerName: username.toLowerCase(),
+                        isOnline,
+                        loginTime: lastLogin,
+                        logoutTime: lastLogout || lastLogin,
+                        durationHours,
+                        durationMinutes
+                    });
+                }
+            }
+        }
+
+        async function fetchPlayers() {
+            try {
+                const now = Date.now();
+                const oneDayAgo = now - (24 * 60 * 60 * 1000);
+                const playerMap = new Map();
+                
+                // Step 1: Fetch players active in last 24 hours (includes online players from sessions)
+                console.log('Fetching recent players (last 24h)...');
+                const recentResponse = await fetchAPI(`https://api.civinfo.net/mc-sessions/all?after=${oneDayAgo}`);
+                if (!recentResponse.ok) throw new Error('Failed to fetch recent players');
+                const recentData = await recentResponse.json();
+                
+                if (!Array.isArray(recentData.loginTimestamps)) throw new Error('Invalid API response');
+                
+                console.log(`Recent sessions: ${recentData.loginTimestamps.length}`);
+                processSessionData(recentData, playerMap, now);
+                console.log(`Unique players after recent fetch: ${playerMap.size}`);
+                
+                // Render recent players immediately
+                allPlayers = Array.from(playerMap.values());
+                allPlayers.sort((a, b) => (a.isOnline === b.isOnline) ? (a.isOnline ? a.loginTime - b.loginTime : b.logoutTime - a.logoutTime) : (a.isOnline ? -1 : 1));
+                cachedElements.headerCount.textContent = allPlayers.filter(p => p.isOnline).length;
+                
+                // Start prefetching online player avatars immediately
+                for (let i = 0; i < allPlayers.length && allPlayers[i].isOnline; i++) {
+                    cacheAvatar(allPlayers[i].username);
+                }
+                
+                renderPlayers();
+                scheduleAvatarCheck();
+                
+                // Step 2: Fetch ALL players from mc-accounts endpoint
+                console.log('Fetching all players from mc-accounts...');
+                const allResponse = await fetchAPI('https://api.civinfo.net/mc-accounts/all?limit=50000');
+                if (allResponse.ok) {
+                    const allData = await allResponse.json();
+                    
+                    if (Array.isArray(allData.mcNames)) {
+                        console.log(`Total accounts from API: ${allData.mcNames.length}`);
+                        processAccountData(allData, playerMap, now);
+                        console.log(`Total unique players: ${playerMap.size}`);
+                        
+                        // Re-render with all players
+                        allPlayers = Array.from(playerMap.values());
+                        allPlayers.sort((a, b) => (a.isOnline === b.isOnline) ? (a.isOnline ? a.loginTime - b.loginTime : b.logoutTime - a.logoutTime) : (a.isOnline ? -1 : 1));
+                        cachedElements.headerCount.textContent = allPlayers.filter(p => p.isOnline).length;
+                        
+                        renderPlayers();
+                        scheduleAvatarCheck();
+                    }
+                } else {
+                    console.error('Failed to fetch all players:', allResponse.status);
+                }
+                
+                const hasOnline = allPlayers.some(p => p.isOnline);
+                if (hasOnline && durationIntervalId === null) {
+                    durationIntervalId = setInterval(updateDurations, 60000);
+                } else if (!hasOnline && durationIntervalId !== null) {
+                    clearInterval(durationIntervalId);
+                    durationIntervalId = null;
+                }
+            } catch (error) { 
+                console.error(error);
+                document.getElementById('player-grid').innerHTML = '<div class="col-span-full text-center text-red-400">Failed to load player data</div>'; 
+            }
+        }
+        function renderPlayers() {
+            const grid = cachedElements.playerGrid; 
+            const searchTerm = cachedElements.playerSearch ? cachedElements.playerSearch.value.trim().toLowerCase() : '';
+
+            if (!allPlayers || !Array.isArray(allPlayers)) {
+                grid.innerHTML = '<div class="col-span-full text-center text-red-400 py-8">Player data unavailable</div>';
+                return;
+            }
+
+            if (allPlayers.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">Loading player data...</div>';
+                return;
+            }
+
+            // Single pass: filter and split online/offline simultaneously
+            onlinePlayers = [];
+            offlinePlayers = [];
+            
+            if (searchTerm) {
+                for (let i = 0; i < allPlayers.length; i++) {
+                    const player = allPlayers[i];
+                    if (player.lowerName && player.lowerName.includes(searchTerm)) {
+                        if (player.isOnline) onlinePlayers.push(player);
+                        else offlinePlayers.push(player);
+                    }
+                }
+            } else {
+                for (let i = 0; i < allPlayers.length; i++) {
+                    const player = allPlayers[i];
+                    if (player.isOnline) onlinePlayers.push(player);
+                    else offlinePlayers.push(player);
+                }
+            }
+            
+            offlineIndex = 0;
+
+            if (onlinePlayers.length === 0 && offlinePlayers.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">No players found</div>';
+                teardownInfiniteScroll();
+                return;
+            }
+
+            teardownInfiniteScroll();
+            grid.innerHTML = '';
+
+            // Render online players first (typically small count, render immediately)
+            if (onlinePlayers.length > 0) {
+                appendPlayerCards(grid, onlinePlayers, true);
+            }
+
+            // Render offline players in chunks using requestAnimationFrame
+            const maxInitialCards = searchTerm ? Number.POSITIVE_INFINITY : INITIAL_OFFLINE_LIMIT;
+            const availableOfflineSlots = Math.max(0, maxInitialCards - onlinePlayers.length);
+            const initialOfflineCount = Math.min(availableOfflineSlots, offlinePlayers.length);
+
+            if (initialOfflineCount > 0) {
+                let rendered = 0;
+                const CHUNK_SIZE = 20;
+                
+                function renderOfflineChunk() {
+                    if (rendered >= initialOfflineCount) {
+                        // Done with initial batch, setup infinite scroll
+                        offlineIndex = initialOfflineCount;
+                        if (!searchTerm && offlinePlayers.length > offlineIndex) {
+                            setupInfiniteScroll(grid);
+                            cacheUpcomingAvatars(offlineIndex);
+                        }
+                        return;
+                    }
+                    
+                    const end = Math.min(rendered + CHUNK_SIZE, initialOfflineCount);
+                    const chunk = offlinePlayers.slice(rendered, end);
+                    appendPlayerCards(grid, chunk);
+                    rendered = end;
+                    
+                    requestAnimationFrame(renderOfflineChunk);
+                }
+                
+                requestAnimationFrame(renderOfflineChunk);
+            } else {
+                // No offline players to render, but may need infinite scroll
+                if (!searchTerm && offlinePlayers.length > 0) {
+                    setupInfiniteScroll(grid);
+                    cacheUpcomingAvatars(0);
+                }
+            }
+        }
+        function updateDurations() {
+            const now = Date.now();
+            document.querySelectorAll('.duration-text').forEach(el => {
+                const loginTime = parseInt(el.dataset.login);
+                if (loginTime) {
+                    const diff = now - loginTime;
+                    const hours = Math.floor(diff / 3600000);
+                    const minutes = Math.floor((diff % 3600000) / 60000);
+                    el.textContent = `${hours}h ${minutes}m`;
+                }
+            });
+        }
+        function updateURL(searchTerm, player) {
+            const url = new URL(window.location);
+            if (searchTerm !== null) {
+                if (searchTerm) url.searchParams.set('search', searchTerm);
+                else url.searchParams.delete('search');
+            }
+            if (player !== null) {
+                url.searchParams.delete('player');
+                if (player) {
+                    url.pathname = baseStatsPath + encodeURIComponent(player);
+                } else {
+                    url.pathname = baseStatsPath;
+                }
+            }
+            window.history.pushState({}, '', url);
+        }
+    </script>
+</body>
+</html>
+
