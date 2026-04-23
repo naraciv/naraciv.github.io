@@ -18,7 +18,7 @@ class CustomNavbar extends HTMLElement {
         }
         .nav-container {
           display: flex;
-          justify-content: space-between;
+          justify-content: flex-start;
           align-items: center;
           max-width: 1200px;
           margin: 0 auto;
@@ -26,7 +26,7 @@ class CustomNavbar extends HTMLElement {
           position: relative;
         }
         .nav-logo {
-          font-size: 1.5rem;
+          font-size: 1.7rem;
           font-weight: 900;
           text-decoration: none;
           z-index: 9001;
@@ -50,6 +50,7 @@ class CustomNavbar extends HTMLElement {
           display: flex;
           gap: 1.5rem;
           align-items: center;
+          margin-left: 1rem;
         }
         .nav-link {
           color: #546E7A;
@@ -193,7 +194,7 @@ class CustomNavbar extends HTMLElement {
           }
           
           .nav-logo {
-            font-size: 1.25rem;
+            font-size: 1.35rem;
           }
           
           .menu-toggle {
