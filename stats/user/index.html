@@ -16,36 +16,8 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" defer></script>
     <link rel="stylesheet" href="../../style.css" fetchpriority="high">
     <style>
-        /* Custom scrollbar for leaderboard */
-        .leaderboard-scroll::-webkit-scrollbar { width: 6px; }
-        .leaderboard-scroll::-webkit-scrollbar-track { background: #1f2937; }
-        .leaderboard-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
-        .leaderboard-scroll::-webkit-scrollbar-thumb:hover { background: #6b7280; }
-
-        .player-card { 
-            transition: transform 0.2s, background-color 0.2s;
-        }
-        .player-card:hover { transform: translateY(-2px); background-color: #1f2937; }
-        
-        .status-indicator {
-            position: absolute; bottom: -5px; right: -5px; width: 20px; height: 20px;
-            border-radius: 50%; border: 4px solid #111827; z-index: 10;
-        }
-        .status-online { background-color: #10b981; }
-        .status-offline { background-color: #ef4444; }
-
-        .time-tooltip {
-            visibility: hidden; opacity: 0; position: absolute; bottom: 100%; left: 50%;
-            transform: translateX(-50%); margin-bottom: 8px; padding: 6px 12px;
-            background: rgba(31, 41, 55, 0.95); border: 1px solid #374151; color: #f9fafb;
-            font-size: 0.85rem; font-weight: 500; border-radius: 6px; white-space: nowrap; z-index: 99999;
-            transition: opacity 0.2s; pointer-events: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(4px);
-        }
-        .group:hover .time-tooltip { visibility: visible; opacity: 1; }
 
         /* Calendar Styles */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
@@ -64,7 +36,6 @@
         .line-path { fill: none; stroke: #ef4444; stroke-width: 2px; }
         .bar-rect { fill: #ef4444; }
         .brush .selection { fill: #ef4444; fill-opacity: 0.3; stroke: #ef4444; stroke-width: 1px; }
-        .brush .handle { fill: #ef4444; width: 6px; }
         
         /* Invisible overlay for capturing mouse events on line chart */
         .overlay { fill: none; pointer-events: all; }
@@ -78,7 +49,7 @@
             transition: opacity 0.15s ease;
         }
 
-        /* Rank Badge on Skin Viewer */
+        /* Profile rank badge (top 10 all-time) */
         .rank-badge {
             position: absolute; top: 8px; left: 8px; z-index: 20;
             width: 32px; height: 32px; border-radius: 50%;
@@ -190,9 +161,6 @@
             transition: background 0.15s; text-align: center;
         }
         .activity-week-label:hover { background: #1f2937; }
-        .activity-grid {
-            display: grid; gap: 0;
-        }
         .activity-session-block {
             position: absolute; left: 0; right: 0;
             background: rgba(239, 68, 68, 0.6);
@@ -323,72 +291,7 @@
 
     <main class="flex-grow py-10 px-4">
         
-        <!-- VIEW: LIST (Default) -->
-        <div id="view-list" class="max-w-[95%] mx-auto w-full flex flex-col lg:flex-row gap-8">
-            
-            <!-- Left Sidebar: Leaderboard (20%) -->
-            <div class="w-full lg:w-1/5 flex flex-col gap-6 lg:sticky lg:top-24">
-                <div class="bg-gray-900 rounded-lg border border-gray-800 p-4 h-fit">
-                    <h2 class="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
-                        <i data-feather="bar-chart-2"></i> Leaderboard
-                    </h2>
-                    
-                    <!-- Tabs -->
-                    <div class="flex gap-2 mb-4 bg-gray-800 p-1 rounded-lg">
-                        <button onclick="switchLeaderboard('weekly')" id="tab-weekly" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors bg-nara-red text-white font-bold">Weekly</button>
-                        <button onclick="switchLeaderboard('monthly')" id="tab-monthly" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors text-gray-400 hover:text-white">Monthly</button>
-                        <button onclick="switchLeaderboard('alltime')" id="tab-alltime" class="flex-1 py-1 px-2 text-sm rounded-md transition-colors text-gray-400 hover:text-white">All-Time</button>
-                    </div>
-
-                    <!-- List -->
-                    <div id="leaderboard-list" class="space-y-3 leaderboard-scroll max-h-[60vh] overflow-y-auto pr-2">
-                        <!-- Populated by JS -->
-                        <div class="text-center text-gray-500 py-4">Loading...</div>
-                    </div>
-                    
-                    <div class="mt-4 text-xs text-gray-500 text-center border-t border-gray-800 pt-3">
-                        Updated daily at 12am UTC
-                    </div>
-                </div>
-
-                <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 text-sm text-gray-300">
-                    <p class="font-semibold text-white">Sources</p>
-                    <p class="mt-2 leading-relaxed">Playtime stats are provided by <a href="https://api.civinfo.net" target="_blank" class="text-nara-red hover:underline">api.civinfo.net</a>. Please contact <span class="font-medium">Gjum</span> if you spot any data errors. Player heads are sourced from <a href="https://mc-heads.net" target="_blank" class="text-nara-red hover:underline">mc-heads.net</a> and <a href="https://minotar.net" target="_blank" class="text-nara-red hover:underline">minotar.net</a>.</p>
-                    
-                    <p class="">Performance errors are likely my fault.</p>
-                </div>
-            </div>
-
-            <!-- Right Content: Player Grid (80%) -->
-            <div class="w-full lg:w-4/5">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                    <h1 class="text-4xl font-bold text-primary flex items-center gap-3">
-                        Online Players 
-                        <span class="text-gray-400 text-2xl flex items-center gap-2">
-                            <i data-feather="users" class="w-6 h-6"></i> <span id="header-count">0</span>
-                        </span>
-                    </h1>
-                    
-                    <!-- Search -->
-                    <div class="relative w-full md:w-[30%]">
-                        <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
-                        <input type="text" id="player-search" placeholder="Search players..." 
-                               class="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-nara-red transition-colors">
-                    </div>
-                </div>
-
-                <!-- Grid -->
-                <div id="player-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-                    <!-- Populated by JS -->
-                    <div class="col-span-full text-center py-12 text-gray-500">
-                        Loading player data...
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW: PROFILE (Hidden by default) -->
-        <div id="view-profile" class="hidden max-w-[95%] mx-auto w-full flex flex-col lg:flex-row gap-8">
+        <div id="view-profile" class="max-w-[95%] mx-auto w-full flex flex-col lg:flex-row gap-8">
             
             <!-- Left Sidebar: Profile Info (25%) -->
             <div class="w-full lg:w-1/4 flex flex-col gap-6 lg:sticky lg:top-24 lg:self-start">
@@ -434,13 +337,10 @@
                             <div id="profile-last-logout" class="text-white">Loading...</div>
                         </div>
 
-                        <a id="profile-namemc" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-gray-300 hover:text-white">
-                            <i data-feather="external-link" class="w-4 h-4"></i> NameMC Profile
+                        <a id="profile-namemc" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-gray-300 hover:text-white p-1">
+                            <i data-feather="external-link" class="w-4 h-4 ml-4"></i> NameMC Profile
                         </a>
                         
-                        <button onclick="goBackToList()" class="flex items-center justify-center gap-2 w-full py-2 border border-gray-700 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-white mt-4">
-                            <i data-feather="arrow-left" class="w-4 h-4"></i> Back to List
-                        </button>
                     </div>
                 </div>
 
@@ -538,50 +438,26 @@
     
     <script>
         // --- Global State ---
-        let allPlayers = [];
         let leaderboardData = [];
-        let currentLeaderboardTab = 'weekly';
         let profileData = null;
         let skinViewer = null;
         let currentChartType = 'calendar';
         let currentGranularity = 'weekly'; 
         let userGranularityPreference = 'weekly'; // User's preferred granularity (daily or weekly)
-        let durationIntervalId = null;
         let showEmptyMonths = false;
-        const INITIAL_OFFLINE_LIMIT = 50; // Only render what fits on screen initially
-        const OFFLINE_BATCH_SIZE = 30;
-        const PREFETCH_AHEAD = 100;
         
         // Cache DOM elements
         let cachedElements = {
-            playerGrid: null,
-            playerSearch: null,
-            headerCount: null,
-            viewList: null,
             viewProfile: null
         };
-
-        let filteredPlayers = [];
-        let onlinePlayers = [];
-        let offlinePlayers = [];
-        let offlineIndex = 0;
-        let loadMoreObserver = null;
-        const loadMoreSentinel = document.createElement('div');
-        loadMoreSentinel.id = 'player-grid-sentinel';
-        loadMoreSentinel.className = 'h-8 col-span-full';
-        const prefetchedAvatars = new Set();
 
         const pathSegments = window.location.pathname.split('/').filter(p => p);
         const statsIndex = pathSegments.indexOf('stats');
         const baseStatsPath = statsIndex === -1
             ? window.location.pathname
             : '/' + pathSegments.slice(0, statsIndex + 1).join('/') + '/';
+        const CHART_TYPES = new Set(['calendar', 'bar', 'heatmap', 'activity']);
 
-        const ICON_CLOCK = '<svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
-        const ICON_LOGOUT = '<svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>';
-
-        let avatarObserver = null;
-        
         const SERVER_START_DATE = 1654041600000; 
         const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
         const MAX_SESSION_MS = 23.8 * 60 * 60 * 1000; 
@@ -593,65 +469,63 @@
             return fetch(url, { headers: API_HEADERS });
         }
 
-        // Avatar hash checking
-        let badAvatarHashes = new Set();
-        let hashCheckInitialized = false;
-
-        // Calculate image hash
-        async function getImageHash(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    try {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0);
-                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                        
-                        // Simple hash: sum of all pixel values
-                        let hash = 0;
-                        for (let i = 0; i < imageData.data.length; i++) {
-                            hash = ((hash << 5) - hash) + imageData.data[i];
-                            hash = hash & hash; // Convert to 32bit integer
-                        }
-                        resolve(hash.toString());
-                    } catch (e) {
-                        reject(e);
-                    }
-                };
-                img.onerror = () => reject(new Error('Failed to load image'));
-                img.src = url;
-            });
+        function parseSimpleCsv(csvText) {
+            const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
+            if (lines.length < 2) return [];
+            const headers = lines[0].split(',').map(h => h.trim());
+            const rows = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                const row = {};
+                for (let j = 0; j < headers.length; j++) {
+                    row[headers[j]] = (values[j] || '').trim();
+                }
+                rows.push(row);
+            }
+            return rows;
         }
 
-        // Initialize bad avatar hashes
-        async function initializeBadHashes() {
-            if (hashCheckInitialized) return;
+        async function loadLeaderboardData() {
             try {
-                const blackHash = await getImageHash('../../static/black.png');
-                const steveHash = await getImageHash('../../static/steve.png');
-                badAvatarHashes.add(blackHash);
-                badAvatarHashes.add(steveHash);
-                console.log('Bad avatar hashes initialized:', Array.from(badAvatarHashes));
-                hashCheckInitialized = true;
-            } catch (e) {
-                console.error('Failed to initialize bad hashes:', e);
+                const response = await fetch('../../data/leaderboard.csv');
+                if (!response.ok) throw new Error('Failed to load leaderboard data');
+                const csvText = await response.text();
+                leaderboardData = parseSimpleCsv(csvText);
+                const currentProfileName = document.getElementById('profile-username')?.textContent?.trim();
+                if (currentProfileName) {
+                    updateRankBadge(currentProfileName);
+                }
+            } catch (error) {
+                leaderboardData = [];
             }
         }
 
-        // Check if an avatar URL returns a bad hash
-        async function isAvatarBad(url) {
-            if (!hashCheckInitialized) await initializeBadHashes();
-            try {
-                const hash = await getImageHash(url);
-                const isBad = badAvatarHashes.has(hash);
-                return isBad;
-            } catch (e) {
-                return false; // If we can't check, assume it's okay
-            }
+        function getPlayerRank(username) {
+            if (!leaderboardData.length || !username) return -1;
+            const keys = Object.keys(leaderboardData[0]);
+            const userKey = keys.find(k => k.toLowerCase().includes('user') || k.toLowerCase().includes('name')) || keys[0];
+            const timeKey = keys.find(k => k.toLowerCase().includes('alltime')) || keys[1];
+            const sorted = [...leaderboardData]
+                .sort((a, b) => (parseFloat(b[timeKey]) || 0) - (parseFloat(a[timeKey]) || 0))
+                .slice(0, 10);
+            return sorted.findIndex(row => row[userKey] && row[userKey].toLowerCase() === username.toLowerCase());
+        }
+
+        function updateRankBadge(username) {
+            const container = document.getElementById('rank-badge-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const rank = getPlayerRank(username);
+            if (rank < 0 || rank >= 10) return;
+            const badge = document.createElement('div');
+            let rankClass = 'rank-other';
+            if (rank === 0) rankClass = 'rank-1';
+            else if (rank === 1) rankClass = 'rank-2';
+            else if (rank === 2) rankClass = 'rank-3';
+            badge.className = `rank-badge ${rankClass}`;
+            badge.textContent = `#${rank + 1}`;
+            badge.title = `#${rank + 1} All-Time`;
+            container.appendChild(badge);
         }
 
         // --- External Script Loading ---
@@ -708,163 +582,8 @@
             }
         }
 
-        function ensureAvatarObserver() {
-            if (!('IntersectionObserver' in window)) {
-                return null;
-            }
-            if (!avatarObserver) {
-                avatarObserver = new IntersectionObserver((entries) => {
-                    for (let i = 0; i < entries.length; i++) {
-                        const entry = entries[i];
-                        if (!entry.isIntersecting) continue;
-                        const img = entry.target;
-                        avatarObserver.unobserve(img);
-                        const username = img.dataset.username;
-                        if (username) resolveAvatarUrl(username, img);
-                    }
-                }, { rootMargin: '500px' }); // Load avatars 500px before they enter viewport
-            }
-            return avatarObserver;
-        }
-
-        function ensureLoadMoreObserver() {
-            if (!('IntersectionObserver' in window)) {
-                return null;
-            }
-            if (!loadMoreObserver) {
-                loadMoreObserver = new IntersectionObserver((entries) => {
-                    if (entries.some(entry => entry.isIntersecting)) {
-                        loadMoreOfflinePlayers();
-                    }
-                }, { rootMargin: '200px' });
-            }
-            return loadMoreObserver;
-        }
-
-        function setupInfiniteScroll(grid) {
-            const observer = ensureLoadMoreObserver();
-            if (!observer) return;
-            if (!grid.contains(loadMoreSentinel)) {
-                grid.appendChild(loadMoreSentinel);
-            }
-            observer.observe(loadMoreSentinel);
-        }
-
-        function teardownInfiniteScroll() {
-            if (loadMoreObserver) {
-                loadMoreObserver.disconnect();
-            }
-            if (loadMoreSentinel.parentElement) {
-                loadMoreSentinel.parentElement.removeChild(loadMoreSentinel);
-            }
-        }
-
-        function appendPlayerCards(grid, players, isEager = false) {
-            if (!players.length) return;
-            const now = Date.now();
-            const fragment = document.createDocumentFragment();
-            const observer = isEager ? null : ensureAvatarObserver();
-            const imagesToLoad = [];
-            
-            for (let i = 0; i < players.length; i++) {
-                const player = players[i];
-                const statusClass = player.isOnline ? 'status-online' : 'status-offline';
-                const referenceTime = player.isOnline ? player.loginTime : player.logoutTime;
-                const tooltipTime = referenceTime ? new Date(referenceTime).toLocaleString() : 'Unknown';
-
-                let statusContent;
-                if (player.isOnline) {
-                    statusContent = `${ICON_CLOCK}<span>Online for <span class="duration-text" data-login="${player.loginTime}">${player.durationHours}h ${player.durationMinutes}m</span></span>`;
-                } else {
-                    const diffMs = referenceTime ? now - referenceTime : 0;
-                    const diffDays = Math.floor(diffMs / 86400000);
-                    statusContent = `${ICON_LOGOUT}<span>${diffDays < 1 ? 'Offline < 1 day' : `Offline for ${diffDays} days`}</span>`;
-                }
-
-                const card = document.createElement('div');
-                card.className = 'player-card bg-gray-900 border border-gray-800 rounded-lg p-4 flex flex-col items-center gap-3 relative cursor-pointer';
-                card.dataset.username = player.username;
-                
-                card.innerHTML = `<div class="relative"><img class="w-20 h-20 rounded-md shadow-lg bg-gray-800" alt="" data-username="${player.username}"><div class="${statusClass} status-indicator"></div></div><div class="font-bold text-white text-lg truncate w-full text-center mt-2">${player.username}</div><div class="text-center w-full mt-1"><div class="relative group cursor-help flex items-center justify-center gap-2 text-sm text-gray-400 font-medium">${statusContent}<div class="time-tooltip">${tooltipTime}</div></div></div>`;
-                
-                // Collect image reference directly
-                const img = card.querySelector('img');
-                if (img) imagesToLoad.push({ img, username: player.username });
-                
-                fragment.appendChild(card);
-            }
-
-            // Insert all cards at once
-            const insertionPoint = loadMoreSentinel.parentElement === grid ? loadMoreSentinel : null;
-            if (insertionPoint) {
-                grid.insertBefore(fragment, insertionPoint);
-            } else {
-                grid.appendChild(fragment);
-            }
-
-            // Load avatars from collected references (no DOM query needed)
-            for (let i = 0; i < imagesToLoad.length; i++) {
-                const { img, username } = imagesToLoad[i];
-                if (isEager) {
-                    resolveAvatarUrl(username, img, true);
-                } else if (observer) {
-                    observer.observe(img);
-                } else {
-                    resolveAvatarUrl(username, img);
-                }
-            }
-        }
-
-        function cacheAvatar(username) {
-            if (!username || prefetchedAvatars.has(username)) return;
-            prefetchedAvatars.add(username);
-            const img = new Image();
-            img.src = `https://mc-heads.net/avatar/${username}/32`;
-        }
-
-        function cacheUpcomingAvatars(startIndex) {
-            const endIndex = Math.min(startIndex + PREFETCH_AHEAD, offlinePlayers.length);
-            for (let i = startIndex; i < endIndex; i++) {
-                cacheAvatar(offlinePlayers[i].username);
-            }
-        }
-
-        function loadMoreOfflinePlayers() {
-            if (offlineIndex >= offlinePlayers.length) {
-                teardownInfiniteScroll();
-                return;
-            }
-            const grid = document.getElementById('player-grid');
-            if (!grid) return;
-            const nextCount = Math.min(OFFLINE_BATCH_SIZE, offlinePlayers.length - offlineIndex);
-            const nextBatch = offlinePlayers.slice(offlineIndex, offlineIndex + nextCount);
-            offlineIndex += nextCount;
-            appendPlayerCards(grid, nextBatch);
-            cacheUpcomingAvatars(offlineIndex);
-
-            if (offlineIndex >= offlinePlayers.length) {
-                teardownInfiniteScroll();
-            }
-        }
-
-        // Debounce function for search
-        let searchTimeout = null;
-        function debouncedRenderPlayers(searchValue) {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                renderPlayers();
-                updateURL(searchValue, null);
-                // Check avatars after search filter
-                scheduleAvatarCheck();
-            }, 200);
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             // Cache shared elements because profile logic references them.
-            cachedElements.playerGrid = document.getElementById('player-grid');
-            cachedElements.playerSearch = document.getElementById('player-search');
-            cachedElements.headerCount = document.getElementById('header-count');
-            cachedElements.viewList = document.getElementById('view-list');
             cachedElements.viewProfile = document.getElementById('view-profile');
 
             const requestedPlayer = getRequestedPlayerFromLocation();
@@ -873,26 +592,7 @@
                 return;
             }
 
-            cachedElements.viewList.classList.add('hidden');
-            cachedElements.viewProfile.classList.remove('hidden');
-
-            document.addEventListener('click', (e) => {
-                const menu = document.getElementById('settings-menu');
-                const btn = document.getElementById('settings-btn');
-                if (!menu || !btn) return;
-                if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                    menu.classList.add('hidden');
-                }
-            });
-
-            const settingsBtn = document.getElementById('settings-btn');
-            if (settingsBtn) {
-                settingsBtn.addEventListener('click', () => {
-                    document.getElementById('settings-menu').classList.toggle('hidden');
-                });
-            }
-
-            loadLeaderboard();
+            loadLeaderboardData();
             handleRouting();
         });
 
@@ -921,7 +621,18 @@
 
             const slug = trailingSegments[0];
             if (!slug || slug === 'user' || slug === 'index.html') return null;
-            return decodeURIComponent(slug);
+            const decodedSlug = decodeURIComponent(slug);
+            const graphType = params.get('graph_type');
+            if (CHART_TYPES.has(decodedSlug) && graphType === decodedSlug) {
+                const rememberedPlayer = sessionStorage.getItem('stats:lastPlayer');
+                if (rememberedPlayer) {
+                    const fixedUrl = new URL(window.location.href);
+                    fixedUrl.pathname = baseStatsPath + encodeURIComponent(rememberedPlayer);
+                    window.history.replaceState({}, '', fixedUrl);
+                    return rememberedPlayer;
+                }
+            }
+            return decodedSlug;
         }
 
         function handleRouting() {
@@ -931,21 +642,6 @@
                 return;
             }
             showProfileView(player);
-        }
-
-        function goBackToList() {
-            window.location.href = baseStatsPath;
-        }
-
-        function showListView(searchTerm, scrollToTop = false) {
-            cachedElements.viewList.classList.remove('hidden');
-            cachedElements.viewProfile.classList.add('hidden');
-            if (searchTerm) cachedElements.playerSearch.value = searchTerm;
-            if (allPlayers.length === 0) { loadLeaderboard(); fetchPlayers(); }
-            else renderPlayers();
-            refreshIcons();
-            if (skinViewer) { skinViewer.dispose(); skinViewer = null; }
-            if (scrollToTop) window.scrollTo(0, 0);
         }
 
         // --- Player Names Cache (for case-sensitivity spell checking + UUID lookup) ---
@@ -1016,8 +712,6 @@
         }
 
         async function showProfileView(username) {
-            cachedElements.viewList.classList.add('hidden');
-            cachedElements.viewProfile.classList.remove('hidden');
             document.getElementById('profile-username').textContent = username;
             document.getElementById('profile-playtime').textContent = 'Loading...';
             document.getElementById('chart-calendar').innerHTML = '<div class="text-center py-20 text-gray-500">Loading history...</div>';
@@ -1038,6 +732,7 @@
             // Update display and URL if the case was corrected
             document.getElementById('profile-username').textContent = username;
             updateRankBadge(username);
+            sessionStorage.setItem('stats:lastPlayer', username);
             const currentPath = window.location.pathname;
             const expectedSuffix = '/' + encodeURIComponent(username);
             if (!currentPath.endsWith(expectedSuffix)) {
@@ -1101,78 +796,6 @@
                 document.getElementById('chart-calendar').innerHTML = '<div class="text-center py-20 text-red-500">Failed to load player history.</div>';
             }
             refreshIcons();
-        }
-
-        // --- Image Handling ---
-        function resolveAvatarUrl(username, imgElement, isEager = false) {
-            const primaryUrl = `https://mc-heads.net/avatar/${username}/32`;
-            const fallbackUrl = `https://minotar.net/avatar/${username}/32`;
-            
-            imgElement.loading = isEager ? 'eager' : 'lazy';
-            imgElement.decoding = 'async';
-            imgElement.src = primaryUrl;
-            
-            imgElement.onerror = () => {
-                if (imgElement.src !== fallbackUrl) {
-                    imgElement.onerror = null;
-                    imgElement.src = fallbackUrl;
-                }
-            };
-        }
-
-        // Schedule avatar check with delay to let images load first
-        let avatarCheckTimeout = null;
-        function scheduleAvatarCheck() {
-            clearTimeout(avatarCheckTimeout);
-            avatarCheckTimeout = setTimeout(() => {
-                checkAndFixBadAvatars();
-            }, 800); // Wait for images to load
-        }
-
-        // Check visible avatars for bad hashes and switch to fallback if needed
-        async function checkAndFixBadAvatars() {
-            if (!hashCheckInitialized) {
-                await initializeBadHashes();
-            }
-            if (!hashCheckInitialized) return; // Failed to initialize
-
-            const images = document.querySelectorAll('img[data-username][src*="mc-heads.net"]');
-            if (images.length === 0) return;
-
-            // Process in small batches to avoid blocking
-            const BATCH_SIZE = 10;
-            let index = 0;
-
-            async function processBatch() {
-                const endIndex = Math.min(index + BATCH_SIZE, images.length);
-                
-                for (let i = index; i < endIndex; i++) {
-                    const img = images[i];
-                    const username = img.dataset.username;
-                    if (!username || !img.complete) continue;
-                    
-                    try {
-                        const isBad = await isAvatarBad(img.src);
-                        if (isBad) {
-                            img.src = `https://minotar.net/avatar/${username}/32`;
-                        }
-                    } catch (e) {
-                        // Skip if we can't check
-                    }
-                }
-                
-                index = endIndex;
-                if (index < images.length) {
-                    // Process next batch on next idle or with timeout
-                    if ('requestIdleCallback' in window) {
-                        requestIdleCallback(processBatch, { timeout: 500 });
-                    } else {
-                        setTimeout(processBatch, 50);
-                    }
-                }
-            }
-
-            processBatch();
         }
 
         // --- Profile Logic ---
@@ -2718,360 +2341,6 @@
             if (e.key === 'Escape') closeWeekPicker();
         });
 
-        // --- Rank Badge Logic ---
-        function getPlayerRank(username) {
-            if (!leaderboardData || leaderboardData.length === 0) return -1;
-            const keys = Object.keys(leaderboardData[0]);
-            const userKey = keys.find(k => k.toLowerCase().includes('user') || k.toLowerCase().includes('name')) || keys[0];
-            const timeKey = keys.find(k => k.toLowerCase().includes('alltime')) || keys[1];
-            const sorted = [...leaderboardData].sort((a, b) => (parseFloat(b[timeKey]) || 0) - (parseFloat(a[timeKey]) || 0)).slice(0, 10);
-            const idx = sorted.findIndex(row => row[userKey] && row[userKey].toLowerCase() === username.toLowerCase());
-            return idx; // 0-based, -1 if not in top 10
-        }
-
-        function updateRankBadge(username) {
-            const container = document.getElementById('rank-badge-container');
-            container.innerHTML = '';
-            const rank = getPlayerRank(username);
-            if (rank < 0 || rank >= 10) return;
-            const badge = document.createElement('div');
-            let rankClass = 'rank-other';
-            if (rank === 0) rankClass = 'rank-1';
-            else if (rank === 1) rankClass = 'rank-2';
-            else if (rank === 2) rankClass = 'rank-3';
-            badge.className = `rank-badge ${rankClass}`;
-            badge.textContent = `#${rank + 1}`;
-            badge.title = `#${rank + 1} All-Time`;
-            container.appendChild(badge);
-        }
-
-        function setFontSize(sizeClass) {
-            const container = document.getElementById('view-profile');
-            container.classList.remove('text-sm', 'text-base', 'text-lg');
-            container.classList.add(sizeClass);
-            document.getElementById('settings-menu').classList.add('hidden');
-        }
-
-        // --- Leaderboard & List (Same as before) ---
-        async function loadLeaderboard() {
-            try {
-                const response = await fetch('../../data/leaderboard.csv');
-                if (!response.ok) throw new Error('Failed');
-                const csvText = await response.text();
-                const results = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-                leaderboardData = results.data;
-                renderLeaderboard();
-                const currentProfileName = document.getElementById('profile-username')?.textContent?.trim();
-                if (currentProfileName) {
-                    updateRankBadge(currentProfileName);
-                }
-            } catch (error) { document.getElementById('leaderboard-list').innerHTML = '<div class="text-center text-gray-500 text-sm py-4">Unavailable</div>'; }
-        }
-        function switchLeaderboard(tab) {
-            currentLeaderboardTab = tab;
-            ['weekly', 'monthly', 'alltime'].forEach(t => {
-                document.getElementById(`tab-${t}`).className = t === tab ? 'flex-1 py-1 px-2 text-sm rounded-md transition-colors bg-nara-red text-white font-bold' : 'flex-1 py-1 px-2 text-sm rounded-md transition-colors text-gray-400 hover:text-white';
-            });
-            renderLeaderboard();
-        }
-        function renderLeaderboard() {
-            const container = document.getElementById('leaderboard-list'); container.innerHTML = '';
-            if (leaderboardData.length === 0) { container.innerHTML = '<div class="text-center text-gray-500 text-sm">No data</div>'; return; }
-            const keys = Object.keys(leaderboardData[0]);
-            const userKey = keys.find(k => k.toLowerCase().includes('user') || k.toLowerCase().includes('name')) || keys[0];
-            const timeKey = keys.find(k => k.toLowerCase().includes(currentLeaderboardTab)) || keys[1];
-            const sortedData = [...leaderboardData].sort((a, b) => (parseFloat(b[timeKey])||0) - (parseFloat(a[timeKey])||0)).slice(0, 10);
-            sortedData.forEach((row, index) => {
-                const username = row[userKey]; const timeVal = row[timeKey];
-                const item = document.createElement('div');
-                item.className = 'flex items-center gap-3 bg-gray-800/50 p-2 rounded hover:bg-gray-800 transition-colors cursor-pointer';
-                item.onclick = () => { updateURL(null, username); showProfileView(username); };
-                let rankClass = index === 0 ? 'text-yellow-400' : index === 1 ? 'text-gray-300' : index === 2 ? 'text-amber-600' : 'text-gray-400';
-                item.innerHTML = `<div class="font-bold w-6 text-center ${rankClass}">#${index + 1}</div><img src="https://minotar.net/avatar/${username}/32" class="w-8 h-8 rounded bg-gray-700"><div class="flex-1 min-w-0"><div class="text-sm font-medium truncate text-white">${username}</div><div class="text-xs text-gray-400">${timeVal} hrs</div></div>`;
-                container.appendChild(item);
-            });
-        }
-        // Helper function to process session data into player map
-        function processSessionData(data, playerMap, now) {
-            const logins = data.loginTimestamps || [];
-            const logouts = data.logoutTimestamps || [];
-            const names = data.mcNames || [];
-            
-            for (let i = 0; i < logins.length; i++) {
-                const username = names[i] || 'Unknown';
-                const loginTime = logins[i];
-                const logoutTime = logouts[i]; // null if still online
-                
-                // Only keep the most recent session per player
-                if (!playerMap.has(username) || loginTime > playerMap.get(username).loginTime) {
-                    let isOnline = logoutTime === null;
-                    let durationHours = 0;
-                    let durationMinutes = 0;
-                    
-                    if (isOnline && loginTime) {
-                        const diff = now - loginTime;
-                        durationHours = Math.floor(diff / 3600000);
-                        durationMinutes = Math.floor((diff % 3600000) / 60000);
-                        if (durationHours >= 24) isOnline = false;
-                    }
-                    
-                    playerMap.set(username, {
-                        username,
-                        lowerName: username.toLowerCase(),
-                        isOnline,
-                        loginTime,
-                        logoutTime: logoutTime || loginTime,
-                        durationHours,
-                        durationMinutes
-                    });
-                }
-            }
-        }
-        
-        // Helper function to process mc-accounts data into player map
-        function processAccountData(data, playerMap, now) {
-            const names = data.mcNames || [];
-            const lastLogins = data.lastLoginTimestamps || [];
-            const lastLogouts = data.lastLogoutTimestamps || [];
-            
-            for (let i = 0; i < names.length; i++) {
-                const username = names[i];
-                if (!username) continue;
-                
-                const lastLogin = lastLogins[i] || 0;
-                const lastLogout = lastLogouts[i] || 0;
-                
-                // Check if player already exists in map (from session data)
-                const existing = playerMap.get(username);
-                
-                if (existing) {
-                    // Player exists from session data - check if account data indicates they're online
-                    // If lastLogin > lastLogout from accounts API, they might be online
-                    if (lastLogin > lastLogout && !existing.isOnline) {
-                        // Account data suggests online, session data didn't catch it
-                        // Check if this login is more recent than what we have
-                        if (lastLogin > existing.loginTime) {
-                            const diff = now - lastLogin;
-                            const durationHours = Math.floor(diff / 3600000);
-                            const durationMinutes = Math.floor((diff % 3600000) / 60000);
-                            
-                            // Only mark as online if the session isn't stale (< 24 hours)
-                            if (durationHours < 24) {
-                                existing.isOnline = true;
-                                existing.loginTime = lastLogin;
-                                existing.durationHours = durationHours;
-                                existing.durationMinutes = durationMinutes;
-                            }
-                        }
-                    }
-                } else {
-                    // New player not in session data - add from accounts
-                    let isOnline = lastLogin > lastLogout;
-                    let durationHours = 0;
-                    let durationMinutes = 0;
-                    
-                    if (isOnline && lastLogin) {
-                        const diff = now - lastLogin;
-                        durationHours = Math.floor(diff / 3600000);
-                        durationMinutes = Math.floor((diff % 3600000) / 60000);
-                        // Don't mark as online if session is stale
-                        if (durationHours >= 24) isOnline = false;
-                    }
-                    
-                    playerMap.set(username, {
-                        username,
-                        lowerName: username.toLowerCase(),
-                        isOnline,
-                        loginTime: lastLogin,
-                        logoutTime: lastLogout || lastLogin,
-                        durationHours,
-                        durationMinutes
-                    });
-                }
-            }
-        }
-
-        async function fetchPlayers() {
-            try {
-                const now = Date.now();
-                const oneDayAgo = now - (24 * 60 * 60 * 1000);
-                const playerMap = new Map();
-                
-                // Step 1: Fetch players active in last 24 hours (includes online players from sessions)
-                console.log('Fetching recent players (last 24h)...');
-                const recentResponse = await fetchAPI(`https://api.civinfo.net/mc-sessions/all?after=${oneDayAgo}`);
-                if (!recentResponse.ok) throw new Error('Failed to fetch recent players');
-                const recentData = await recentResponse.json();
-                
-                if (!Array.isArray(recentData.loginTimestamps)) throw new Error('Invalid API response');
-                
-                console.log(`Recent sessions: ${recentData.loginTimestamps.length}`);
-                processSessionData(recentData, playerMap, now);
-                console.log(`Unique players after recent fetch: ${playerMap.size}`);
-                
-                // Render recent players immediately
-                allPlayers = Array.from(playerMap.values());
-                allPlayers.sort((a, b) => (a.isOnline === b.isOnline) ? (a.isOnline ? a.loginTime - b.loginTime : b.logoutTime - a.logoutTime) : (a.isOnline ? -1 : 1));
-                cachedElements.headerCount.textContent = allPlayers.filter(p => p.isOnline).length;
-                
-                // Start prefetching online player avatars immediately
-                for (let i = 0; i < allPlayers.length && allPlayers[i].isOnline; i++) {
-                    cacheAvatar(allPlayers[i].username);
-                }
-                
-                renderPlayers();
-                scheduleAvatarCheck();
-                
-                // Step 2: Fetch ALL players from mc-accounts endpoint
-                console.log('Fetching all players from mc-accounts...');
-                const allResponse = await fetchAPI('https://api.civinfo.net/mc-accounts/all?limit=50000');
-                if (allResponse.ok) {
-                    const allData = await allResponse.json();
-                    
-                    if (Array.isArray(allData.mcNames)) {
-                        console.log(`Total accounts from API: ${allData.mcNames.length}`);
-                        processAccountData(allData, playerMap, now);
-                        console.log(`Total unique players: ${playerMap.size}`);
-                        
-                        // Re-render with all players
-                        allPlayers = Array.from(playerMap.values());
-                        allPlayers.sort((a, b) => (a.isOnline === b.isOnline) ? (a.isOnline ? a.loginTime - b.loginTime : b.logoutTime - a.logoutTime) : (a.isOnline ? -1 : 1));
-                        cachedElements.headerCount.textContent = allPlayers.filter(p => p.isOnline).length;
-                        
-                        renderPlayers();
-                        scheduleAvatarCheck();
-                    }
-                } else {
-                    console.error('Failed to fetch all players:', allResponse.status);
-                }
-                
-                const hasOnline = allPlayers.some(p => p.isOnline);
-                if (hasOnline && durationIntervalId === null) {
-                    durationIntervalId = setInterval(updateDurations, 60000);
-                } else if (!hasOnline && durationIntervalId !== null) {
-                    clearInterval(durationIntervalId);
-                    durationIntervalId = null;
-                }
-            } catch (error) { 
-                console.error(error);
-                document.getElementById('player-grid').innerHTML = '<div class="col-span-full text-center text-red-400">Failed to load player data</div>'; 
-            }
-        }
-        function renderPlayers() {
-            const grid = cachedElements.playerGrid; 
-            const searchTerm = cachedElements.playerSearch ? cachedElements.playerSearch.value.trim().toLowerCase() : '';
-
-            if (!allPlayers || !Array.isArray(allPlayers)) {
-                grid.innerHTML = '<div class="col-span-full text-center text-red-400 py-8">Player data unavailable</div>';
-                return;
-            }
-
-            if (allPlayers.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">Loading player data...</div>';
-                return;
-            }
-
-            // Single pass: filter and split online/offline simultaneously
-            onlinePlayers = [];
-            offlinePlayers = [];
-            
-            if (searchTerm) {
-                for (let i = 0; i < allPlayers.length; i++) {
-                    const player = allPlayers[i];
-                    if (player.lowerName && player.lowerName.includes(searchTerm)) {
-                        if (player.isOnline) onlinePlayers.push(player);
-                        else offlinePlayers.push(player);
-                    }
-                }
-            } else {
-                for (let i = 0; i < allPlayers.length; i++) {
-                    const player = allPlayers[i];
-                    if (player.isOnline) onlinePlayers.push(player);
-                    else offlinePlayers.push(player);
-                }
-            }
-            
-            offlineIndex = 0;
-
-            if (onlinePlayers.length === 0 && offlinePlayers.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">No players found</div>';
-                teardownInfiniteScroll();
-                return;
-            }
-
-            teardownInfiniteScroll();
-            grid.innerHTML = '';
-
-            // Render online players first (typically small count, render immediately)
-            if (onlinePlayers.length > 0) {
-                appendPlayerCards(grid, onlinePlayers, true);
-            }
-
-            // Render offline players in chunks using requestAnimationFrame
-            const maxInitialCards = searchTerm ? Number.POSITIVE_INFINITY : INITIAL_OFFLINE_LIMIT;
-            const availableOfflineSlots = Math.max(0, maxInitialCards - onlinePlayers.length);
-            const initialOfflineCount = Math.min(availableOfflineSlots, offlinePlayers.length);
-
-            if (initialOfflineCount > 0) {
-                let rendered = 0;
-                const CHUNK_SIZE = 20;
-                
-                function renderOfflineChunk() {
-                    if (rendered >= initialOfflineCount) {
-                        // Done with initial batch, setup infinite scroll
-                        offlineIndex = initialOfflineCount;
-                        if (!searchTerm && offlinePlayers.length > offlineIndex) {
-                            setupInfiniteScroll(grid);
-                            cacheUpcomingAvatars(offlineIndex);
-                        }
-                        return;
-                    }
-                    
-                    const end = Math.min(rendered + CHUNK_SIZE, initialOfflineCount);
-                    const chunk = offlinePlayers.slice(rendered, end);
-                    appendPlayerCards(grid, chunk);
-                    rendered = end;
-                    
-                    requestAnimationFrame(renderOfflineChunk);
-                }
-                
-                requestAnimationFrame(renderOfflineChunk);
-            } else {
-                // No offline players to render, but may need infinite scroll
-                if (!searchTerm && offlinePlayers.length > 0) {
-                    setupInfiniteScroll(grid);
-                    cacheUpcomingAvatars(0);
-                }
-            }
-        }
-        function updateDurations() {
-            const now = Date.now();
-            document.querySelectorAll('.duration-text').forEach(el => {
-                const loginTime = parseInt(el.dataset.login);
-                if (loginTime) {
-                    const diff = now - loginTime;
-                    const hours = Math.floor(diff / 3600000);
-                    const minutes = Math.floor((diff % 3600000) / 60000);
-                    el.textContent = `${hours}h ${minutes}m`;
-                }
-            });
-        }
-        function updateURL(searchTerm, player) {
-            const url = new URL(window.location);
-            if (searchTerm !== null) {
-                if (searchTerm) url.searchParams.set('search', searchTerm);
-                else url.searchParams.delete('search');
-            }
-            if (player !== null) {
-                url.searchParams.delete('player');
-                if (player) {
-                    url.pathname = baseStatsPath + encodeURIComponent(player);
-                } else {
-                    url.pathname = baseStatsPath;
-                }
-            }
-            window.history.pushState({}, '', url);
-        }
     </script>
 </body>
 </html>
