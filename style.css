@@ -1,335 +1,161 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Rajdhani:wght@400;600;700&display=swap');
 
+/* ─── Root Variables ─────────────────────────────────── */
+:root {
+--gold:   #FFD700;
+--purple: #A855F7;
+--blue:   #3B82F6;
+--nara-red: #cd2e3a;
+--nara-blue: #2596be;
+
+--bg-dark: #0a0a12;
+--bg-card: #12121e;
+--bg-card-hover: #1a1a2e;
+
+--text-main: #e2e2f0;
+--text-muted: #8888aa;
+
+--glow-gold: rgba(255,215,0,0.35);
+--glow-purple: rgba(168,85,247,0.3);
+--glow-blue: rgba(59,130,246,0.25);
+}
+
+/* ─── Base ───────────────────────────────────────────── */
 body {
-    font-family: 'Noto Sans JP', sans-serif;
-    scroll-behavior: smooth;
+font-family: 'Rajdhani', 'Noto Sans JP', sans-serif;
+scroll-behavior: smooth;
+background: var(--bg-dark);
+color: var(--text-main);
 }
 
-/* Mobile Responsive Utilities */
-@media (max-width: 768px) {
-    /* Padding adjustments for mobile */
-    .py-20 {
-        padding-top: 3rem !important;
-        padding-bottom: 3rem !important;
-    }
-    
-    /* Font size adjustments */
-    .text-6xl {
-        font-size: 2.5rem !important;
-    }
-    
-    .text-5xl {
-        font-size: 2rem !important;
-    }
-    
-    .text-4xl {
-        font-size: 1.75rem !important;
-    }
-    
-    .text-3xl {
-        font-size: 1.5rem !important;
-    }
-    
-    .text-2xl {
-        font-size: 1.25rem !important;
-    }
-    
-    .text-xl {
-        font-size: 1.125rem !important;
-    }
-    
-    /* Container width adjustments */
-    .max-w-6xl {
-        max-width: 100% !important;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
-    
-    /* Grid adjustments */
-    .grid {
-        gap: 1rem !important;
-    }
-    
-    /* Button adjustments */
-    .px-6 {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
-    
-    .py-3 {
-        padding-top: 0.625rem !important;
-        padding-bottom: 0.625rem !important;
-    }
-    
-    /* Improve touch targets */
-    button, a {
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
+/* ─── Star Background ───────────────────────────────── */
+body::before {
+content: '';
+position: fixed;
+inset: 0;
+z-index: -2;
+background:
+radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.15) 50%, transparent 100%),
+radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.10) 50%, transparent 100%),
+radial-gradient(1.2px 1.2px at 60% 20%, rgba(255,255,255,0.12) 50%, transparent 100%),
+radial-gradient(1px 1px at 80% 80%, rgba(255,255,255,0.08) 50%, transparent 100%);
+background-size: 200px 200px, 300px 300px, 250px 250px, 350px 350px;
+animation: starDrift 60s linear infinite;
+}
+@keyframes starDrift {
+to { background-position: 200px 200px, -300px 300px, 250px -250px, -350px 350px; }
 }
 
-/* --- Remove the line-art stroke --- */
+/* ─── Text Styles ───────────────────────────────────── */
+.text-primary { color: var(--nara-blue); }
+.text-gold { color: var(--gold); }
+
+.text-gacha {
+background: linear-gradient(90deg, var(--gold), var(--purple), var(--blue), var(--gold));
+background-size: 300% 100%;
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+0% { background-position: 0% 50%; }
+50% { background-position: 100% 50%; }
+100% { background-position: 0% 50%; }
+}
+
+/* ─── Cards ─────────────────────────────────────────── */
+.gacha-card {
+background: var(--bg-card);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 16px;
+overflow: hidden;
+transition: 0.3s;
+position: relative;
+}
+
+.gacha-card:hover {
+transform: translateY(-6px) scale(1.02);
+box-shadow: 0 12px 40px rgba(168,85,247,0.15);
+}
+
+/* ─── Rarity ───────────────────────────────────────── */
+.rarity-legendary { border-color: var(--gold); box-shadow: 0 0 20px var(--glow-gold); }
+.rarity-epic { border-color: var(--purple); box-shadow: 0 0 16px var(--glow-purple); }
+.rarity-rare { border-color: var(--blue); box-shadow: 0 0 12px var(--glow-blue); }
+.rarity-common { border-color: #6B7280; }
+
+/* ─── Gacha Machine ───────────────────────────────── */
+.gacha-machine { width: 340px; height: 480px; margin: auto; position: relative; }
+
+.gacha-machine-body {
+background: linear-gradient(180deg, #1e1e3a, #12121e);
+border-radius: 30px 30px 16px 16px;
+border: 2px solid rgba(255,215,0,0.25);
+box-shadow: 0 0 40px rgba(168,85,247,0.15);
+position: absolute;
+inset: 0;
+}
+
+/* ─── Button ───────────────────────────────────────── */
+.gacha-pull-btn {
+padding: 14px 48px;
+font-weight: 700;
+text-transform: uppercase;
+color: white;
+background: linear-gradient(135deg, var(--nara-red), var(--purple));
+border-radius: 50px;
+cursor: pointer;
+transition: 0.3s;
+}
+
+.gacha-pull-btn:hover {
+transform: scale(1.05);
+}
+
+/* ─── Flag Animation (merged) ───────────────────────── */
 #flag-container svg path {
-    fill: #2596be; /* Use your Nara blue instead of stroke */
-    stroke: none;
-    transition: fill 1s ease-in-out;
+fill: var(--nara-blue);
+stroke: none;
+transition: fill 1s;
 }
 
-/* --- Optional hover for subtle interactive shimmer (if you like) --- */
 #flag-container:hover svg path {
-    filter: drop-shadow(0 0 8px rgba(37, 150, 190, 0.6));
+filter: drop-shadow(0 0 8px rgba(37,150,190,0.6));
 }
 
-/* --- Glowing background once sun settles --- */
+/* ─── Sun Glow ─────────────────────────────────────── */
 #sun-glow {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    filter: blur(60px);
-    opacity: 0;
-    background: none;
-    mix-blend-mode: screen;
-    animation: sunGlowPulse 8s ease-in-out infinite;
+position: absolute;
+left: 50%;
+top: 50%;
+width: 600px;
+height: 600px;
+border-radius: 50%;
+transform: translate(-50%, -50%);
+filter: blur(60px);
+opacity: 0;
+animation: sunGlowPulse 8s infinite;
 }
 
-/* --- Smooth glow pulsing effect --- */
 @keyframes sunGlowPulse {
-    0% {
-        opacity: 0.1;
-        transform: translate(-50%, -50%) scale(1);
-        /* filter: blur(.5rem); */
-    }
-    50% {
-        opacity: 0.5;
-        transform: translate(-50%, -50%) scale(1.2);
-        /* filter: blur(2rem); */
-    }
-    100% {
-        opacity: 0.15;
-        transform: translate(-50%, -50%) scale(1);
-        /* filter: blur(.75rem); */
-    }
+0% { opacity: 0.1; transform: translate(-50%, -50%) scale(1); }
+50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.2); }
+100% { opacity: 0.15; transform: translate(-50%, -50%) scale(1); }
 }
 
-/* --- Custom scrollbar (unchanged) --- */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #111;
-}
-::-webkit-scrollbar-thumb {
-    background: #2596be;
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #1d7a9c;
-}
+/* ─── Scrollbar ───────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
-/* --- Optional: the old keyframe (flagRise) can stay or be removed if unused --- */
-@keyframes flagRise {
-    from { transform: translateY(0); }
-    to { transform: translateY(-100%); }
-}
-
-/* Mobile-Specific Improvements */
+/* ─── Responsive ─────────────────────────────────── */
 @media (max-width: 768px) {
-    /* City cards for mobile */
-    .city-card {
-        margin-bottom: 1rem;
-    }
-    
-    /* Images responsive */
-    .city-image, .big-city-image {
-        width: 100%;
-        height: auto;
-    }
-    
-    /* Modal improvements for mobile */
-    .fullscreen-modal .close-button {
-        width: 40px;
-        height: 40px;
-        top: 10px;
-        right: 10px;
-    }
-    
-    /* Hero section adjustments */
-    #flag-container {
-        width: 200px !important;
-        height: 100px !important;
-    }
-    
-    #sun-glow {
-        width: 400px !important;
-        height: 400px !important;
-    }
-    
-    /* Discord button mobile positioning and sizing */
-    .fixed.bottom-10.left-6 {
-        bottom: 1rem !important;
-        left: 1rem !important;
-    }
-    
-    .fixed.bottom-10.left-6 a {
-        width: 3.5rem !important;
-        min-width: 3.5rem !important;
-        height: 3.5rem !important;
-        padding: 0.625rem !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-    
-    .fixed.bottom-10.left-6 a svg {
-        width: 2rem !important;
-        height: 2rem !important;
-        flex-shrink: 0 !important;
-        display: block !important;
-    }
-    
-    .fixed.bottom-10.left-6 a:hover {
-        width: 10.5rem !important;
-        justify-content: flex-start !important;
-        padding-left: 0.625rem !important;
-        padding-right: 0.625rem !important;
-    }
-    
-    /* Hide Discord text on mobile */
-    .fixed.bottom-10.left-6 a span {
-        display: none !important;
-    }
-    
-    /* Improve spacing on mobile */
-    section {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    
-    /* Better flex wrapping */
-    .flex.flex-wrap.gap-4 {
-        gap: 0.75rem !important;
-    }
-    
-    /* Adjust about section layout */
-    .about-image-container .absolute {
-        position: static !important;
-        margin-top: 1rem;
-        text-align: center;
-    }
+.gacha-machine { transform: scale(0.8); }
+.section-title { font-size: 1.75rem; }
 }
 
 @media (max-width: 480px) {
-    /* Extra small devices */
-    #flag-container {
-        width: 150px !important;
-        height: 75px !important;
-    }
-    
-    /* Further reduce padding */
-    .px-4 {
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-    }
-    
-    /* Discord button sizing on very small screens */
-    .fixed.bottom-10.left-6 {
-        bottom: 0.75rem !important;
-        left: 0.75rem !important;
-    }
-    
-    .fixed.bottom-10.left-6 a {
-        width: 3.5rem !important;
-        min-width: 3.5rem !important;
-        height: 3.5rem !important;
-        padding: 0.625rem !important;
-    }
-    
-    .fixed.bottom-10.left-6 a svg {
-        width: 2rem !important;
-        height: 2rem !important;
-    }
-    
-    .fixed.bottom-10.left-6 a:hover {
-        width: 9rem !important;
-    }
-}
-
-/* Improve table responsiveness for shops page */
-@media (max-width: 1024px) {
-    .overflow-x-auto {
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    table {
-        min-width: 800px;
-    }
-}
-
-/* Mobile improvements for shop filters */
-@media (max-width: 768px) {
-    /* Stack filter controls vertically */
-    .flex.items-center.justify-between {
-        flex-direction: column;
-        align-items: stretch !important;
-        gap: 1rem;
-    }
-    
-    /* Full width search on mobile */
-    .w-1\/2 {
-        width: 100% !important;
-    }
-    
-    /* Adjust city filter buttons */
-    .flex.gap-2 {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .city-filter-btn {
-        flex: 1;
-        font-size: 0.875rem;
-        padding: 0.5rem 0.75rem !important;
-    }
-    
-    /* Table wrapper adjustments */
-    .w-\[80\%\] {
-        width: 100% !important;
-    }
-    
-    /* Smaller table text on mobile */
-    table th,
-    table td {
-        padding: 0.5rem !important;
-        font-size: 0.75rem !important;
-    }
-    
-    /* Tags grid adjustments */
-    #tags-filter {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-}
-
-/* Touch-friendly improvements */
-@media (hover: none) and (pointer: coarse) {
-    /* Increase touch targets */
-    button, a, .nav-link, .city-filter-btn, .field-option {
-        min-height: 44px;
-        min-width: 44px;
-    }
-    
-    /* Remove hover effects on touch devices */
-    .city-card:hover,
-    .big-city-image:hover,
-    .city-image:hover {
-        transform: none !important;
-        box-shadow: none !important;
-        opacity: 1 !important;
-    }
+.gacha-machine { transform: scale(0.65); }
 }
