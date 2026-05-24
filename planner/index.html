@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Planner | Nara</title>
+
+    <meta name="description" content="Plan and visualize bastions, snitches, and mob repellators in Minecraft CivMC. Set centers, generate grids, draw claim borders, and export exact coordinates.">
+    <meta name="theme-color" content="#2596be">
+    <link class="page-icon" rel="icon" href="../images/nara_flag_white_border.svg" type="image/svg+xml">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="../style.css" fetchpriority="high">
+
+    <style>
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            background: #0b0b0f;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            overflow: auto;
+            box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.85);
+        }
+
+        .map-container:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            border: none;
+        }
+
+        #planner-map {
+            width: 100%;
+            height: 100%;
+            background: #0b0b0f;
+        }
+
+        .leaflet-container {
+            background: #0b0b0f;
+            cursor: grab;
+            font-family: inherit;
+        }
+
+        .leaflet-container:active {
+            cursor: grabbing;
+        }
+
+        .leaflet-tile,
+        .leaflet-image-layer {
+            image-rendering: pixelated;
+        }
+
+        .leaflet-tile {
+            opacity: 0.45;
+        }
+
+        .planner-overlay-canvas {
+            z-index: 450;
+        }
+
+        .scrollable-panel {
+            height: 100%;
+            max-height: none;
+            overflow-y: scroll;
+            padding-right: 0.75rem;
+        }
+
+        .scrollable-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollable-panel::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 4px;
+        }
+
+        .scrollable-panel::-webkit-scrollbar-thumb {
+            background: rgba(147, 51, 234, 0.6);
+            border-radius: 4px;
+        }
+
+        .scrollable-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(224, 64, 251, 0.6);
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(224, 64, 251, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+        }
+
+        .coords-display {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.85rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #e2e8f0;
+            z-index: 900;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .map-controls {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 900;
+        }
+
+        .map-control-btn {
+            width: 38px;
+            height: 38px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .map-control-btn:hover {
+            background: rgba(224, 64, 251, 0.2);
+            border-color: rgba(224, 64, 251, 0.5);
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        input[type="number"],
+        input[type="text"],
+        textarea {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            transition: all 0.2s;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #e040fb;
+            outline: none;
+            box-shadow: 0 0 10px rgba(224, 64, 251, 0.25);
+        }
+
+        .title-beta {
+            position: absolute;
+            top: -0.6rem;
+            left: -2rem;
+            transform: rotate(-18deg);
+            transform-origin: center;
+            background: #dc2626;
+            color: #ffffff;
+            font-size: 0.95rem;
+            line-height: 1;
+            letter-spacing: 0.04em;
+            padding: 0.35rem 0.65rem;
+            border-radius: 0.25rem;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+            z-index: 2;
+        }
+
+        @media (min-width: 640px) {
+            .title-beta {
+                top: -0.8rem;
+                left: -2.7rem;
+                font-size: 1.1rem;
+            }
+        }
+
+        .planner-layout {
+            min-height: 560px;
+        }
+
+        @media (min-width: 1024px) {
+            main {
+                padding-bottom: 1rem !important;
+            }
+
+            html,
+            body {
+                height: 100vh;
+                overflow: auto;
+            }
+
+            custom-footer {
+                display: none;
+            }
+
+            .planner-layout {
+                height: calc(100vh - 256px);
+                min-height: 430px;
+            }
+
+            .planner-sidebar {
+                gap: 0.75rem;
+            }
+
+            .planner-sidebar .glass-panel {
+                padding: 1rem;
+            }
+
+            .planner-sidebar h2 {
+                margin-bottom: 0.65rem;
+            }
+
+            .planner-sidebar .mb-4 {
+                margin-bottom: 0.75rem;
+            }
+
+            .planner-sidebar .pt-4 {
+                padding-top: 0.75rem;
+            }
+
+            .planner-sidebar .mt-4 {
+                margin-top: 0.75rem;
+            }
+        }
+    </style>
+
+    <script src="../components/analytics.js" defer></script>
+    <script src="../components/navbar.js" defer></script>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col">
+    <custom-navbar></custom-navbar>
+
+    <div class="h-[80px] sm:h-[100px] flex-shrink-0"></div>
+
+    <main class="flex-grow px-4 sm:px-6 pb-12 flex flex-col">
+        <div class="max-w-[98%] sm:max-w-[95%] mx-auto w-full flex-grow flex flex-col">
+            <div class="text-center mb-6 relative flex-shrink-0">
+                <div class="relative inline-block">
+                    <span class="title-beta">BETA</span>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold mb-2 bg-gradient-to-r from-orange-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent tracking-tight">
+                        Bastion & Snitch Grid Planner
+                    </h1>
+                </div>
+                <p class="text-slate-400 text-sm sm:text-base">Visualize coverages, draw selection borders, and export exact layout coordinates outward in perfect harmony.</p>
+            </div>
+
+            <div class="planner-layout flex flex-col lg:flex-row gap-6">
+                <div class="planner-sidebar w-full lg:w-[420px] flex-shrink-0 flex flex-col gap-5 scrollable-panel">
+                    <div class="glass-panel rounded-xl p-5">
+                        <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <i data-feather="settings" class="w-5 h-5 text-purple-400"></i> Grid Settings
+                        </h2>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Grid Option</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="selectGridOption('city')" id="btn-grid-city" class="py-2.5 px-2 bg-purple-950/40 border border-purple-500/20 hover:border-purple-500/50 rounded-lg text-xs font-medium text-slate-300 transition-all text-center">
+                                    City Bastion<br><span class="text-[10px] text-slate-500">101 x 101</span>
+                                </button>
+                                <button onclick="selectGridOption('vault')" id="btn-grid-vault" class="py-2.5 px-2 bg-purple-950/40 border border-purple-500/20 hover:border-purple-500/50 rounded-lg text-xs font-medium text-slate-300 transition-all text-center">
+                                    Vault Bastion<br><span class="text-[10px] text-slate-500">21 x 21</span>
+                                </button>
+                                <button onclick="selectGridOption('snitch')" id="btn-grid-snitch" class="py-2.5 px-2 bg-purple-950/40 border border-purple-500/20 hover:border-purple-500/50 rounded-lg text-xs font-medium text-slate-300 transition-all text-center">
+                                    Snitch<br><span class="text-[10px] text-slate-500">23 x 23</span>
+                                </button>
+                                <button onclick="selectGridOption('repellator')" id="btn-grid-repellator" class="py-2.5 px-2 bg-purple-950/40 border border-purple-500/20 hover:border-purple-500/50 rounded-lg text-xs font-medium text-slate-300 transition-all text-center">
+                                    Mob Repellator<br><span class="text-[10px] text-slate-500">96 Radius</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Grid Center Point</label>
+                            <div class="flex gap-2">
+                                <div class="flex-1">
+                                    <div class="relative">
+                                        <span class="absolute left-2.5 top-2 text-xs font-bold text-slate-500">X</span>
+                                        <input type="number" id="center-x-input" class="w-full text-sm pl-7 pr-2 py-1.5 rounded-lg" value="0" oninput="onCenterPointChange()">
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="relative">
+                                        <span class="absolute left-2.5 top-2 text-xs font-bold text-slate-500">Z</span>
+                                        <input type="number" id="center-z-input" class="w-full text-sm pl-7 pr-2 py-1.5 rounded-lg" value="0" oninput="onCenterPointChange()">
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-slate-500 mt-1 block">Left click on map to set Center unless Frozen or Drawing.</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs text-slate-300">Range Zoom Layer</span>
+                                <span id="range-zoom-value" class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">-1</span>
+                            </div>
+                            <input type="range" id="range-zoom-input" min="-6" max="2" step="1" value="-1" class="w-full accent-purple-500" oninput="onRangeZoomChange(this.value)">
+                            <span id="range-zoom-default" class="text-[10px] text-slate-500 block mt-1">Default: -1</span>
+                        </div>
+                        <div class="border-t border-slate-800/80 pt-4 flex flex-col gap-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-300">Freeze Grid Center</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-grid-freeze" class="sr-only peer" onchange="toggleGridFreeze(this.checked)">
+                                    <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-300">Show Claims Overlay</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-claims-map" class="sr-only peer" checked onchange="toggleClaimsOverlay(this.checked)">
+                                    <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-300">Show Grid Ranges</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-show-ranges" class="sr-only peer" checked onchange="toggleShowRanges(this.checked)">
+                                    <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-300">Show Coords on Map</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-draw-labels" class="sr-only peer" onchange="toggleDrawLabels(this.checked)">
+                                    <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                </label>
+                            </div>
+                            <div id="contain-border-row" class="flex items-center justify-between opacity-45">
+                                <span class="text-xs text-slate-300">Contain Within Border</span>
+                                <label class="relative inline-flex items-center cursor-not-allowed">
+                                    <input type="checkbox" id="toggle-contain-border" class="sr-only peer" onchange="toggleContainWithinBorder(this.checked)" disabled>
+                                    <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer disabled:opacity-60 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-xl p-5">
+                        <h2 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                            <i data-feather="crop" class="w-5 h-5 text-green-400"></i> Selection Border
+                        </h2>
+
+                        <div class="flex flex-col gap-2 mb-4">
+                            <div class="flex gap-2">
+                                <button onclick="toggleDrawMode()" id="btn-draw-mode" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-lg text-xs transition-all flex items-center justify-center gap-1.5">
+                                    <i data-feather="edit-2" class="w-3.5 h-3.5"></i> Draw Border
+                                </button>
+                                <button onclick="clearBorderPoints()" class="flex-1 py-2 bg-red-950/40 border border-red-500/20 hover:border-red-500/50 text-red-300 font-semibold rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5">
+                                    <i data-feather="trash-2" class="w-3.5 h-3.5"></i> Clear Border
+                                </button>
+                            </div>
+                            <span class="text-[10px] text-slate-500 block">Click Draw Border, then click on the map to place vertices. The shape will close automatically.</span>
+                        </div>
+
+                        <div class="border-t border-slate-800/80 pt-4 flex flex-col gap-2.5">
+                            <button onclick="copyBastionsBorder(true)" id="btn-copy-strict" class="w-full py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-lg transition-all shadow-md shadow-purple-900/10 flex items-center justify-center gap-1.5 opacity-50 cursor-not-allowed" disabled>
+                                <i data-feather="clipboard" class="w-3.5 h-3.5"></i> Copy strictly inside
+                            </button>
+                            <button onclick="copyBastionsBorder(false)" id="btn-copy-overlap" class="w-full py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-semibold rounded-lg transition-all shadow-md shadow-cyan-900/10 flex items-center justify-center gap-1.5 opacity-50 cursor-not-allowed" disabled>
+                                <i data-feather="clipboard" class="w-3.5 h-3.5"></i> Copy with center inside
+                            </button>
+                            <span id="border-stats-text" class="text-[10px] text-slate-500 block text-center mt-1">No border polygon drawn yet.</span>
+                        </div>
+
+                        <div class="border-t border-slate-800/80 pt-4 mt-4 flex flex-col gap-2">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">JSON Border Import / Export</label>
+                            <a href="https://civmap.com" target="_blank" class="text-xs text-purple-400 hover:text-purple-300 font-medium inline-flex items-center gap-1 mb-1">
+                                <i data-feather="external-link" class="w-3 h-3"></i> Get claim JSON configurations from civmap.com
+                            </a>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="toggleJsonWindow()" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5">
+                                    <i data-feather="download" class="w-3.5 h-3.5"></i> Load from JSON
+                                </button>
+                                <button onclick="exportToJson()" class="py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5">
+                                    <i data-feather="upload" class="w-3.5 h-3.5"></i> Save to JSON
+                                </button>
+                            </div>
+
+                            <div id="json-window-container" class="hidden flex flex-col gap-2 mt-2">
+                                <textarea id="json-window-textarea" rows="6" class="w-full text-[11px] p-2 bg-slate-900/80 border border-slate-800 rounded-lg text-slate-100 font-mono focus:border-purple-500 focus:outline-none" placeholder="Paste your civmap.com JSON border payload here..."></textarea>
+                                <button onclick="importFromJson()" class="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg text-xs transition-colors">
+                                    Apply JSON Configuration
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 relative">
+                    <div class="map-container" id="map-container">
+                        <div id="planner-map"></div>
+
+                        <div class="map-controls">
+                            <button class="map-control-btn" id="zoom-in" title="Zoom In">
+                                <i data-feather="plus" class="w-5 h-5"></i>
+                            </button>
+                            <button class="map-control-btn" id="zoom-out" title="Zoom Out">
+                                <i data-feather="minus" class="w-5 h-5"></i>
+                            </button>
+                            <button class="map-control-btn" id="reset-view" title="Reset View">
+                                <i data-feather="crosshair" class="w-5 h-5"></i>
+                            </button>
+                            <button class="map-control-btn" id="fullscreen-btn" title="Toggle Fullscreen">
+                                <i data-feather="maximize" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+
+                        <div class="coords-display" id="coords-display">
+                            <span id="coords-text" class="font-bold">X: 0, Z: 0</span>
+                            <span id="coords-tip-text" class="text-slate-500 text-[10px] block mt-0.5">Click to place Center. Hover to see blocks.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <custom-footer></custom-footer>
+    <script src="../components/footer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module">
+        import { MapEngine } from '../components/map-engine.js';
+
+        const $ = (id) => document.getElementById(id);
+        const gridOptions = ['city', 'vault', 'snitch', 'repellator'];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.feather) feather.replace();
+
+            MapEngine.init('planner-map', {
+                onUpdate: syncPlannerUI,
+                onMouseMove: updateMouseCoordinates
+            });
+            initializeEventListeners();
+            selectGridOption('city');
+            syncPlannerUI();
+        });
+
+        function initializeEventListeners() {
+            $('zoom-in').addEventListener('click', () => MapEngine.zoomIn());
+            $('zoom-out').addEventListener('click', () => MapEngine.zoomOut());
+            $('reset-view').addEventListener('click', () => MapEngine.resetView());
+            $('fullscreen-btn').addEventListener('click', toggleFullscreen);
+
+            document.addEventListener('fullscreenchange', () => {
+                setTimeout(() => MapEngine.invalidateSize(), 100);
+            });
+        }
+
+        function syncPlannerUI() {
+            $('center-x-input').value = Math.round(MapEngine.config.centerX);
+            $('center-z-input').value = Math.round(MapEngine.config.centerZ);
+            updateMouseCoordinates(
+                { x: MapEngine.config.centerX, z: MapEngine.config.centerZ },
+                MapEngine.map?.getZoom()
+            );
+            updateBorderStats();
+        }
+
+        function updateMouseCoordinates(point, zoom) {
+            const currentZoom = Number.isFinite(zoom) ? zoom : MapEngine.map?.getZoom();
+            const zoomText = Number.isFinite(currentZoom) ? currentZoom : '-';
+            $('coords-text').textContent = `X: ${Math.round(point.x)}, Z: ${Math.round(point.z)} (Zoom: ${zoomText})`;
+        }
+
+        function selectGridOption(option) {
+            MapEngine.setOption(option);
+
+            gridOptions.forEach((gridOption) => {
+                setGridButtonActive($(`btn-grid-${gridOption}`), gridOption === option);
+            });
+
+            const preset = MapEngine.presets[option];
+            $('range-zoom-input').value = preset.rangeMinZoom;
+            $('range-zoom-value').textContent = preset.rangeMinZoom;
+            $('range-zoom-default').textContent = `Default: ${preset.rangeMinZoom}`;
+            updateBorderStats();
+        }
+
+        function setGridButtonActive(button, active) {
+            button.classList.toggle('bg-purple-600/30', active);
+            button.classList.toggle('border-purple-500', active);
+            button.classList.toggle('text-white', active);
+            button.classList.toggle('bg-purple-950/40', !active);
+            button.classList.toggle('border-purple-500/20', !active);
+            button.classList.toggle('text-slate-300', !active);
+        }
+
+        function onCenterPointChange() {
+            const x = Number.parseInt($('center-x-input').value, 10) || 0;
+            const z = Number.parseInt($('center-z-input').value, 10) || 0;
+            MapEngine.setCenter(x, z);
+        }
+
+        function toggleClaimsOverlay(checked) {
+            MapEngine.setClaimsVisible(checked);
+        }
+
+        function toggleShowRanges(checked) {
+            MapEngine.setShowRanges(checked);
+        }
+
+        function onRangeZoomChange(value) {
+            $('range-zoom-value').textContent = value;
+            MapEngine.setRangeMinZoom(value);
+        }
+
+        function toggleContainWithinBorder(checked) {
+            MapEngine.setContainWithinBorder(checked);
+        }
+
+        function toggleDrawLabels(checked) {
+            MapEngine.setDrawLabels(checked);
+        }
+
+        function toggleGridFreeze(checked) {
+            MapEngine.setGridFrozen(checked);
+        }
+
+        function toggleDrawMode() {
+            MapEngine.setDrawingBorder(!MapEngine.config.isDrawingBorder);
+
+            const button = $('btn-draw-mode');
+            const tipText = $('coords-tip-text');
+
+            if (MapEngine.config.isDrawingBorder) {
+                button.innerHTML = '<i data-feather="check" class="w-3.5 h-3.5"></i> Drawing Active';
+                button.classList.add('bg-green-600/30', 'border-green-500', 'text-green-300');
+                button.classList.remove('bg-slate-800', 'hover:bg-slate-700', 'text-slate-300');
+                tipText.textContent = 'Click on the map to add border points. Click button again to exit Drawing Mode.';
+                tipText.classList.add('text-green-400');
+                tipText.classList.remove('text-slate-500');
+            } else {
+                button.innerHTML = '<i data-feather="edit-2" class="w-3.5 h-3.5"></i> Draw Border';
+                button.classList.remove('bg-green-600/30', 'border-green-500', 'text-green-300');
+                button.classList.add('bg-slate-800', 'hover:bg-slate-700', 'text-slate-300');
+                tipText.textContent = 'Click to place Center. Hover to see blocks.';
+                tipText.classList.remove('text-green-400');
+                tipText.classList.add('text-slate-500');
+            }
+
+            if (window.feather) feather.replace();
+        }
+
+        function clearBorderPoints() {
+            MapEngine.clearBorder();
+            updateBorderStats();
+        }
+
+        function updateBorderStats() {
+            const statsText = $('border-stats-text');
+            const strictButton = $('btn-copy-strict');
+            const overlapButton = $('btn-copy-overlap');
+            const containToggle = $('toggle-contain-border');
+            const containRow = $('contain-border-row');
+            const count = MapEngine.config.borderPoints.length;
+            const hasClosedBorder = count >= 3;
+
+            containToggle.disabled = !hasClosedBorder;
+            containRow.classList.toggle('opacity-45', !hasClosedBorder);
+            containRow.querySelector('label').classList.toggle('cursor-not-allowed', !hasClosedBorder);
+            containRow.querySelector('label').classList.toggle('cursor-pointer', hasClosedBorder);
+
+            if (!hasClosedBorder && containToggle.checked) {
+                containToggle.checked = false;
+                MapEngine.setContainWithinBorder(false);
+            }
+
+            if (count === 0) {
+                statsText.innerHTML = '<span class="text-slate-500 italic">No border polygon drawn yet.</span>';
+                setCopyButtonsEnabled(false, strictButton, overlapButton);
+                return;
+            }
+
+            if (count < 3) {
+                statsText.innerHTML = `<span class="text-yellow-400 font-medium">Border Points: ${count}</span><br><span class="text-[10px] text-slate-500">Need at least 3 points to form closed polygon.</span>`;
+                setCopyButtonsEnabled(false, strictButton, overlapButton);
+                return;
+            }
+
+            const borderCounts = MapEngine.getBorderSelectionCounts();
+            statsText.innerHTML = `<span class="text-green-400 font-bold">Closed Polygon Active</span><br><span class="text-[10px] text-slate-400">Border Points: ${count} vertices</span><br><span class="text-[10px] text-slate-300">${borderCounts.strict} strictly inside, ${borderCounts.center} with center inside</span>`;
+            setCopyButtonsEnabled(true, strictButton, overlapButton);
+        }
+
+        function setCopyButtonsEnabled(enabled, strictButton, overlapButton) {
+            strictButton.disabled = !enabled;
+            overlapButton.disabled = !enabled;
+            strictButton.classList.toggle('opacity-50', !enabled);
+            strictButton.classList.toggle('cursor-not-allowed', !enabled);
+            overlapButton.classList.toggle('opacity-50', !enabled);
+            overlapButton.classList.toggle('cursor-not-allowed', !enabled);
+        }
+
+        function copyBastionsBorder(strictOnly) {
+            if (MapEngine.config.borderPoints.length < 3) return;
+
+            const selectedCoords = MapEngine.getBorderSelection(strictOnly ? 'strict' : 'center');
+
+            if (selectedCoords.length === 0) {
+                alert('No grid points found matching this criteria inside the selection border.');
+                return;
+            }
+
+            const text = selectedCoords.map((coord) => `${Math.round(coord.x)}, ${Math.round(coord.z)}`).join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`Successfully copied ${selectedCoords.length} grid coordinates (${strictOnly ? 'Strictly Inside' : 'Center Inside'}) to clipboard!`);
+            }).catch((error) => {
+                console.error('Copy failed:', error);
+            });
+        }
+
+        function toggleJsonWindow() {
+            $('json-window-container').classList.toggle('hidden');
+            if (window.feather) feather.replace();
+        }
+
+        function importFromJson() {
+            const textarea = $('json-window-textarea');
+            const rawValue = textarea.value.trim();
+
+            if (!rawValue) {
+                alert('Please paste a valid JSON string before applying.');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(rawValue);
+                const coordinatesArray = getPolygonCoordinates(parsed);
+
+                if (!coordinatesArray || !Array.isArray(coordinatesArray) || coordinatesArray.length < 3) {
+                    alert('Could not discover or map a valid polygon array within the pasted configuration framework.');
+                    return;
+                }
+
+                const borderPoints = coordinatesArray.map((coords) => ({
+                    x: Number.parseFloat(coords[0]),
+                    z: Number.parseFloat(coords[1])
+                })).filter((point) => Number.isFinite(point.x) && Number.isFinite(point.z));
+
+                if (
+                    borderPoints.length > 1
+                    && borderPoints[0].x === borderPoints[borderPoints.length - 1].x
+                    && borderPoints[0].z === borderPoints[borderPoints.length - 1].z
+                ) {
+                    borderPoints.pop();
+                }
+
+                MapEngine.setBorderPoints(borderPoints);
+
+                if (borderPoints.length > 0) {
+                    MapEngine.map.panTo(L.latLng(-borderPoints[0].z, borderPoints[0].x));
+                }
+
+                updateBorderStats();
+                $('json-window-container').classList.add('hidden');
+                alert(`Border configuration loaded successfully! Imported ${borderPoints.length} boundary vertices.`);
+            } catch (error) {
+                alert(`Failed to parse configurations. Ensure value is fully structured, unbroken JSON formatting: ${error.message}`);
+            }
+        }
+
+        function getPolygonCoordinates(parsed) {
+            if (parsed.polygons && Array.isArray(parsed.polygons) && parsed.polygons.length > 0) {
+                const primaryPolygon = parsed.polygons[0];
+                if (primaryPolygon.geometryGeoJson && primaryPolygon.geometryGeoJson.coordinates) {
+                    return primaryPolygon.geometryGeoJson.coordinates[0];
+                }
+            }
+
+            if (parsed.geometryGeoJson && parsed.geometryGeoJson.coordinates) {
+                return parsed.geometryGeoJson.coordinates[0];
+            }
+
+            if (parsed.type === 'Polygon' && Array.isArray(parsed.coordinates)) {
+                return parsed.coordinates[0];
+            }
+
+            return null;
+        }
+
+        function exportToJson() {
+            const borderPoints = MapEngine.config.borderPoints;
+            if (borderPoints.length < 3) {
+                alert('You must define a complete border tracking polygon (minimum 3 vertices) before generating a template.');
+                return;
+            }
+
+            const rawRing = borderPoints.map((point) => [point.x, point.z]);
+            rawRing.push([borderPoints[0].x, borderPoints[0].z]);
+
+            const payload = {
+                name: 'Exported Configuration',
+                color: '#e040fb',
+                polygons: [
+                    {
+                        geometryGeoJson: {
+                            type: 'Polygon',
+                            coordinates: [rawRing]
+                        },
+                        sortOrder: 0
+                    }
+                ]
+            };
+
+            const jsonString = JSON.stringify(payload, null, 2);
+            const textWindow = $('json-window-textarea');
+            textWindow.value = jsonString;
+            $('json-window-container').classList.remove('hidden');
+
+            navigator.clipboard.writeText(jsonString).then(() => {
+                alert('Configuration structure compiled successfully and automatically added to your clipboard framework!');
+            }).catch(() => {
+                alert('Configuration payload generated inside the tracking text window panel below.');
+            });
+        }
+
+        function toggleFullscreen() {
+            const mapContainer = $('map-container');
+            if (!document.fullscreenElement) {
+                mapContainer.requestFullscreen()
+                    .then(() => setTimeout(() => MapEngine.invalidateSize(), 100))
+                    .catch((error) => console.error('Error enabling fullscreen:', error));
+                return;
+            }
+
+            document.exitFullscreen();
+        }
+
+        window.selectGridOption = selectGridOption;
+        window.onCenterPointChange = onCenterPointChange;
+        window.toggleClaimsOverlay = toggleClaimsOverlay;
+        window.toggleShowRanges = toggleShowRanges;
+        window.onRangeZoomChange = onRangeZoomChange;
+        window.toggleContainWithinBorder = toggleContainWithinBorder;
+        window.toggleDrawLabels = toggleDrawLabels;
+        window.toggleGridFreeze = toggleGridFreeze;
+        window.toggleDrawMode = toggleDrawMode;
+        window.clearBorderPoints = clearBorderPoints;
+        window.copyBastionsBorder = copyBastionsBorder;
+        window.toggleJsonWindow = toggleJsonWindow;
+        window.importFromJson = importFromJson;
+        window.exportToJson = exportToJson;
+    </script>
+</body>
+</html>
