@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nara Homes | Zillow Civ Properties</title>
+    
+    <meta name="description" content="Explore real estate and properties across Nara. Browse cities, view dynamic coordinates, download layouts, and interact with 3D schematics.">
+    <meta name="theme-color" content="#2596be">
+    <link class="page-icon" rel="icon" href="../images/nara_flag_white_border.svg" type="image/svg+xml">
+
+    <!-- Tailwind and Feather Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js" defer></script>
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../style.css" fetchpriority="high">
+
+    <!-- ThreeJS Importmap for Schematic Renderer -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.181.2/build/three.module.js"
+        }
+    }
+    </script>
+
+    <style>
+        /* Custom layout sizes to mimic Zillow */
+        .portal-height {
+            height: calc(100vh - 100px);
+        }
+
+        @media (max-width: 1024px) {
+            .portal-height {
+                height: auto;
+            }
+        }
+
+        /* Premium Scrollbars */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.4);
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(6, 182, 212, 0.35);
+            border-radius: 3px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(6, 182, 212, 0.6);
+        }
+
+        /* Leaflet Dark Customizations */
+        .leaflet-container {
+            background: #090d16; /* Slate 950 variant */
+            cursor: grab;
+            font-family: inherit;
+        }
+        .leaflet-container:active {
+            cursor: grabbing;
+        }
+        .leaflet-tile {
+            opacity: 0.5;
+            image-rendering: pixelated;
+        }
+
+        /* Modernized Leaflet Popup wrapper */
+        .leaflet-popup-content-wrapper {
+            background: rgba(15, 23, 42, 0.95) !important; 
+            backdrop-filter: blur(12px) !important;
+            color: #f1f5f9 !important;
+            border: 1px solid rgba(6, 182, 212, 0.3) !important;
+            box-shadow: 0 20px 45px -5px rgba(0, 0, 0, 0.7) !important;
+            border-radius: 12px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+        .leaflet-popup-content {
+            margin: 0 !important;
+            line-height: inherit !important;
+        }
+        .leaflet-popup-tip {
+            background: rgba(15, 23, 42, 0.95) !important;
+            border-left: 1px solid rgba(6, 182, 212, 0.3) !important;
+            border-bottom: 1px solid rgba(6, 182, 212, 0.3) !important;
+        }
+        .leaflet-popup-close-button {
+            color: #94a3b8 !important;
+            padding: 8px 8px 0 0 !important;
+            font-size: 16px !important;
+        }
+        .leaflet-popup-close-button:hover {
+            color: #f1f5f9 !important;
+        }
+        
+        .property-card-glow {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .property-card-glow:hover {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+            border-color: rgba(6, 182, 212, 0.5);
+            background-color: rgba(15, 23, 42, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* 3D Canvas height details */
+        #canvas {
+            width: 100%;
+            height: 480px;
+            display: block;
+            background: #090d16;
+            border-radius: 12px;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .item-icon {
+            image-rendering: pixelated;
+        }
+
+        /* Gradient glowing borders for panels */
+        .neon-border {
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            box-shadow: inset 0 0 20px rgba(6, 182, 212, 0.05);
+        }
+    </style>
+
+    <script src="../components/analytics.js" defer></script>
+    <script src="../components/navbar.js" defer></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+    <!-- Navbar Component -->
+    <custom-navbar></custom-navbar>
+    
+    <!-- Navbar Spacer -->
+    <div class="h-[100px] flex-shrink-0"></div>
+
+    <!-- MAIN VIEW: Split Listings / Map Search -->
+    <div id="listings-view" class="flex flex-col flex-grow w-full">
+        <!-- Portal Main Content: Split Map 3/5, Sidebar Listings 2/5 -->
+        <div class="flex flex-col lg:flex-row flex-grow portal-height w-full overflow-hidden">
+            <!-- Left Side: Leaflet Map (3/5) -->
+            <div class="w-full lg:w-3/5 h-[450px] lg:h-full relative border-b lg:border-b-0 lg:border-r border-slate-800 flex-shrink-0">
+                <div id="homes-map" class="w-full h-full"></div>
+                <!-- Coords Display Overlay -->
+                <div class="absolute bottom-4 left-4 bg-slate-950/90 border border-slate-800/80 rounded-lg px-3 py-1.5 font-mono text-xs text-slate-300 z-[900] pointer-events-none shadow-lg">
+                    X: <span id="map-hover-x" class="text-cyan-400 font-bold">0</span>, Z: <span id="map-hover-z" class="text-cyan-400 font-bold">0</span>
+                </div>
+            </div>
+
+            <!-- Right Side: Unified Control Panel + Scrollable Listings (2/5) -->
+            <div class="w-full lg:w-2/5 h-full flex flex-col bg-slate-950 flex-grow border-l border-slate-900">
+                
+                <!-- Filter Section inside the Sidebar -->
+                <div class="px-6 py-5 border-b border-slate-800 bg-slate-900/40 neon-border flex flex-col gap-4 flex-shrink-0">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2 tracking-tight">
+                            <i data-feather="sliders" class="w-4 h-4 text-cyan-400"></i> Search & Filters
+                        </h2>
+                        <!-- Listings Counter -->
+                        <span id="listings-count" class="text-xs bg-cyan-950 text-cyan-400 border border-cyan-800/50 rounded-full px-2.5 py-0.5 font-bold">0 listings</span>
+                    </div>
+
+                    <!-- Filters Grid -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Location Selector -->
+                        <div class="flex flex-col">
+                            <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Region / Location</label>
+                            <select id="filter-city" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2.5 py-2.5 focus:outline-none focus:border-cyan-500 transition-colors cursor-pointer" onchange="applyFilters()">
+                                <option value="all">All Locations</option>
+                            </select>
+                        </div>
+
+                        <!-- Building Type Selector -->
+                        <div class="flex flex-col">
+                            <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Building Style</label>
+                            <select id="filter-building-type" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2.5 py-2.5 focus:outline-none focus:border-cyan-500 transition-colors cursor-pointer" onchange="applyFilters()">
+                                <option value="all">All Buildings</option>
+                                <option value="home" selected>Home</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="house_shop">House & Shop</option>
+                                <option value="hotel_room">Hotel Room</option>
+                            </select>
+                        </div>
+
+                        <!-- Listing Type Selector -->
+                        <div class="flex flex-col">
+                            <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-1">Listing Category</label>
+                            <select id="filter-type" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2.5 py-2.5 focus:outline-none focus:border-cyan-500 transition-colors cursor-pointer" onchange="applyFilters()">
+                                <option value="all">Sale & Rental</option>
+                                <option value="sale">For Sale</option>
+                                <option value="rental">Rental Only</option>
+                            </select>
+                        </div>
+
+                        <!-- Max Price Range -->
+                        <div class="flex flex-col justify-end">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Max Cost</label>
+                                <span id="price-val" class="text-[10px] font-bold text-cyan-400">All Prices</span>
+                            </div>
+                            <input type="range" id="filter-price" min="0" max="1000" step="5" value="1000" class="w-full h-1.5 bg-slate-850 rounded-lg appearance-none cursor-pointer accent-cyan-500" oninput="updatePriceLabel(this.value); applyFilters()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listings Grid -->
+                <div id="listings-container" class="flex-grow overflow-y-auto px-6 py-5 flex flex-col gap-4 custom-scroll">
+                    <!-- Cards will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETAIL VIEW: Dynamic Property Details -->
+    <div id="details-view" class="hidden flex-grow max-w-6xl mx-auto w-full px-6 py-8 flex flex-col gap-6">
+        <!-- Back navigation -->
+        <div>
+            <button onclick="navigateToListings()" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors py-2">
+                <i data-feather="arrow-left" class="w-4 h-4 transition-transform group-hover:-translate-x-1"></i>
+                <span>Back to Listings</span>
+            </button>
+        </div>
+
+        <!-- Split Detail View -->
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+            <!-- Left Side: Gallery & 3D Render (3/5) -->
+            <div class="lg:col-span-3 flex flex-col gap-6">
+                <!-- Image Section -->
+                <div id="detail-media-container" class="rounded-xl overflow-hidden bg-slate-900 border border-slate-800 relative shadow-xl">
+                    <!-- Dynamic details image or coordinate placeholder -->
+                </div>
+
+                <!-- 3D Schematic Renderer Section -->
+                <div id="schematic-section" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl flex flex-col gap-4">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div class="flex items-center gap-2">
+                            <i data-feather="box" class="w-5 h-5 text-cyan-400"></i>
+                            <h3 class="font-bold text-lg text-white">3D Schematic View</h3>
+                        </div>
+                        <span class="text-xs text-slate-400 bg-slate-850 border border-slate-700 px-2 py-0.5 rounded flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Preloaded
+                        </span>
+                    </div>
+                    <div class="relative w-full h-[480px]">
+                        <canvas id="canvas"></canvas>
+                        <!-- Instructions Overlay -->
+                        <div class="absolute bottom-4 right-4 bg-slate-950/80 border border-slate-800/80 rounded px-3 py-1 text-[10px] text-slate-400 font-mono pointer-events-none flex items-center gap-2">
+                            <span>🖱 Drag to Rotate</span>
+                            <span>⚙ Scroll to Zoom</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Info Panel (2/5) -->
+            <div class="lg:col-span-2 flex flex-col gap-6 lg:sticky lg:top-[120px]">
+                <!-- Property Details card -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl flex flex-col gap-5">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col gap-1">
+                            <span id="detail-badge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full w-fit"></span>
+                            <span id="detail-building-badge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-850 text-slate-400 border border-slate-800 w-fit uppercase tracking-wider"></span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Price</span>
+                            <span id="detail-price" class="text-xl font-extrabold text-white flex items-center justify-end gap-1.5"></span>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-800 pt-4 flex flex-col gap-1">
+                        <h2 id="detail-address" class="text-2xl font-extrabold text-white tracking-tight"></h2>
+                        <p id="detail-city" class="text-slate-400 flex items-center gap-1.5 text-sm">
+                            <i data-feather="map-pin" class="w-4 h-4 text-cyan-400"></i> <span></span>
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 border-t border-slate-800 pt-4">
+                        <div class="bg-slate-950/50 border border-slate-850 rounded-lg p-3">
+                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Owner</span>
+                            <span id="detail-owner" class="text-sm font-bold text-slate-200"></span>
+                        </div>
+                        <div class="bg-slate-950/50 border border-slate-850 rounded-lg p-3">
+                            <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Coordinates</span>
+                            <span id="detail-coords-text" class="text-sm font-mono font-bold text-slate-200"></span>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="flex flex-col gap-3 pt-2">
+                        <button onclick="copyCoordsToClipboard()" class="w-full py-3 bg-slate-850 hover:bg-slate-800 text-slate-200 font-bold rounded-lg transition-all flex items-center justify-center gap-2 border border-slate-800 shadow-md">
+                            <i data-feather="copy" class="w-4 h-4 text-cyan-400"></i> Copy Coordinates
+                        </button>
+                        <a id="detail-download-btn" href="#" download class="hidden w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold rounded-lg transition-all shadow-md shadow-cyan-900/10 flex items-center justify-center gap-2">
+                            <i data-feather="download" class="w-4 h-4"></i> Download Layout Schematic
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3D Schematic Import Script -->
+    <script type="module">
+        import { SchematicRenderer } from "https://unpkg.com/schematic-renderer@1.1.23/dist/schematic-renderer.es.js";
+        window.SchematicRendererClass = SchematicRenderer;
+    </script>
+
+    <!-- Main Logic Script -->
+    <script>
+        // Global Portal State
+        let allListings = [];
+        let map = null;
+        let mapMarkers = [];
+        let currentRenderer = null;
+
+        // Assets
+        const DIAMOND_ICON_URL = "https://ccvaults.com/assets/10.%20Items/11.%20Materials/Diamond.png";
+        
+        // Leaflet Terrain Tile Config
+        const TILE_URL = 'https://civmc-map.duckdns.org/tiles/terrain/z{z}/{x}/{y}.png';
+
+        // Coordinate conversion helper
+        function toLatLng(x, z) {
+            return L.latLng(-z, x);
+        }
+        function fromLatLng(latlng) {
+            return { x: latlng.lng, z: -latlng.lat };
+        }
+
+        // Coordinate parser
+        function parseCoordinates(coordStr) {
+            if (!coordStr) return null;
+            const matches = coordStr.match(/-?\d+/g);
+            if (!matches || matches.length < 2) return null;
+            if (matches.length === 2) {
+                return { x: parseInt(matches[0], 10), z: parseInt(matches[1], 10) };
+            } else {
+                return { x: parseInt(matches[0], 10), y: parseInt(matches[1], 10), z: parseInt(matches[2], 10) };
+            }
+        }
+
+        // Initialize Map (Territory overlays removed as requested)
+        function initMap() {
+            map = L.map('homes-map', {
+                crs: L.CRS.Simple,
+                minZoom: -6,
+                maxZoom: 2,
+                zoomControl: false,
+                attributionControl: false,
+                preferCanvas: true
+            });
+
+            // Terrain Tile layer
+            L.tileLayer(TILE_URL, {
+                tileSize: 256,
+                minZoom: -6,
+                maxZoom: 2,
+                maxNativeZoom: 0,
+                noWrap: true,
+                bounds: [[-25600, -25600], [25600, 25600]]
+            }).addTo(map);
+
+            // Default Shiroyama center
+            map.setView(toLatLng(3227, 4792), -3);
+
+            // Zoom controls
+            L.control.zoom({ position: 'topright' }).addTo(map);
+
+            // Mouse coordinates tracking
+            map.on('mousemove', function(e) {
+                const point = fromLatLng(e.latlng);
+                document.getElementById('map-hover-x').textContent = Math.round(point.x);
+                document.getElementById('map-hover-z').textContent = Math.round(point.z);
+            });
+        }
+
+        // Helper to format building types for human readability
+        function formatBuildingType(type) {
+            if (!type) return 'Home';
+            switch (type.toLowerCase()) {
+                case 'home': return 'Home';
+                case 'apartment': return 'Apartment';
+                case 'house_shop': return 'House & Shop';
+                case 'hotel_room': return 'Hotel Room';
+                default: return type;
+            }
+        }
+
+        // Fetch properties from Sanity CMS API
+        async function loadProperties() {
+            const query = encodeURIComponent(`*[_type == "listingPost"] {
+                _id,
+                address,
+                coordinates,
+                price,
+                is_rental,
+                city,
+                listing_owner,
+                building_type,
+                "schematicUrl": schematic_file.asset->url,
+                "images": images[].asset->url
+            }`);
+            
+            try {
+                const response = await fetch(`https://scdpub0o.apicdn.sanity.io/v2021-10-21/data/query/production?query=${query}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Sanity CDN returned status code: ${response.status}`);
+                }
+
+                const data = await response.json();
+                allListings = data.result || [];
+                
+                // Populate filters and UI
+                populateCityDropdown();
+                renderListings();
+                plotMarkers();
+                updateListingsCount(getFilteredListings().length);
+            } catch (err) {
+                console.error("Failed to load listings from Sanity CMS:", err);
+                renderSanityCorsAlert();
+            }
+        }
+
+        // Render beautiful, interactive CORS troubleshooting instructions
+        function renderSanityCorsAlert() {
+            const container = document.getElementById('listings-container');
+            container.innerHTML = `
+            <div class="bg-red-950/20 border border-red-800/40 rounded-xl p-5 flex flex-col gap-4 text-slate-300 shadow-lg">
+                <div class="flex items-center gap-2 border-b border-red-800/30 pb-3">
+                    <i data-feather="alert-triangle" class="w-5 h-5 text-red-400"></i>
+                    <h3 class="font-extrabold text-sm text-white tracking-wide uppercase">CORS Origin Config Blocked</h3>
+                </div>
+                <div class="text-xs leading-relaxed flex flex-col gap-2.5">
+                    <p>Sanity CMS successfully denied your browser's cross-origin query (403 Forbidden). By default, Sanity blocks requests from unauthorized domains.</p>
+                    <p class="font-bold text-white">To resolve this error instantly:</p>
+                    <ol class="list-decimal list-inside pl-1 space-y-1">
+                        <li>Navigate to <a href="https://manage.sanity.io" target="_blank" class="text-cyan-400 font-semibold hover:underline">manage.sanity.io</a></li>
+                        <li>Open project <span class="bg-slate-900 border border-slate-800 px-1.5 py-0.5 rounded font-mono font-bold text-[11px] text-cyan-300">nara-zillow</span></li>
+                        <li>Go to <span class="text-slate-200 font-medium">API</span> tab → <span class="text-slate-200 font-medium">CORS Origins</span></li>
+                        <li>Click <span class="text-slate-200 font-medium">Add CORS Origin</span> and paste your URL:
+                            <div class="bg-slate-950 border border-slate-900 rounded p-2 mt-1.5 font-mono text-[10px] text-slate-400 flex flex-col gap-0.5">
+                                <span>Active Origin: <span class="text-green-400 font-bold">${window.location.origin}</span></span>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>`;
+            if (window.feather) feather.replace();
+        }
+
+        // Populate location filter options
+        function populateCityDropdown() {
+            const select = document.getElementById('filter-city');
+            const cities = [...new Set(allListings.map(l => l.city).filter(Boolean))].sort();
+            
+            cities.forEach(city => {
+                const opt = document.createElement('option');
+                opt.value = city;
+                opt.textContent = city;
+                select.appendChild(opt);
+            });
+        }
+
+        // Plot interactive pins
+        function plotMarkers() {
+            // Clear active markers
+            mapMarkers.forEach(m => m.remove());
+            mapMarkers = [];
+
+            const filtered = getFilteredListings();
+
+            filtered.forEach(listing => {
+                const coords = parseCoordinates(listing.coordinates);
+                if (!coords) return;
+
+                const latlng = toLatLng(coords.x, coords.z);
+                const isRental = listing.is_rental;
+                
+                // Glowing POI pin markup
+                const pinColorClass = isRental ? 'bg-purple-600' : 'bg-cyan-500';
+                const pulseColorClass = isRental ? 'bg-purple-500/30' : 'bg-cyan-500/30';
+                const pinIcon = L.divIcon({
+                    className: 'custom-pin-icon',
+                    html: `
+                    <div class="relative flex items-center justify-center" style="width: 24px; height: 24px;">
+                        <div class="absolute w-8 h-8 rounded-full ${pulseColorClass} animate-ping"></div>
+                        <div class="relative w-6 h-6 rounded-full ${pinColorClass} border-2 border-slate-900 flex items-center justify-center shadow-lg">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                        </div>
+                    </div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+
+                // Zillow-style premium popup preview with diamond icon
+                const imageSection = listing.images && listing.images[0] 
+                    ? `<img src="${listing.images[0]}" class="w-full h-32 object-cover block" alt="Property Image">` 
+                    : `<div class="w-full h-24 bg-slate-850 flex flex-col items-center justify-center border-b border-slate-800 text-slate-400 font-mono text-[10px]"><span class="font-bold">Minecraft Coords</span><span>X: ${coords.x}, Z: ${coords.z}</span></div>`;
+
+                const priceDisplay = listing.price === 0 
+                    ? 'Free' 
+                    : `<img src="${DIAMOND_ICON_URL}" class="w-4.5 h-4.5 item-icon select-none inline-block align-middle" style="image-rendering:pixelated;"> ${listing.price}`;
+
+                const popupHtml = `
+                <div class="bg-slate-900 text-slate-100 rounded-lg overflow-hidden w-64 shadow-2xl font-sans" style="font-family: inherit;">
+                    ${imageSection}
+                    <div class="p-4 flex flex-col gap-2">
+                        <div class="flex justify-between items-center gap-2">
+                            <div class="flex gap-1.5">
+                                <span class="text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${isRental ? 'bg-purple-950 text-purple-300 border border-purple-800' : 'bg-cyan-950 text-cyan-300 border border-cyan-800'}">${isRental ? 'Rental' : 'For Sale'}</span>
+                                <span class="text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-850 text-slate-400 border border-slate-800">${formatBuildingType(listing.building_type)}</span>
+                            </div>
+                            <span class="text-sm font-extrabold text-white flex items-center gap-1">${priceDisplay}</span>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white truncate">${listing.address || 'Unnamed Property'}</h4>
+                            <p class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5 truncate">
+                                <svg class="w-3 h-3 text-cyan-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span>${listing.city} (${coords.x}, ${coords.z})</span>
+                            </p>
+                        </div>
+                        <button onclick="navigateToDetail('${listing._id}')" class="w-full text-center py-2 mt-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold rounded-lg transition-all shadow-md shadow-cyan-950/20">View Blueprint details</button>
+                    </div>
+                </div>`;
+
+                const marker = L.marker(latlng, { icon: pinIcon }).addTo(map);
+                marker.bindPopup(popupHtml, {
+                    maxWidth: 270,
+                    minWidth: 250,
+                    closeButton: true,
+                    offset: [0, -5]
+                });
+
+                // Interaction highlight on click
+                marker.on('click', function() {
+                    map.panTo(latlng);
+                    highlightCard(listing._id);
+                });
+
+                mapMarkers.push(marker);
+            });
+        }
+
+        // Get matching listings
+        function getFilteredListings() {
+            const city = document.getElementById('filter-city').value;
+            const type = document.getElementById('filter-type').value;
+            const buildingType = document.getElementById('filter-building-type').value;
+            const maxPrice = parseInt(document.getElementById('filter-price').value, 10);
+
+            return allListings.filter(l => {
+                // City
+                if (city !== 'all' && l.city !== city) return false;
+                
+                // Building Style
+                const listBType = l.building_type ? l.building_type.toLowerCase() : 'home';
+                if (buildingType !== 'all' && listBType !== buildingType) return false;
+
+                // Category type
+                if (type === 'sale' && l.is_rental) return false;
+                if (type === 'rental' && !l.is_rental) return false;
+                
+                // Price
+                if (l.price > maxPrice) return false;
+
+                return true;
+            });
+        }
+
+        // Render card layout on right side
+        function renderListings() {
+            const container = document.getElementById('listings-container');
+            container.innerHTML = '';
+            
+            const filtered = getFilteredListings();
+            updateListingsCount(filtered.length);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                <div class="py-16 flex flex-col items-center justify-center text-slate-500 gap-3 border border-slate-900 rounded-xl bg-slate-900/10">
+                    <i data-feather="home" class="w-8 h-8 text-slate-700"></i>
+                    <p class="text-xs font-semibold text-slate-600">No properties found matching criteria.</p>
+                </div>`;
+                if (window.feather) feather.replace();
+                return;
+            }
+
+            filtered.forEach(listing => {
+                const coords = parseCoordinates(listing.coordinates);
+                const isRental = listing.is_rental;
+                
+                const card = document.createElement('div');
+                card.id = `card-${listing._id}`;
+                card.className = `bg-slate-900/30 border border-slate-900 rounded-xl overflow-hidden cursor-pointer transition-all duration-300 flex property-card-glow`;
+                card.onclick = () => {
+                    panToCoordinates(coords.x, coords.z);
+                    highlightCard(listing._id);
+                };
+
+                const imgHtml = listing.images && listing.images[0]
+                    ? `<img src="${listing.images[0]}" class="w-32 h-full object-cover select-none" alt="Image">`
+                    : `<div class="w-32 h-full min-h-[115px] bg-slate-950/80 flex flex-col items-center justify-center text-slate-600 font-mono text-[9px] px-2 text-center border-r border-slate-900">
+                        <span class="font-bold text-slate-400 block mb-0.5">X: ${coords.x}</span>
+                        <span class="font-bold text-slate-400">Z: ${coords.z}</span>
+                       </div>`;
+
+                const priceDisplay = listing.price === 0 
+                    ? 'Free' 
+                    : `<img src="${DIAMOND_ICON_URL}" class="w-4 h-4 item-icon select-none inline-block align-middle" style="image-rendering:pixelated;"> ${listing.price}`;
+
+                card.innerHTML = `
+                    ${imgHtml}
+                    <div class="p-4 flex flex-col justify-between flex-grow min-w-0">
+                        <div class="flex justify-between items-start gap-2 mb-1">
+                            <div class="flex gap-1">
+                                <span class="text-[8px] font-bold px-2 py-0.5 rounded-full ${isRental ? 'bg-purple-950/60 text-purple-300 border border-purple-800/30' : 'bg-cyan-950/60 text-cyan-300 border border-cyan-800/30'}">${isRental ? 'Rental' : 'For Sale'}</span>
+                                <span class="text-[8px] font-bold px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-slate-800">${formatBuildingType(listing.building_type)}</span>
+                            </div>
+                            <span class="text-xs font-extrabold text-cyan-400 flex items-center gap-1">${priceDisplay}</span>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-sm font-extrabold text-white truncate">${listing.address || 'Unnamed Property'}</h3>
+                            <p class="text-xs text-slate-400 flex items-center gap-1 mt-0.5 truncate">
+                                <i data-feather="map-pin" class="w-3 h-3 text-cyan-500"></i>
+                                <span>${listing.city} · ${coords.x}, ${coords.z}</span>
+                            </p>
+                        </div>
+
+                        <div class="flex justify-between items-center border-t border-slate-800/60 pt-2 mt-2">
+                            <span class="text-[9px] text-slate-500 font-bold truncate">Owner: ${listing.listing_owner || 'Unknown'}</span>
+                            <button onclick="event.stopPropagation(); navigateToDetail('${listing._id}')" class="text-[9px] font-bold text-cyan-400 hover:text-white hover:underline flex items-center gap-0.5 transition-colors">
+                                Details <i data-feather="chevron-right" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            if (window.feather) feather.replace();
+        }
+
+        // Apply filters
+        function applyFilters() {
+            renderListings();
+            plotMarkers();
+        }
+
+        function updatePriceLabel(val) {
+            const label = document.getElementById('price-val');
+            if (parseInt(val, 10) === 1000) {
+                label.textContent = "All Prices";
+            } else {
+                label.textContent = `≤ 💎 ${val}`;
+            }
+        }
+
+        function updateListingsCount(count) {
+            document.getElementById('listings-count').textContent = `${count} ${count === 1 ? 'listing' : 'listings'}`;
+        }
+
+        function panToCoordinates(x, z) {
+            if (map) {
+                map.panTo(toLatLng(x, z));
+            }
+        }
+
+        function highlightCard(id) {
+            // Remove active classes
+            document.querySelectorAll('[id^="card-"]').forEach(c => {
+                c.classList.remove('border-cyan-500', 'bg-slate-900/90', 'ring-1', 'ring-cyan-500/20');
+            });
+
+            const card = document.getElementById(`card-${id}`);
+            if (card) {
+                card.classList.add('border-cyan-500', 'bg-slate-900/90', 'ring-1', 'ring-cyan-500/20');
+                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // Route Views Conditionally
+        function showListingsView() {
+            document.getElementById('listings-view').classList.remove('hidden');
+            document.getElementById('details-view').classList.add('hidden');
+            
+            // Clean active 3D renderer if any
+            if (currentRenderer) {
+                currentRenderer = null;
+            }
+
+            // Invalidate Map size to handle layout paint recalculation
+            setTimeout(() => {
+                if (map) map.invalidateSize();
+            }, 100);
+        }
+
+        async function showDetailsView(id) {
+            document.getElementById('listings-view').classList.add('hidden');
+            document.getElementById('details-view').classList.remove('hidden');
+
+            // Find matching listing
+            if (allListings.length === 0) {
+                await loadProperties();
+            }
+
+            const listing = allListings.find(l => l._id === id);
+            if (!listing) {
+                navigateToListings();
+                return;
+            }
+
+            // Render detailed properties in elements
+            const isRental = listing.is_rental;
+            const coords = parseCoordinates(listing.coordinates);
+
+            // Badge Setup
+            const badge = document.getElementById('detail-badge');
+            badge.className = `text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${isRental ? 'bg-purple-950 text-purple-300 border border-purple-800' : 'bg-cyan-950 text-cyan-300 border border-cyan-800'}`;
+            badge.textContent = isRental ? 'Rental Property' : 'For Sale';
+
+            const buildingBadge = document.getElementById('detail-building-badge');
+            buildingBadge.textContent = formatBuildingType(listing.building_type);
+
+            const detailPrice = document.getElementById('detail-price');
+            if (listing.price === 0) {
+                detailPrice.textContent = "Free";
+            } else {
+                detailPrice.innerHTML = `<img src="${DIAMOND_ICON_URL}" class="w-5 h-5 item-icon select-none inline-block align-middle" style="image-rendering:pixelated;"> <span>${listing.price}</span>`;
+            }
+
+            document.getElementById('detail-address').textContent = listing.address || 'Unnamed Property';
+            document.getElementById('detail-city').querySelector('span').textContent = `${listing.city} Region`;
+            document.getElementById('detail-owner').textContent = listing.listing_owner || 'Unknown';
+            document.getElementById('detail-coords-text').textContent = listing.coordinates;
+
+            // Render Images Gallery
+            const mediaContainer = document.getElementById('detail-media-container');
+            mediaContainer.innerHTML = '';
+            
+            if (listing.images && listing.images.length > 0) {
+                const imgsMarkup = listing.images.map((imgUrl, i) => `
+                    <img src="${imgUrl}" class="w-full h-80 object-cover ${i > 0 ? 'border-t border-slate-800' : ''}" alt="Nara Property Shot ${i + 1}">
+                `).join('');
+                mediaContainer.innerHTML = imgsMarkup;
+            } else {
+                mediaContainer.innerHTML = `
+                <div class="h-64 bg-slate-950 flex flex-col items-center justify-center text-slate-500 gap-2 border-b border-slate-800">
+                    <i data-feather="image" class="w-12 h-12 text-slate-700"></i>
+                    <p class="font-mono text-[10px] font-bold text-slate-500">X: ${coords.x}, Z: ${coords.z}</p>
+                    <p class="text-xs text-slate-600">No photos uploaded for this property blueprint yet.</p>
+                </div>`;
+            }
+
+            // Copy Coordinates clipboard logic helper variable
+            window.activeMinecraftCoordinates = listing.coordinates;
+
+            // Render download button layout schematic
+            const downloadBtn = document.getElementById('detail-download-btn');
+            if (listing.schematicUrl) {
+                downloadBtn.classList.remove('hidden');
+                downloadBtn.href = listing.schematicUrl;
+            } else {
+                downloadBtn.classList.add('hidden');
+            }
+
+            // Render 3D Schematic Block layout
+            const schematicSection = document.getElementById('schematic-section');
+            if (listing.schematicUrl && window.SchematicRendererClass) {
+                schematicSection.classList.remove('hidden');
+                init3DRenderer(listing);
+            } else {
+                schematicSection.classList.add('hidden');
+            }
+
+            if (window.feather) feather.replace();
+        }
+
+        // 3D Schematic Renderer initialization
+        function init3DRenderer(listing) {
+            const canvas = document.getElementById("canvas");
+            const fileId = listing.address ? listing.address.replace(/\s+/g, '') : "house";
+
+            try {
+                currentRenderer = new window.SchematicRendererClass(
+                    canvas,
+                    {
+                        [fileId]: async () => {
+                            const res = await fetch(listing.schematicUrl);
+                            return res.arrayBuffer();
+                        }
+                    },
+                    {}, // Default resource pack
+                    {
+                        enableDragAndDrop: true,
+                        showGrid: true,
+                        cameraOptions: {
+                            position: [20, 20, 20],
+                        },
+                    }
+                );
+            } catch (err) {
+                console.error("Failed to initialize 3D Schematic Renderer:", err);
+            }
+        }
+
+        // Copy coordinates utility
+        function copyCoordsToClipboard() {
+            if (window.activeMinecraftCoordinates) {
+                navigator.clipboard.writeText(window.activeMinecraftCoordinates).then(() => {
+                    alert(`Coordinates "${window.activeMinecraftCoordinates}" copied to clipboard successfully!`);
+                }).catch(e => console.error("Clipboard copy failure:", e));
+            }
+        }
+
+        // Handle routing strategies dynamically for GitHub Pages SPA
+        function handleRoute() {
+            const path = window.location.pathname;
+            const segments = path.split('/').filter(s => s);
+            const homesIndex = segments.indexOf('homes');
+            
+            if (homesIndex !== -1 && segments.length > homesIndex + 1) {
+                const listingId = segments[homesIndex + 1];
+                showDetailsView(listingId);
+            } else {
+                showListingsView();
+            }
+        }
+
+        // Navigation state pushes without full browser repaint
+        function navigateToDetail(id) {
+            history.pushState(null, '', `/homes/${id}`);
+            handleRoute();
+        }
+
+        function navigateToListings() {
+            history.pushState(null, '', `/homes`);
+            handleRoute();
+        }
+
+        // Mount listeners and initialize on load
+        window.addEventListener('popstate', handleRoute);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            loadProperties();
+            
+            // Allow navbar setup to bind first
+            setTimeout(() => {
+                handleRoute();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

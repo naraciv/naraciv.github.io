@@ -263,7 +263,6 @@ class CustomNavbar extends HTMLElement {
             <a href="/" class="nav-link">Home</a>
             <a href="/collect" class="nav-link nav-link-gacha">🎰 Collect</a>
             <a href="/government" class="nav-link">Government</a>
-            <a href="/properties" class="nav-link">Properties</a>
             <div class="nav-dropdown">
               <a href="/shops" class="nav-link nav-dropdown-trigger">
                 Shops

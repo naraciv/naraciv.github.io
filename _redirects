@@ -2,6 +2,8 @@
 # Clean URLs - serve index.html from directories
 /government           /government/index.html           200
 /properties           /properties/index.html           200
+/homes                /homes/index.html                200
+/homes/*              /homes/index.html                200
 /shops                /shops/index.html                200
 /joining              /joining/index.html              200
 /3dplaytime           /3dplaytime/index.html           200
