@@ -35,8 +35,28 @@
                 }
             }
 
+            // Check if we are in /homes/...
+            var homesIndex = segments.indexOf('homes');
+            if (homesIndex !== -1) {
+                var trailing = segments.slice(homesIndex + 1);
+                var basePath = '/' + segments.slice(0, homesIndex + 1).join('/');
+
+                if (trailing.length === 2 && trailing[0] === 'view') {
+                    // /homes/view/<id> -> /homes/view/?id=<id>
+                    window.location.replace('/homes/view/?id=' + encodeURIComponent(trailing[1]));
+                    return;
+                } else if (trailing.length === 1 && trailing[0] !== 'index.html' && trailing[0] !== 'view') {
+                    // /homes/<id> -> /homes/view/?id=<id>
+                    window.location.replace('/homes/view/?id=' + encodeURIComponent(trailing[0]));
+                    return;
+                } else if (trailing.length === 0 || (trailing.length === 1 && trailing[0] === 'index.html')) {
+                    window.location.replace('/homes/');
+                    return;
+                }
+            }
+
             {
-                // Fallback to home if not a stats route
+                // Fallback to home if not a stats or homes route
                 window.location.replace('/');
             }
         })();

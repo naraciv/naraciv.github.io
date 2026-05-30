@@ -1,0 +1,32 @@
+[
+  {
+    "departure_city": "Pavia City",
+    "departure_country": "Pavia",
+    "departure_coordinates": "",
+    "line_name": "Nara Direct Line",
+    "arrival_city": "Shiroyama",
+    "arrival_country": "Nara",
+    "arrival_coordinates": "",
+    "dest_command": ""
+  },
+  {
+    "departure_city": "Shiroyama",
+    "departure_country": "Nara",
+    "departure_coordinates": "x:3456, y:73, z:4822",
+    "line_name": "Nara Overland Rail",
+    "arrival_city": "Orakuru",
+    "arrival_country": "Nara",
+    "arrival_coordinates": "x:3826, y:133, z:6984",
+    "dest_command": "/dest Orakuru"
+  },
+  {
+    "departure_city": "Shiroyama",
+    "departure_country": "Nara",
+    "departure_coordinates": "x:3456, y:73, z:4822",
+    "line_name": "Nara Overland Rail",
+    "arrival_city": "Karasu",
+    "arrival_country": "Nara",
+    "arrival_coordinates": "x:3320, y:86, z:5800",
+    "dest_command": "/dest Karasu"
+  }
+]
