@@ -472,7 +472,7 @@
                 new window.SchematicRendererClass(
                     canvas,
                     { [fileId]: async () => (await fetch(listing.schematicUrl)).arrayBuffer() },
-                    { default: async () => (await fetch("../../data/pack.zip")).blob() },
+                    { default: async () => (await fetch("https://dl.dropbox.com/scl/fi/6v6uqbfgedpi5n9gk2316/1.21.11-Template.zip?rlkey=mk8x5sp50uk7mk7hj554o4hfn&dl=1")).blob() },
                     {
                         enableDragAndDrop: true,
                         showGrid: true,
