@@ -838,8 +838,23 @@
         let selectedTags = new Set();
         let availableTags = new Set();
         
-        // Load CSV and initialize
-        fetch('../data/shop_data.csv')
+        // Load CSV from Sanity CMS (most recent shopEntry)
+        const SANITY_PROJECT_ID = 'scdpub0o';
+        const SANITY_DATASET = 'production';
+        const SANITY_API_VERSION = '2021-10-21';
+        const SANITY_CDN = `https://${SANITY_PROJECT_ID}.apicdn.sanity.io/v${SANITY_API_VERSION}/data/query/${SANITY_DATASET}`;
+
+        const shopQuery = encodeURIComponent(
+            `*[_type == "shopEntry"] | order(_createdAt desc)[0] { "csvUrl": csv_file.asset->url }`
+        );
+
+        fetch(`${SANITY_CDN}?query=${shopQuery}`)
+            .then(response => response.json())
+            .then(data => {
+                const csvUrl = data?.result?.csvUrl;
+                if (!csvUrl) throw new Error('No shop CSV found in Sanity');
+                return fetch(csvUrl);
+            })
             .then(response => response.text())
             .then(csvText => {
                 const results = Papa.parse(csvText, { header: false, skipEmptyLines: true });
@@ -848,7 +863,7 @@
                 filteredData = [...processedData];
                 init();
             })
-            .catch(err => console.error('Error loading CSV:', err));
+            .catch(err => console.error('Error loading shop data from Sanity:', err));
         
         // Load filters from URL on page load
         function loadFiltersFromURL() {
