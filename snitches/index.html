@@ -978,8 +978,8 @@
         }
         
         function getTileUrl(tileX, tileY, zoom) {
-            // URL format: https://civmc-map.duckdns.org/tiles/terrain/z-5/-1,-1.png
-            return `https://civmc-map.duckdns.org/tiles/terrain/z${zoom}/${tileX},${tileY}.png`;
+            // URL format: https://civmap.nara.rocks/{z}/{x},{y}.png
+            return `https://civmap.nara.rocks/${zoom}/${tileX},${tileY}.png`;
         }
         
         function getTileKey(tileX, tileY, zoom) {

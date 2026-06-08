@@ -383,7 +383,7 @@
         const DIAMOND_ICON_URL = "https://ccvaults.com/assets/10.%20Items/11.%20Materials/Diamond.png";
 
         // Leaflet Terrain Tile Config
-        const TILE_URL = 'https://civmc-map.duckdns.org/tiles/terrain/z{z}/{x},{y}.png';
+        const TILE_URL = 'https://civmap.nara.rocks/{z}/{x},{y}.png';
 
         // Coordinate conversion helper
         function toLatLng(x, z) {
@@ -409,7 +409,7 @@
         function initMap() {
             map = L.map('homes-map', {
                 crs: L.CRS.Simple,
-                minZoom: -6,
+                minZoom: -3,
                 maxZoom: 2,
                 zoomControl: false,
                 attributionControl: false,

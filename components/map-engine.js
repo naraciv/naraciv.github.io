@@ -1,6 +1,6 @@
 // /components/map-engine.js
 const CLAIMS_IMAGE_URL = 'https://civmc-map.github.io/CivMCMap44Transparent.png';
-const TILE_URL = 'https://civmc-map.duckdns.org/tiles/terrain/z{z}/{x},{y}.png';
+const TILE_URL = 'https://civmap.nara.rocks/{z}/{x},{y}.png';
 const MAX_GRID_POINTS = 1200;
 const MAP_ALIGNMENT_OFFSET = { x: 12, z: 10 };
 const BORDER_SELECTION_MODES = {

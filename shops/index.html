@@ -1676,7 +1676,7 @@
              function initMap() {
             map = L.map('shop-map', {
                 crs: L.CRS.Simple,
-                minZoom: -6,
+                minZoom: -4,
                 maxZoom: 2,
                 zoomControl: false,
                 attributionControl: false,
@@ -1684,10 +1684,10 @@
             });
 
             // Terrain Tile layer
-            const TILE_URL = 'https://civmc-map.duckdns.org/tiles/terrain/z{z}/{x},{y}.png';
+            const TILE_URL = 'https://civmap.nara.rocks/{z}/{x},{y}.png';
             L.tileLayer(TILE_URL, {
                 tileSize: 256,
-                minZoom: -6,
+                minZoom: -4,
                 maxZoom: 2,
                 maxNativeZoom: 0,
                 noWrap: true,
