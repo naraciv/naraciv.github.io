@@ -488,6 +488,7 @@
                 coordinates,
                 price,
                 is_rental,
+                is_active,
                 city,
                 listing_owner,
                 building_type,
@@ -762,6 +763,9 @@ marker.on('popupopen', function(e) {
         // Get matching listings
         function getFilteredListings() {
             return allListings.filter(l => {
+                // Hide inactive listings (is_active defaults to true when undefined)
+                if (l.is_active === false) return false;
+
                 if (selectedFilters.city !== 'all' && l.city !== selectedFilters.city) return false;
 
                 // Normalized check to cover alternate 'house_shop' & 'house_and_shop' variations natively
