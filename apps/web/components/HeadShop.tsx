@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Switch } from '@/components/ui'
+import { ToggleButton } from '@/components/ui'
 import {
   ChevronDown,
   ChevronsRight,
+  LayoutGrid,
+  List,
   Minus,
   Plus,
   RotateCw,
@@ -153,18 +155,30 @@ export function HeadShop({ heads }: { heads: Head[] }) {
 
   return (
     <>
-      {/* ── Sticky search, cart and view toggle ── */}
-      <div className="sticky top-[74px] z-40 bg-black/80 pt-4 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-center gap-2 sm:gap-3">
-          <div className="flex h-10 max-w-2xl min-w-0 flex-1 items-center gap-2 rounded-full border border-edge bg-surface pr-2 pl-3 transition-colors focus-within:border-primary sm:h-11 sm:pl-4">
-            <Search aria-hidden className="size-4 shrink-0 text-ink-3 sm:size-5" />
+      {/* ── View toggle, search and cart: the /shops layout, kept sticky so the
+          cart stays in reach. Page-coloured rather than blurred. ── */}
+      <div className="sticky top-navbar z-40 flex flex-wrap items-center gap-3 bg-ground py-3">
+        <div className="flex gap-2" role="group" aria-label="View">
+          <ToggleButton pressed={!byCategory} onClick={() => setByCategory(false)}>
+            <LayoutGrid aria-hidden className="size-4" />
+            All
+          </ToggleButton>
+          <ToggleButton pressed={byCategory} onClick={() => setByCategory(true)}>
+            <List aria-hidden className="size-4" />
+            By Category
+          </ToggleButton>
+        </div>
+
+        <div className="ml-auto flex w-full items-center gap-2 sm:w-1/2">
+          <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-full border border-edge bg-surface pr-2 pl-3 transition-colors focus-within:border-primary">
+            <Search aria-hidden className="size-4 shrink-0 text-ink-3" />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search..."
+              placeholder="Search heads…"
               aria-label="Search heads"
-              className="h-full min-w-0 grow bg-transparent text-xs text-white placeholder-ink-2 focus:outline-none sm:text-sm"
+              className="h-full min-w-0 grow bg-transparent text-sm text-white placeholder-ink-2 focus:outline-none"
             />
             <label htmlFor="head-field" className="sr-only">
               Search in
@@ -173,7 +187,7 @@ export function HeadShop({ heads }: { heads: Head[] }) {
               id="head-field"
               value={field}
               onChange={(e) => setField(e.target.value as Field)}
-              className="shrink-0 cursor-pointer bg-surface text-xs text-white focus:outline-none sm:text-sm"
+              className="shrink-0 cursor-pointer bg-surface text-sm text-white focus:outline-none"
             >
               <option value="all">All Fields</option>
               <option value="name">Name</option>
@@ -185,24 +199,15 @@ export function HeadShop({ heads }: { heads: Head[] }) {
             type="button"
             popoverTarget="head-cart"
             aria-label={`Cart, ${cartCount} ${cartCount === 1 ? 'head' : 'heads'}`}
-            className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-edge bg-surface px-3 transition-colors hover:border-primary sm:h-11 sm:gap-2 sm:px-4"
+            className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-edge bg-surface px-3 transition-colors hover:border-primary"
           >
-            <ShoppingCart aria-hidden className="size-4 text-ink-3 sm:size-5" />
-            <span className="text-xs font-semibold text-white sm:text-sm">{cartCount}</span>
+            <ShoppingCart aria-hidden className="size-4 text-ink-3" />
+            <span className="text-sm font-semibold text-white">{cartCount}</span>
           </button>
-        </div>
-
-        <div className="mt-3 flex items-center justify-center border-b border-edge pb-2 sm:mt-4 sm:pb-3">
-          <Switch
-            label="Sort by Category"
-            checked={byCategory}
-            onChange={setByCategory}
-            className="justify-center text-xs sm:text-sm"
-          />
         </div>
       </div>
 
-      <p aria-live="polite" className="py-3 text-center text-sm text-ink-3">
+      <p aria-live="polite" className="mb-3 text-sm text-ink-3">
         <span className="font-semibold text-white">{heads.length - outOfStock}</span> heads
         available
         {outOfStock > 0 && ` (${outOfStock} out of stock)`}

@@ -31,8 +31,8 @@ const heads = parseHeads(
 
 export default function HeadsPage() {
   return (
-    <div className="px-2 pt-[80px] sm:px-4 sm:pt-[100px]">
-      <div className="mx-auto w-full max-w-[98%] sm:max-w-[95%]">
+    <div className="px-3 pt-[88px] sm:px-4 sm:pt-[100px]">
+      <div className="mx-auto w-full py-6 sm:w-[90%] sm:max-w-[90%] sm:py-20">
         {/* A Store, not a catalogue of Offers: prices are diamonds and iron,
             which have no currency code, and inventing one would be fabricated
             structured data. */}
@@ -47,7 +47,7 @@ export default function HeadsPage() {
           }}
         />
 
-        <h1 className="mb-4 text-center text-2xl font-bold text-primary sm:mb-6 sm:text-4xl">
+        <h1 className="mb-6 text-center text-4xl font-bold text-primary sm:mb-16 sm:text-5xl">
           MitsuHeadCorp
         </h1>
 
