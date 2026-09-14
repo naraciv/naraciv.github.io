@@ -27,7 +27,7 @@ export const ROCKET = {
 /** A passenger's main inventory. Armour and off-hand slots are left out. */
 export const PLAYER_SLOTS = 36
 
-/** Per the wiki. The server reads one configured value per side. */
+/** Each server's `delta-v-meters-per-second`: main 10,000, Zorweth 6,000. */
 export const DELTA_V = { toZorweth: 10_000, toMain: 6_000 } as const
 
 /**
