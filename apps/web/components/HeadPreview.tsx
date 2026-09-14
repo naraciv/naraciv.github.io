@@ -7,11 +7,11 @@ import type { Head } from '@nara/lib'
 /**
  * A rotatable 3D head in a <dialog>.
  *
- * headview3d (MIT, a head-only fork of skinview3d) is imported on first open,
- * so three.js lands in its own chunk and never weighs on the page itself.
+ * skinview3d (MIT) is imported on first open, with everything but the head
+ * hidden, so three.js lands in its own chunk and never weighs on the page itself.
  */
 
-type Viewer = import('headview3d').SkinViewer
+type Viewer = import('skinview3d').SkinViewer
 
 export function HeadPreview({ head, onClose }: { head: Head | null; onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null)
@@ -24,15 +24,21 @@ export function HeadPreview({ head, onClose }: { head: Head | null; onClose: () 
 
     let viewer: Viewer | null = null
     let cancelled = false
-    import('headview3d')
-      .then((headview) => {
+    import('skinview3d')
+      .then((skinview) => {
         if (cancelled || !canvas.current) return
-        viewer = new headview.SkinViewer({
+        viewer = new skinview.SkinViewer({
           canvas: canvas.current,
           width: 250,
           height: 250,
         })
         viewerRef.current = viewer
+        /* Just the head, recentred on the origin (it sits 12 units up on a full player). */
+        const { skin } = viewer.playerObject
+        for (const part of [skin.body, skin.leftArm, skin.rightArm, skin.leftLeg, skin.rightLeg])
+          part.visible = false
+        viewer.playerObject.backEquipment = null
+        viewer.playerObject.position.y = -12
         if (head.skinUrl) viewer.loadSkin(head.skinUrl).catch(console.warn)
         Object.assign(viewer, { zoom: 1, animation: null, autoRotate: true, autoRotateSpeed: 0.75 })
         Object.assign(viewer.controls, { enableZoom: true, enableRotate: true, enablePan: false })

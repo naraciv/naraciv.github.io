@@ -13,7 +13,6 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@nara/lib": "workspace:*",
-    "headview3d": "3.0.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.550.0",
     "next": "16.3.4",
