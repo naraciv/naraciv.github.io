@@ -18,6 +18,9 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  /* /map redirects off-site; prefetching it makes the browser follow the
+                     redirect with fetch(), which the rail map's host refuses (CORS). */
+                  prefetch={link.href === '/map' ? false : undefined}
                   className="py-1 text-[#aaa] transition-colors duration-300 hover:text-primary-alt"
                 >
                   {link.label}
