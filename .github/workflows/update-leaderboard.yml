@@ -10,31 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      actions: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          
-      - name: Install dependencies
-        run: npm install fs axios papaparse
-        
+          node-version: '24'
+
       - name: Run update script
         run: node scripts/update-leaderboard.js
-        
+
       - name: Commit and push changes
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
-          git add data/leaderboard.csv
+          git add data/leaderboard.csv data/player_names.json
           # Only commit if there are changes
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update leaderboard" && git push)
-
-      - name: Trigger Deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh workflow run deploy.yml --ref main
+          # Vercel deploys the push; vercel.json's ignoreCommand watches data/.
