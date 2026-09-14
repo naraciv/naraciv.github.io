@@ -7,7 +7,7 @@ import { site } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'Homes',
   description:
-    'Property listings across Nara — homes, apartments, shops and hotel rooms for sale or rent, with prices, coordinates and owners, on the CivMC world map.',
+    'Property listings across Nara: homes, apartments, shops and hotel rooms for sale or rent, with prices, coordinates and owners, on the CivMC world map.',
   alternates: { canonical: '/homes' },
 }
 

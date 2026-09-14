@@ -26,7 +26,9 @@ function pinFor(cluster: Cluster<Listing>) {
     className: 'zillow-price-marker-wrap',
     anchor: [30, 12] as [number, number],
     html: `<div class="zillow-price-marker${listing.is_rental ? ' rental' : ''}">${
-      listing.price === 0 ? '' : `<img src="${DIAMOND_ICON}" class="size-3.5" alt="">`
+      listing.price === 0
+        ? ''
+        : `<img src="${DIAMOND_ICON}" class="size-3.5 [image-rendering:pixelated]" alt="">`
     }<span>${price}${listing.is_rental ? '/mo' : ''}</span></div>`,
   }
 }

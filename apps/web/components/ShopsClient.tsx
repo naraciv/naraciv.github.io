@@ -376,7 +376,7 @@ export function Lore({ text, label }: { text: string; label: string }) {
       <button
         ref={button}
         type="button"
-        className="lore-icon"
+        className="relative ml-1 inline-flex min-h-6 min-w-6 cursor-help items-center justify-center align-middle"
         aria-label={`Item details for ${label}`}
         aria-describedby={id}
         onMouseEnter={show}
@@ -399,7 +399,7 @@ export function Lore({ text, label }: { text: string; label: string }) {
         onToggle={(e) => {
           if (e.newState === 'closed') pinned.current = false
         }}
-        className="lore-tooltip"
+        className="fixed inset-auto m-0 w-max max-w-[min(320px,calc(100vw-16px))] rounded-md border border-[#4b5563] bg-surface px-3 py-2 text-left text-sm whitespace-pre-wrap text-white shadow-[0_4px_6px_rgb(0_0_0/30%)]"
       >
         {text}
       </div>

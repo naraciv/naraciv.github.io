@@ -111,8 +111,8 @@ export default function ShopsMapPanel({ shops, hidden }: { shops: Shop[]; hidden
   }
 
   return (
-    /* The map's height must be definite, not just a minimum: .map-container is
-       height:100%, and a percentage against a min-height resolves to zero. So
+    /* The map's height must be definite, not just a minimum: the map frame is
+       h-full, and a percentage against a min-height resolves to zero. So
        a fixed 450px stacked, and the row's own height side by side. */
     <div hidden={hidden} className="flex flex-col lg:h-[calc(100vh-200px)] lg:flex-row">
       {/* ── Sidebar ── */}

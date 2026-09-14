@@ -278,17 +278,6 @@
     height: 480px;
     margin: 0 auto;
   }
-  .gacha-machine-body {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, #141425 0%, #0f0f1e 100%);
-    border-radius: 30px 30px 16px 16px;
-    border: 3px solid rgba(224, 64, 251, 0.4);
-    box-shadow:
-      0 8px 40px rgba(224, 64, 251, 0.15),
-      0 0 0 1px rgba(255, 255, 255, 0.04);
-    overflow: hidden;
-  }
   .gacha-dome {
     position: absolute;
     top: 0;
@@ -314,19 +303,6 @@
     background: radial-gradient(ellipse, rgba(255, 255, 255, 0.12), transparent);
     border-radius: 50%;
   }
-  .gacha-balls {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 55%;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 4px;
-    padding: 8px;
-  }
   .gacha-ball {
     width: 28px;
     height: 28px;
@@ -349,19 +325,6 @@
   .gacha-ball:nth-child(3n) {
     animation-delay: -0.7s;
   }
-  .gacha-slot {
-    position: absolute;
-    bottom: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 50px;
-    background: #1a1a2e;
-    border-radius: 0 0 40px 40px;
-    border: 2px solid rgba(224, 64, 251, 0.3);
-    border-top: none;
-  }
-
   .machine-sparkles {
     position: absolute;
     width: 500px;
@@ -461,14 +424,6 @@
     border: 0;
     padding: 0;
   }
-  .gacha-lever-track {
-    width: 12px;
-    height: 100px;
-    background: linear-gradient(180deg, #b0bec5, #90a4ae);
-    border-radius: 6px;
-    position: relative;
-    margin: 0 auto;
-  }
   .gacha-lever-handle {
     position: absolute;
     top: 0;
@@ -541,27 +496,7 @@
     box-shadow: none;
   }
 
-  .countdown {
-    font-family: var(--font-countdown);
-    font-size: 1.1rem;
-    color: var(--color-orange);
-    font-weight: 600;
-  }
-
   /* ─── Reveal overlay ───────────────────────────────────── */
-  .gacha-reveal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(10, 10, 20, 0.95);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
-  .gacha-reveal-overlay.active {
-    display: flex;
-  }
   .gacha-reveal-card {
     width: 280px;
     padding: 24px;
@@ -576,31 +511,6 @@
     to {
       transform: scale(1);
     }
-  }
-  .gacha-reveal-card .skin-render {
-    width: 150px;
-    height: auto;
-    margin: 0 auto 12px;
-    image-rendering: pixelated;
-  }
-  .gacha-reveal-card .stars {
-    font-size: 1.5rem;
-    letter-spacing: 4px;
-  }
-  .gacha-reveal-card .naran-name {
-    font-size: 1.5rem;
-    font-weight: 900;
-    margin: 8px 0 4px;
-  }
-  .gacha-reveal-card .naran-title {
-    font-size: 0.95rem;
-    opacity: 0.7;
-  }
-  .gacha-reveal-card .naran-desc {
-    margin-top: 12px;
-    font-size: 0.85rem;
-    opacity: 0.6;
-    line-height: 1.5;
   }
   .burst-particles {
     position: absolute;
@@ -665,41 +575,6 @@
     box-shadow: 0 12px 40px rgba(224, 64, 251, 0.15);
   }
 
-  /* ─── Quiz ─────────────────────────────────────────────── */
-  .quiz-option {
-    width: 100%;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    background: #1a1a2e;
-    color: #c8cad0;
-    font-weight: 600;
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: block;
-  }
-  .quiz-option:hover {
-    border-color: #e040fb;
-  }
-  .quiz-option.quiz-selected {
-    border-color: #e040fb;
-    background: rgba(224, 64, 251, 0.18);
-    color: #f3e5f5;
-  }
-  .quiz-input {
-    width: 100%;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    background: #1a1a2e;
-    color: #c8cad0;
-    font-weight: 600;
-  }
-  .quiz-input::placeholder {
-    color: #8b95a8;
-  }
-
   /* ─── Scrollbar ────────────────────────────────────────── */
   ::-webkit-scrollbar {
     width: 8px;
@@ -755,25 +630,6 @@
   }
 
   /* ─── Navbar ───────────────────────────────────────────── */
-  .nav-shell {
-    background: rgba(18, 18, 30, 0.95);
-    backdrop-filter: blur(16px);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-    border-bottom: 1px solid rgba(224, 64, 251, 0.2);
-  }
-  .nav-logo {
-    font-size: 1.7rem;
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-decoration: none;
-    background: linear-gradient(90deg, #ff6b35, #e040fb, #00bcd4, #ff6b35);
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    animation: shimmer 4s ease-in-out infinite;
-  }
   .nav-link {
     /* a11y: #546e7a is 3.46:1 on the navbar; this is the minimum lift to 4.5:1 */
     color: #62818f;
@@ -815,79 +671,6 @@
     color: #ff6b35;
     text-shadow: 0 0 12px rgba(255, 107, 53, 0.5);
   }
-  .nav-dropdown-menu {
-    background: rgba(18, 18, 30, 0.98);
-    border: 1px solid rgba(224, 64, 251, 0.25);
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(224, 64, 251, 0.1);
-  }
-  .nav-dropdown-item {
-    color: #b0bec5;
-    text-decoration: none;
-    white-space: nowrap;
-    transition:
-      background 0.2s,
-      color 0.2s;
-  }
-  .nav-dropdown-item:hover {
-    background: rgba(224, 64, 251, 0.12);
-    color: #e040fb;
-  }
-  .nav-panel {
-    background: rgba(18, 18, 30, 0.98);
-    box-shadow: -5px 0 20px rgba(224, 64, 251, 0.08);
-  }
-
-  /* ─── Footer ───────────────────────────────────────────── */
-  .site-footer {
-    background-color: rgba(10, 10, 10, 0.95);
-    color: #fff;
-    border-top: 1px solid rgba(37, 150, 190, 0.2);
-  }
-  .footer-heading {
-    color: #2596be;
-    font-size: 1.25rem;
-  }
-  .footer-link {
-    color: #aaa;
-    text-decoration: none;
-    transition: color 0.3s;
-  }
-  .footer-link:hover {
-    color: #2596be;
-  }
-  .footer-copyright {
-    border-top: 1px solid #333;
-    /* a11y: #666 is 3.45:1 at 14.4px; minimum lift to 4.5:1 */
-    color: #797979;
-    font-size: 0.9rem;
-  }
-
-  /* ─── Buttons ──────────────────────────────────────────── */
-  /* The outline companion to .gacha-pull-btn — "Join Nara" on the homepage. */
-  .btn-outline {
-    display: inline-block;
-    padding: 10px 28px;
-    font-size: 1rem;
-    font-weight: 600;
-    border: 2px solid var(--color-purple);
-    border-radius: 50px;
-    color: #cbd5e1;
-    text-decoration: none;
-    transition: all 0.3s;
-  }
-  .btn-outline:hover {
-    background: var(--color-purple);
-    color: #fff;
-  }
-
-  /* ─── Homepage decoration ──────────────────────────────── */
-  .capital-badge {
-    background: linear-gradient(135deg, #ff6b35, #e040fb);
-  }
-  .culture-flag {
-    filter: drop-shadow(0 0 30px rgba(224, 64, 251, 0.2));
-  }
 
   /*
    * While a preview is open the pointer is still resting on the tile that
@@ -912,44 +695,6 @@
   }
 
   /* ─── Planner ──────────────────────────────────────────── */
-  /*
-   * isolation: Leaflet stacks its panes and controls at z-index 400-1000, and
-   * without a stacking context of its own those values compete with the whole
-   * page — so the map drew over the fixed navbar and the Discord button, both
-   * z-50. Isolating here keeps every map's layers inside its own frame.
-   */
-  .map-container {
-    position: relative;
-    isolation: isolate;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    background: #0b0b0f;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.85);
-  }
-  .map-container:fullscreen {
-    width: 100vw;
-    height: 100vh;
-    border-radius: 0;
-    border: none;
-  }
-  .planner-map {
-    width: 100%;
-    height: 100%;
-    background: #0b0b0f;
-  }
-
-  .glass-panel {
-    background: rgba(15, 23, 42, 0.65);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(224, 64, 251, 0.15);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
-  }
-
   .scrollable-panel {
     height: 100%;
     overflow-y: auto;
@@ -968,89 +713,6 @@
   }
   .scrollable-panel::-webkit-scrollbar-thumb:hover {
     background: rgba(224, 64, 251, 0.6);
-  }
-
-  .coords-display {
-    position: absolute;
-    bottom: 1rem;
-    left: 1rem;
-    background: rgba(15, 23, 42, 0.9);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.5rem;
-    padding: 0.5rem 0.85rem;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: #e2e8f0;
-    z-index: 900;
-    pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  }
-
-  .map-controls {
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    z-index: 900;
-  }
-  .map-control-btn {
-    width: 38px;
-    height: 38px;
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.5rem;
-    color: #f1f5f9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  }
-  .map-control-btn:hover {
-    background: rgba(224, 64, 251, 0.2);
-    border-color: rgba(224, 64, 251, 0.5);
-    color: #ffffff;
-    transform: scale(1.05);
-  }
-
-  .planner-input {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    transition: all 0.2s;
-  }
-  .planner-input:focus {
-    border-color: #e040fb;
-    outline: none;
-    box-shadow: 0 0 10px rgba(224, 64, 251, 0.25);
-  }
-
-  .title-beta {
-    position: absolute;
-    top: -0.6rem;
-    left: -2rem;
-    transform: rotate(-18deg);
-    background: #dc2626;
-    color: #ffffff;
-    font-size: 0.95rem;
-    line-height: 1;
-    letter-spacing: 0.04em;
-    padding: 0.35rem 0.65rem;
-    border-radius: 0.25rem;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-    z-index: 2;
-  }
-  @media (min-width: 640px) {
-    .title-beta {
-      top: -0.8rem;
-      left: -2.7rem;
-      font-size: 1.1rem;
-    }
   }
 
   .planner-layout {
@@ -1098,92 +760,12 @@
     background: #111827;
     z-index: 1000 !important;
   }
-  .zillow-price-marker img {
-    image-rendering: pixelated;
-  }
-
-  /*
-   * A slate border over a 30%-opacity slate ground.
-   */
-  .property-card-glow {
-    background: rgba(15, 23, 42, 0.3);
-    border: 1px solid #0f172a;
-    border-radius: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .property-card-glow:hover {
-    box-shadow:
-      0 0 25px rgba(255, 107, 53, 0.35),
-      0 0 12px rgba(6, 182, 212, 0.2);
-    border-color: #ff6b35;
-    background-color: rgba(22, 28, 45, 0.8);
-    transform: translateY(-3px);
-  }
-
-  /* ─── Listing detail ───────────────────────────────────── */
-  .unified-panel {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(9, 13, 22, 0.95));
-    border: 1px solid rgba(255, 107, 53, 0.2);
-    box-shadow: 0 12px 45px rgba(0, 0, 0, 0.6);
-  }
-  .album-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(5, 8, 17, 0.8);
-    color: #ffffff;
-    transition:
-      background 0.2s,
-      transform 0.2s;
-  }
-  .album-arrow:hover {
-    background: rgba(255, 107, 53, 0.8);
-    transform: translateY(-50%) scale(1.08);
-  }
-
-  .schematic-canvas-container {
-    position: relative;
-    width: 100%;
-    height: 480px;
-    overflow: hidden;
-    background: #040810;
-    border-top: 1px solid rgba(255, 107, 53, 0.25);
-  }
-  .schematic-canvas-container canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* ─── Snitch viewer ─── */
-  .snitches-view {
-    --map-backdrop: #1a1a1a;
-    --map-tile-opacity: 0.35;
-  }
-
-  /* ─── Homes portal chrome ──────────────────────────────── */
 
   /* Per-page map tuning; see the .leaflet-container comment above. */
   .homes-portal {
     --map-backdrop: #050811;
     --map-tile-opacity: 0.65;
-  }
-
-  /* The filters header: a slate gradient with an inset
-     orange glow, which is what gives the panel its edge-lit look. */
-  .neon-panel {
-    border: 1px solid #1e293b;
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(9, 13, 22, 0.95));
-    box-shadow:
-      0 12px 45px 0 rgba(0, 0, 0, 0.6),
-      inset 0 0 25px rgba(255, 107, 53, 0.08);
+    --popup-accent: 255 107 53;
   }
 
   /* Orange thumb with a white ring, turning cyan on hover. Without this the
@@ -1278,6 +860,7 @@
   .shops-view {
     --map-backdrop: #050811;
     --map-tile-opacity: 0.65;
+    --popup-accent: 37 150 190;
   }
 
   /* Item icons are 16px textures scaled up; without this the browser blurs
@@ -1300,39 +883,6 @@
   .coord-link:hover::after,
   .coord-link:focus-visible::after {
     width: 100%;
-  }
-
-  /*
-   * Item lore, from the book glyph's button: opens on hover and on focus.
-   */
-  .lore-icon {
-    position: relative;
-    display: inline-flex;
-    /* WCAG 2.2 target size; the icon inside stays as drawn. */
-    min-width: 24px;
-    min-height: 24px;
-    align-items: center;
-    justify-content: center;
-    margin-left: 4px;
-    vertical-align: middle;
-    cursor: help;
-  }
-  /* A popover (top layer), placed by Lore in ShopsClient.tsx. */
-  .lore-tooltip {
-    position: fixed;
-    inset: auto;
-    width: max-content;
-    max-width: min(320px, calc(100vw - 16px));
-    margin: 0;
-    padding: 8px 12px;
-    border: 1px solid #4b5563;
-    border-radius: 6px;
-    background-color: var(--color-surface);
-    box-shadow: 0 4px 6px rgb(0 0 0 / 30%);
-    color: #fff;
-    font-size: 0.875rem;
-    text-align: left;
-    white-space: pre-wrap;
   }
 
   /*
@@ -1394,75 +944,30 @@
   z-index: 450;
 }
 /*
- * Leaflet's popup chrome is light by default. Scoped to the portal so /shops
- * can style its own popups differently without fighting this.
+ * Leaflet's popup chrome is light by default. /homes and /shops share one dark
+ * treatment, each in its own accent (--popup-accent, an "r g b" triple).
  */
-.homes-portal .leaflet-popup-content-wrapper {
-  background: rgba(9, 13, 22, 0.98);
-  backdrop-filter: blur(16px);
-  color: #f1f5f9;
-  border: 1px solid rgba(255, 107, 53, 0.5);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
-  border-radius: 16px;
-  padding: 0;
-  overflow: hidden;
-}
-.homes-portal .leaflet-popup-content {
-  margin: 0;
-  width: auto !important;
-  line-height: inherit;
-}
-.homes-portal .leaflet-popup-tip {
-  background: rgba(9, 13, 22, 0.98);
-  border-left: 1px solid rgba(255, 107, 53, 0.5);
-  border-bottom: 1px solid rgba(255, 107, 53, 0.5);
-}
-.homes-portal a.leaflet-popup-close-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  top: 10px;
-  right: 10px;
-  width: 24px;
-  height: 24px;
-  padding: 0 0 1px;
-  border: 1px solid rgba(255, 107, 53, 0.4);
-  border-radius: 50%;
-  background: rgba(15, 23, 42, 0.85);
-  color: #f1f5f9;
-  font-size: 13px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 5000;
-}
-.homes-portal a.leaflet-popup-close-button:hover {
-  color: #ffffff;
-  background: #ff6b35;
-  border-color: #ff6b35;
-  transform: scale(1.1);
-}
-
-/* The same treatment for /shops, in its own accent. */
-.shops-view .leaflet-popup-content-wrapper {
+:is(.homes-portal, .shops-view) .leaflet-popup-content-wrapper {
   background: rgb(9 13 22 / 98%);
   backdrop-filter: blur(16px);
   color: #f1f5f9;
-  border: 1px solid rgb(37 150 190 / 50%);
+  border: 1px solid rgb(var(--popup-accent) / 50%);
   box-shadow: 0 25px 50px -12px rgb(0 0 0 / 90%);
   border-radius: 16px;
   padding: 0;
   overflow: hidden;
 }
-.shops-view .leaflet-popup-content {
+:is(.homes-portal, .shops-view) .leaflet-popup-content {
   margin: 0;
   width: auto !important;
   line-height: inherit;
 }
-.shops-view .leaflet-popup-tip {
+:is(.homes-portal, .shops-view) .leaflet-popup-tip {
   background: rgb(9 13 22 / 98%);
-  border-left: 1px solid rgb(37 150 190 / 50%);
-  border-bottom: 1px solid rgb(37 150 190 / 50%);
+  border-left: 1px solid rgb(var(--popup-accent) / 50%);
+  border-bottom: 1px solid rgb(var(--popup-accent) / 50%);
 }
-.shops-view a.leaflet-popup-close-button {
+:is(.homes-portal, .shops-view) a.leaflet-popup-close-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1471,7 +976,7 @@
   width: 24px;
   height: 24px;
   padding: 0 0 1px;
-  border: 1px solid rgb(37 150 190 / 40%);
+  border: 1px solid rgb(var(--popup-accent) / 40%);
   border-radius: 50%;
   background: rgb(15 23 42 / 85%);
   color: #f1f5f9;
@@ -1479,10 +984,10 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 5000;
 }
-.shops-view a.leaflet-popup-close-button:hover {
+:is(.homes-portal, .shops-view) a.leaflet-popup-close-button:hover {
   color: #ffffff;
-  background: var(--color-primary-alt);
-  border-color: var(--color-primary-alt);
+  background: rgb(var(--popup-accent));
+  border-color: rgb(var(--popup-accent));
   transform: scale(1.1);
 }
 

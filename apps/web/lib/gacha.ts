@@ -85,27 +85,15 @@ export type QuizQuestion = {
 const today = () => new Date().toISOString().slice(0, 10)
 
 /** localStorage throws in some privacy modes; never let that break the page. */
-function read(key: string): string | null {
+const safe = <T>(fn: () => T): T | null => {
   try {
-    return localStorage.getItem(key)
+    return fn()
   } catch {
     return null
   }
 }
-function write(key: string, value: string) {
-  try {
-    localStorage.setItem(key, value)
-  } catch {
-    /* ignore */
-  }
-}
-function remove(key: string) {
-  try {
-    localStorage.removeItem(key)
-  } catch {
-    /* ignore */
-  }
-}
+const read = (key: string) => safe(() => localStorage.getItem(key))
+const write = (key: string, value: string) => safe(() => localStorage.setItem(key, value))
 
 export async function fetchNarans(): Promise<Naran[]> {
   try {
@@ -175,9 +163,7 @@ export function hasEverPulled(collection: Collection) {
   return !!read(GACHA_LAST_PULL) || Object.keys(collection).length > 0
 }
 
-export function resetPullTimer() {
-  remove(GACHA_LAST_PULL)
-}
+export const resetPullTimer = () => safe(() => localStorage.removeItem(GACHA_LAST_PULL))
 
 export function getQuizCountToday(): number {
   try {
@@ -202,9 +188,6 @@ export const getNextQuizDifficulty = (): Difficulty =>
 export const quizFailedToday = () => read(GACHA_QUIZ_FAILED) === today()
 
 export const markQuizFailed = () => write(GACHA_QUIZ_FAILED, today())
-
-export const starString = (rarity: RarityKey) =>
-  '★'.repeat(RARITY[rarity].stars) + '☆'.repeat(5 - RARITY[rarity].stars)
 
 export const getSkinUrl = (username: string, type: 'body' | 'head' = 'body') =>
   type === 'head'

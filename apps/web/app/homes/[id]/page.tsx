@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps<'/homes/[id]'>): Pr
     }.`,
     alternates: { canonical: `/homes/${id}` },
     openGraph: {
-      title: `${name} — ${kind} ${deal}`,
+      title: `${name}: ${kind} ${deal}`,
       images: listing.images?.[0] ? [listing.images[0]] : undefined,
     },
   }
@@ -109,7 +109,7 @@ export default async function ListingPage({ params }: PageProps<'/homes/[id]'>) 
         </Link>
       </div>
 
-      <div className="unified-panel flex w-full flex-col overflow-hidden rounded-2xl lg:flex-row">
+      <div className="flex w-full flex-col overflow-hidden rounded-2xl border border-orange/20 bg-linear-135/srgb from-[rgba(15,23,42,0.95)] to-[rgba(9,13,22,0.95)] shadow-[0_12px_45px_rgba(0,0,0,0.6)] lg:flex-row">
         <div className="flex w-full flex-col border-b border-edge lg:w-3/5 lg:border-r lg:border-b-0">
           <PropertyAlbum
             images={listing.images ?? []}

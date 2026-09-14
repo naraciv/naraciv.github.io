@@ -5,6 +5,9 @@ import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react'
 import type { Coords } from '@nara/lib'
 
+const arrow =
+  'absolute top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/12 bg-[rgba(5,8,17,0.8)] text-white transition-[background,transform] duration-200 hover:scale-108 hover:bg-orange/80'
+
 /**
  * The listing image carousel.
  */
@@ -39,7 +42,7 @@ export function PropertyAlbum({
       <Image
         key={images[index]}
         src={images[index]}
-        alt={many ? `${alt} — image ${index + 1} of ${images.length}` : alt}
+        alt={many ? `${alt}, image ${index + 1} of ${images.length}` : alt}
         fill
         sizes="(max-width: 1024px) 100vw, 60vw"
         className="object-contain"
@@ -52,7 +55,7 @@ export function PropertyAlbum({
             type="button"
             onClick={() => go(-1)}
             aria-label="Previous image"
-            className="album-arrow left-3"
+            className={`${arrow} left-3`}
           >
             <ChevronLeft aria-hidden className="size-[18px]" />
           </button>
@@ -60,7 +63,7 @@ export function PropertyAlbum({
             type="button"
             onClick={() => go(1)}
             aria-label="Next image"
-            className="album-arrow right-3"
+            className={`${arrow} right-3`}
           >
             <ChevronRight aria-hidden className="size-[18px]" />
           </button>

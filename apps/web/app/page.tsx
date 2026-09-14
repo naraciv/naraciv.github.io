@@ -83,7 +83,10 @@ export default async function HomePage() {
               >
                 Our Government
               </Link>
-              <Link href="/joining" className="btn-outline">
+              <Link
+                href="/joining"
+                className="inline-block rounded-full border-2 border-purple px-7 py-2.5 font-semibold text-[#cbd5e1] transition-all duration-300 hover:bg-purple hover:text-white"
+              >
                 Join Nara
               </Link>
             </div>
@@ -101,7 +104,7 @@ export default async function HomePage() {
               role="button"
               data-full-src="/images/nara_above.webp"
             />
-            <div className="capital-badge pointer-events-none absolute -right-5 -bottom-5 rounded-lg p-4 shadow-lg">
+            <div className="pointer-events-none absolute -right-5 -bottom-5 rounded-lg bg-linear-135/srgb from-orange to-purple p-4 shadow-lg">
               <p className="font-bold text-white">Capital: Shiroyama</p>
             </div>
           </div>
@@ -174,7 +177,7 @@ export default async function HomePage() {
               alt="The flag of Nara"
               width={800}
               height={533}
-              className="culture-flag mx-auto h-auto w-3/4 rounded-lg shadow-xl md:w-[600px] lg:w-[800px]"
+              className="mx-auto h-auto w-3/4 rounded-lg shadow-xl drop-shadow-[0_0_30px_rgba(224,64,251,0.2)] md:w-[600px] lg:w-[800px]"
             />
           </div>
         </div>
@@ -183,9 +186,7 @@ export default async function HomePage() {
       {/* ── Collection CTA ── */}
       <section className="gacha-section px-4 py-16">
         <div className="gacha-banner mx-auto max-w-2xl text-center">
-          <h2 className="text-gacha relative z-10 mb-4 text-3xl font-bold">
-            📦 View Your Collection
-          </h2>
+          <h2 className="text-gacha relative z-10 mb-4 text-3xl font-bold">View Your Collection</h2>
           <p className="relative z-10 mb-6 text-ink-hero">
             See all the Narans you&rsquo;ve found and check your progress of completing the full
             nara

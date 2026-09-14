@@ -75,7 +75,7 @@ export default function HomesPortalClient({ listings }: { listings: Listing[] })
 
         {/* ── Filters + cards ── */}
         <div className="flex h-full w-full grow flex-col border-l border-[#0f172a] bg-ground lg:w-2/5">
-          <div className="neon-panel flex shrink-0 flex-col gap-4 px-6 py-5">
+          <div className="flex shrink-0 flex-col gap-4 border border-[#1e293b] bg-linear-135/srgb from-[rgba(15,23,42,0.95)] to-[rgba(9,13,22,0.95)] px-6 py-5 shadow-[0_12px_45px_0_rgba(0,0,0,0.6),inset_0_0_25px_rgba(255,107,53,0.08)]">
             <div className="flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-base font-extrabold tracking-tight text-white">
                 <Sliders aria-hidden className="size-4 text-orange" /> Search &amp; Filters
@@ -274,7 +274,7 @@ function ListingCard({ listing }: { listing: Listing }) {
   const rental = listing.is_rental
 
   return (
-    <li className="property-card-glow overflow-hidden">
+    <li className="overflow-hidden rounded-xl border border-[#0f172a] bg-[rgba(15,23,42,0.3)] transition-all duration-300 hover:-translate-y-[3px] hover:border-orange hover:bg-[rgba(22,28,45,0.8)] hover:shadow-[0_0_25px_rgba(255,107,53,0.35),0_0_12px_rgba(6,182,212,0.2)]">
       <Link href={`/homes/${listing._id}`} className="flex h-full flex-col">
         <div className="relative h-40 w-full shrink-0">
           {listing.images?.[0] ? (

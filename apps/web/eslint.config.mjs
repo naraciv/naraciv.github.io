@@ -1,4 +1,4 @@
-import { defineConfig, globalIgnores } from 'eslint/config'
+import { defineConfig } from 'eslint/config'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 import betterTailwind from 'eslint-plugin-better-tailwindcss'
@@ -40,74 +40,33 @@ const eslintConfig = defineConfig([
         {
           /* Hand-written classes from globals.css, which this rule cannot see. */
           ignore: [
-            'active',
-            'album-.*',
-            'album-arrow',
             'big-city-image',
-            'btn-outline',
             'burst-particles',
-            'capital-badge',
             'city-image',
-            'collection-card',
-            'coords-display',
-            'countdown',
-            'culture-flag',
             'coord-link',
             'custom-scroll',
-            'footer-copyright',
             'fullscreen-modal',
-            'footer-heading',
-            'footer-link',
             'gacha-.*',
-            'glass-panel',
             'hero-gacha',
             'homes-portal',
             'item-icon',
             'leaflet-.*',
-            'lore-icon',
-            'lore-tooltip',
             'machine-.*',
-            'map-container',
-            'map-control-btn',
-            'map-controls',
-            'naran-desc',
-            'naran-name',
-            'naran-title',
             'nav-.*',
-            'neon-panel',
             'planner-.*',
-            'property-card-glow',
             'pulled',
-            'quiz-.*',
             'range-pair',
-            'schematic-canvas-container',
             'scrollable-panel',
             'section-title',
             'shop-marker-pill',
             'shops-view',
-            'site-footer',
-            'skin-render',
-            'snitches-view',
-            'srp-notice',
-            'stars',
             'text-gacha',
-            'title-beta',
-            'unified-panel',
             'zillow-price-marker',
           ],
         },
       ],
     },
   },
-
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    '.next/**',
-    'out/**',
-    'build/**',
-    'next-env.d.ts',
-  ]),
 ])
 
 export default eslintConfig

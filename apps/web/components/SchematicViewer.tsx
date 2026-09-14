@@ -120,7 +120,7 @@ export function SchematicViewer({ url, name }: { url: string; name: string }) {
                 const packs = await renderer.getResourcePacks?.()
                 if (!packs?.length) {
                   console.warn(
-                    `[nara] Schematic rendered without a resource pack — check ${RESOURCE_PACK_URL}.`,
+                    `[nara] Schematic rendered without a resource pack. Check ${RESOURCE_PACK_URL}.`,
                   )
                 }
               },
@@ -164,7 +164,7 @@ export function SchematicViewer({ url, name }: { url: string; name: string }) {
           instead.
         </p>
       ) : (
-        <div className="schematic-canvas-container">
+        <div className="relative h-[480px] w-full overflow-hidden border-t border-orange/25 bg-[#040810] [&_canvas]:block [&_canvas]:size-full">
           <canvas ref={canvasRef} aria-label={`3D view of ${name}`} />
           <div className="pointer-events-none absolute right-4 bottom-4 flex items-center gap-3 rounded-md border border-edge bg-ground/80 px-3 py-1.5 font-mono text-[10px] text-ink-3">
             <span>Drag to rotate</span>
