@@ -40,7 +40,13 @@ export function HeadPreview({ head, onClose }: { head: Head | null; onClose: () 
         viewer.playerObject.backEquipment = null
         viewer.playerObject.position.y = -12
         if (head.skinUrl) viewer.loadSkin(head.skinUrl).catch(console.warn)
-        Object.assign(viewer, { zoom: 1, animation: null, autoRotate: true, autoRotateSpeed: 0.75 })
+        Object.assign(viewer, {
+          zoom: 1,
+          animation: null,
+          /* Idle spin only for people who have not asked for less motion; dragging still rotates. */
+          autoRotate: !matchMedia('(prefers-reduced-motion: reduce)').matches,
+          autoRotateSpeed: 0.75,
+        })
         Object.assign(viewer.controls, { enableZoom: true, enableRotate: true, enablePan: false })
         viewer.camera.position.set(0, 10, 25)
         viewer.camera.lookAt(0, 26, 0)

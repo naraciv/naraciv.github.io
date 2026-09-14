@@ -20,9 +20,12 @@ export function SkinViewer3D({ name, uuid }: { name: string; uuid: string | null
         viewer = new lib.SkinViewer({ canvas: canvas.current, width: 250, height: 350 })
         viewer.controls.enableZoom = true
         viewer.controls.enableRotate = true
-        const walk = new lib.WalkingAnimation()
-        walk.speed = 0.5
-        viewer.animation = walk
+        /* Standing still for anyone who prefers reduced motion. */
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          const walk = new lib.WalkingAnimation()
+          walk.speed = 0.5
+          viewer.animation = walk
+        }
 
         const byName = `https://mc-heads.net/skin/${encodeURIComponent(name)}`
         const v = viewer

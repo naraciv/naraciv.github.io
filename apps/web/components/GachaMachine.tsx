@@ -63,6 +63,21 @@ const DIFFICULTY_BADGE: Record<string, { bg: string; color: string }> = {
   hard: { bg: '#FFEBEE', color: '#C62828' },
 }
 
+/* Its own component so the per-second tick re-renders one line, not the whole
+   machine. No live region: announcing the time every second drowns a screen reader. */
+function Countdown() {
+  const [time, setTime] = useState(timeUntilMidnight)
+  useEffect(() => {
+    const id = setInterval(() => setTime(timeUntilMidnight()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  return (
+    <div className="z-10 mb-6 font-countdown text-[1.1rem] font-semibold text-orange">
+      Next free pull in <span>{time}</span>
+    </div>
+  )
+}
+
 export function GachaMachine() {
   const [narans, setNarans] = useState<Naran[]>([])
   const [collection, setCollection] = useState<Collection>({})
@@ -71,7 +86,6 @@ export function GachaMachine() {
   const [pulling, setPulling] = useState(false)
   const [leverPulled, setLeverPulled] = useState(false)
   const [shaking, setShaking] = useState(false)
-  const [countdown, setCountdown] = useState(timeUntilMidnight)
   const [reveal, setReveal] = useState<Naran | null>(null)
   const [revealCount, setRevealCount] = useState(1)
   /* Generated with the pull, not during render — a render must be pure. */
@@ -94,11 +108,6 @@ export function GachaMachine() {
     return () => {
       alive = false
     }
-  }, [])
-
-  useEffect(() => {
-    const id = setInterval(() => setCountdown(timeUntilMidnight()), 1000)
-    return () => clearInterval(id)
   }, [])
 
   const doPull = useCallback(() => {
@@ -165,14 +174,7 @@ export function GachaMachine() {
           Pull the lever once per day to unlock a Naran citizen!
         </p>
 
-        {!canPull && ready && (
-          <div
-            className="z-10 mb-6 font-countdown text-[1.1rem] font-semibold text-orange"
-            role="status"
-          >
-            Next free pull in <span>{countdown}</span>
-          </div>
-        )}
+        {!canPull && ready && <Countdown />}
 
         <div className="gacha-machine z-10">
           <div className="machine-sparkles" aria-hidden>

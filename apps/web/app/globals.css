@@ -71,7 +71,11 @@
   body {
     background: var(--color-ground);
     color: var(--color-ink);
-    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   main p {
@@ -89,7 +93,9 @@
  * win — unlayered CSS would silently outrank a utility like `px-7`.
  */
 @layer components {
-  /* ─── Drifting confetti dots behind everything (dark variant) ─── */
+  /* ─── Confetti dots behind everything (dark variant) ───
+     Static on purpose: drifting them animated background-position on a
+     full-viewport layer, a repaint of the whole screen every frame. */
   body::before {
     content: '';
     position: fixed;
@@ -109,7 +115,6 @@
       260px 260px,
       200px 200px,
       240px 240px;
-    animation: starDrift 45s linear infinite;
   }
   body::after {
     content: '';
@@ -120,15 +125,6 @@
     background:
       radial-gradient(ellipse at 20% 0%, rgba(224, 64, 251, 0.04) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 100%, rgba(79, 195, 247, 0.03) 0%, transparent 50%);
-  }
-  @keyframes starDrift {
-    to {
-      background-position:
-        200px 200px,
-        -300px 300px,
-        250px -250px,
-        -350px 350px;
-    }
   }
 
   /* ─── Shimmering gradient text ─────────────────────────── */
@@ -226,28 +222,6 @@
     position: relative;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  }
-  .gacha-banner::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(
-      from 0deg,
-      transparent,
-      rgba(255, 107, 53, 0.03),
-      transparent,
-      rgba(224, 64, 251, 0.03),
-      transparent
-    );
-    animation: bannerSpin 12s linear infinite;
-  }
-  @keyframes bannerSpin {
-    to {
-      transform: rotate(360deg);
-    }
   }
 
   /* ─── Hero ─────────────────────────────────────────────── */

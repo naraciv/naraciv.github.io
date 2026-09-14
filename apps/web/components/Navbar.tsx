@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { ChevronDown, Sparkles } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { nav, type NavItem } from '@/lib/site'
 
 const dropdownItem =
@@ -33,7 +33,7 @@ export function Navbar() {
       .join(' ')
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-purple/20 bg-[rgba(18,18,30,0.95)] shadow-[0_2px_20px_rgba(0,0,0,0.3)] backdrop-blur-lg">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-purple/20 bg-[rgba(18,18,30,0.95)] shadow-[0_2px_20px_rgba(0,0,0,0.3)]">
       <nav
         aria-label="Main"
         className="mx-auto flex max-w-[1200px] items-center gap-4 px-4 py-4 sm:px-8"
@@ -50,7 +50,6 @@ export function Navbar() {
                 aria-current={pathname === item.href ? 'page' : undefined}
                 className={`${linkClass(item)} flex items-center gap-1`}
               >
-                {item.accent && <Sparkles aria-hidden className="size-4" />}
                 {item.label}
                 {item.children && (
                   <ChevronDown
@@ -112,9 +111,8 @@ export function Navbar() {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 aria-current={pathname === item.href ? 'page' : undefined}
-                className={`${linkClass(item)} flex items-center gap-2 py-1 text-[1.25rem]`}
+                className={`${linkClass(item)} block py-1 text-[1.25rem]`}
               >
-                {item.accent && <Sparkles aria-hidden className="size-5" />}
                 {item.label}
               </Link>
               {item.children && (
