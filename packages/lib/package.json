@@ -1,0 +1,13 @@
+{
+  "name": "@nara/lib",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@sanity/client": "^7.12.0"
+  }
+}
