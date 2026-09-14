@@ -42,6 +42,7 @@ const RENDERER_URL = `https://cdn.jsdelivr.net/npm/schematic-renderer@${VERSION}
  * bundled pack.
  */
 const RESOURCE_PACK_URL = '/schematic-pack.zip'
+const PACK_NAME = 'nara-1'
 
 /** Only the surface this component touches. */
 type Renderer = {
@@ -80,10 +81,12 @@ export function SchematicViewer({ url, name }: { url: string; name: string }) {
         const renderer = new mod.SchematicRenderer(
           canvasRef.current,
           { [name]: async () => (await fetch(url)).arrayBuffer() },
-          /* The third positional argument is legacy in 1.6.1 and is ignored;
-             packs are loaded through resourcePackOptions.defaultPacks below.
-             Passing it here renders every block with placeholder textures. */
-          {},
+          /* The only way 1.6.1 loads packs: it calls each loader whose name is
+             not already stored in its IndexedDB, then keeps the result there.
+             So the name carries a version; bump it whenever the pack changes or
+             returning visitors keep the old one. (resourcePackOptions has no
+             defaultPacks in this version; the bundle never reads it.) */
+          { [PACK_NAME]: async () => (await fetch(RESOURCE_PACK_URL)).blob() },
           {
             showGrid: true,
             cameraOptions: { position: [20, 20, 20] },
@@ -102,9 +105,6 @@ export function SchematicViewer({ url, name }: { url: string; name: string }) {
             sidebarOptions: { enabled: false, enableKeyboardShortcuts: false },
             keyboardControlsOptions: { enabled: false },
             resourcePackOptions: {
-              defaultPacks: {
-                default: async () => (await fetch(RESOURCE_PACK_URL)).blob(),
-              },
               enableUI: false,
               enableKeyboardShortcuts: false,
               /* Its advice — drop a resource pack — is meaningless here. The
