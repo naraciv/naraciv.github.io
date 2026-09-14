@@ -1,7 +1,33 @@
 {
-  "dependencies": {
-    "axios": "^1.13.6",
-    "fs": "^0.0.1-security",
-    "papaparse": "^5.5.3"
+  "name": "nara",
+  "private": true,
+  "packageManager": "pnpm@11.5.0",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "dev:all": "pnpm --parallel --filter web --filter studio dev",
+    "build": "pnpm --filter web build",
+    "start": "pnpm --filter web start",
+    "lint": "pnpm --filter web lint",
+    "test": "node --test packages/**/src/*.test.ts apps/web/components/map/*.test.ts",
+    "studio": "pnpm --filter studio dev",
+    "studio:build": "pnpm --filter studio build",
+    "studio:deploy": "pnpm --filter studio deploy",
+    "seed:sanity": "pnpm --filter studio exec sanity exec scripts/seed-content.ts --with-user-token",
+    "typecheck": "pnpm --filter studio typecheck && pnpm --filter web exec tsc --noEmit",
+    "build:pack": "node scripts/build-texture-pack.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:css": "stylelint \"apps/**/*.css\"",
+    "check": "pnpm format:check && pnpm lint && pnpm lint:css && pnpm typecheck && pnpm test"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.6.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "stylelint": "^17.15.0",
+    "stylelint-config-standard": "^40.0.0"
   }
 }

@@ -27,3 +27,17 @@ dist/
 ehthumbs.db
 Thumbs.db
 data/pack.zip
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Sanity
+.sanity/
+
+# Local notes and editor tooling
+HANDOFF.md
+AGENTS.md
+CLAUDE.md
+.claude/
