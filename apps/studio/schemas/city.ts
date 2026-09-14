@@ -14,7 +14,7 @@ export const city = defineType({
       title: 'Name',
       type: 'string',
       description:
-        'Optional, so you can save a draft as you go — but a city needs one before it shows on the site.',
+        'Optional, so you can save a draft as you go, but a city needs one before it shows on the site.',
     }),
     defineField({
       name: 'slug',
@@ -27,7 +27,7 @@ export const city = defineType({
       name: 'coordinates',
       title: 'Coordinates',
       type: 'string',
-      description: 'In-game X, Z — e.g. "3200, 4800". Y is optional and rarely useful here.',
+      description: 'In-game X, Z, e.g. "3200, 4800". Y is optional and rarely useful here.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -63,7 +63,7 @@ export const city = defineType({
   preview: {
     select: {title: 'name', subtitle: 'coordinates', media: 'image'},
     prepare: ({title, subtitle, media}) => ({
-      title: title || 'Untitled city — not shown on the site',
+      title: title || 'Untitled city (not shown on the site)',
       subtitle,
       media,
     }),

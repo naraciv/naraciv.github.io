@@ -129,13 +129,13 @@ export function OnlinePlayers() {
   return (
     <div className="w-full lg:w-4/5">
       <div className="mb-6 flex flex-col items-center justify-between gap-4 md:flex-row">
-        <h1 className="flex items-center gap-3 text-4xl font-bold text-primary">
+        <h2 className="flex items-center gap-3 text-4xl font-bold text-primary">
           Online Players
           <span aria-live="polite" className="flex items-center gap-2 text-2xl text-ink-2">
             <Users aria-hidden className="size-6" />
             {players.filter((p) => p.isOnline).length}
           </span>
-        </h1>
+        </h2>
         <div className="relative w-full md:w-[30%]">
           <Search
             aria-hidden

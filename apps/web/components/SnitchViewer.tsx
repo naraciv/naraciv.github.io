@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { UploadCloud, Upload } from 'lucide-react'
+import { Check, UploadCloud, Upload } from 'lucide-react'
 import {
   STATUS_COLOR,
   filterSnitches,
@@ -459,7 +459,7 @@ function GroupList({
               aria-hidden
               className={`flex size-3.5 shrink-0 items-center justify-center rounded-sm border text-[10px] ${hidden.has(group) ? 'border-[#4b5563]' : 'border-primary bg-primary text-ground'}`}
             >
-              {!hidden.has(group) && '✓'}
+              {!hidden.has(group) && <Check className="size-3" strokeWidth={3} />}
             </span>
             <span className="min-w-0 flex-1 truncate text-ink" title={group}>
               {group}

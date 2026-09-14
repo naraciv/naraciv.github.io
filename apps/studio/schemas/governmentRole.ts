@@ -14,14 +14,14 @@ export const governmentRole = defineType({
       title: 'Role',
       type: 'string',
       description:
-        'The name of the role, e.g. "Shikken" or "Lord of the North". Optional while drafting — a role needs one before it shows on the site.',
+        'The name of the role, e.g. "Shikken" or "Lord of the North". Optional while drafting; a role needs one before it shows on the site.',
     }),
     defineField({
       name: 'holder',
       title: 'Held by',
       type: 'string',
       description:
-        'Minecraft username, or several separated by commas. Leave blank if the post is vacant — the site fills in "Vacant" for you. Roles under Other Roles and Nara’s Populace describe a kind of person rather than a post, so leave this empty for them.',
+        'Minecraft username, or several separated by commas. Leave blank if the post is vacant; the site fills in "Vacant" for you. Roles under Other Roles and Nara’s Populace describe a kind of person rather than a post, so leave this empty for them.',
     }),
     defineField({
       name: 'group',
@@ -82,7 +82,7 @@ export const governmentRole = defineType({
   preview: {
     select: {title: 'title', holder: 'holder', group: 'group'},
     prepare: ({title, holder, group}) => ({
-      title: title || 'Untitled role — not shown on the site',
+      title: title || 'Untitled role (not shown on the site)',
       subtitle: ['other', 'populace'].includes(group) ? group : `${holder || 'Vacant'} · ${group}`,
     }),
   },

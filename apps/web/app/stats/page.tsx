@@ -29,6 +29,7 @@ const boards = {
 export default function StatsPage() {
   return (
     <div className="px-4 pt-[100px]">
+      <h1 className="sr-only">CivMC Player Stats</h1>
       <div className="mx-auto flex w-full max-w-[95%] flex-col gap-8 py-10 lg:flex-row">
         {/* Below lg the aside dissolves (`contents`) so Sources can drop to the very bottom. */}
         <aside className="flex w-full flex-col gap-6 max-lg:contents lg:sticky lg:top-24 lg:w-1/5 lg:self-start">

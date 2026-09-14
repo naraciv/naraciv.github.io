@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { Dices, Lock, Sparkles } from 'lucide-react'
+import { Stars } from '@/components/Stars'
 import { ToggleButton } from '@/components/ui'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -10,7 +12,6 @@ import {
   fetchNarans,
   fetchState,
   getSkinUrl,
-  starString,
   type Collection,
   type Naran,
   type RarityKey,
@@ -32,7 +33,7 @@ const FILTERS: ['all' | RarityKey, string, string][] = [
   ['all', 'All', '#546E7A'],
   ...RARITY_ORDER.map((key): [RarityKey, string, string] => [
     key,
-    `★ ${RARITY[key].label}`,
+    RARITY[key].label,
     key === 'COMMON' ? '#6B7280' : RARITY[key].color,
   ]),
 ]
@@ -114,14 +115,18 @@ export function NaranCollection() {
             'Loading your collection…'
           ) : canPullToday(lastPull) ? (
             <>
-              ✨ <span className="text-orange">Your daily pull is available!</span>
+              <Sparkles aria-hidden className="inline size-4 text-orange" />{' '}
+              <span className="text-orange">Your daily pull is available!</span>
             </>
           ) : (
             'Come back tomorrow for your next pull!'
           )}
         </p>
-        <Link href="/" className="gacha-pull-btn relative z-10 no-underline">
-          🎰 Go Pull!
+        <Link
+          href="/"
+          className="gacha-pull-btn relative z-10 inline-flex items-center gap-2 no-underline"
+        >
+          <Dices aria-hidden className="size-5" /> Go Pull!
         </Link>
       </div>
 
@@ -186,9 +191,7 @@ function NaranCard({
   const rarity = RARITY[naran.rarity]
   const body = (
     <>
-      <span className="block tracking-[2px]" style={{ color: rarity.color }}>
-        {starString(naran.rarity)}
-      </span>
+      <Stars rarity={naran.rarity} className="flex" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={getSkinUrl(naran.name)}
@@ -216,8 +219,8 @@ function NaranCard({
         className={`${shared} border-white/5 brightness-[0.3] grayscale`}
       >
         {body}
-        <span aria-hidden className="absolute inset-0 flex items-center justify-center text-5xl">
-          🔒
+        <span aria-hidden className="absolute inset-0 flex items-center justify-center">
+          <Lock className="size-12 text-white" />
         </span>
       </div>
     )
@@ -273,9 +276,7 @@ function NaranDetail({
     >
       {naran && rarity && (
         <>
-          <div className="text-2xl tracking-[4px]" style={{ color: rarity.color }}>
-            {starString(naran.rarity)}
-          </div>
+          <Stars rarity={naran.rarity} className="flex text-2xl" />
           <div className="mx-auto my-4 inline-block [perspective:600px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

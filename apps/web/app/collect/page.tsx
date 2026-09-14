@@ -4,7 +4,7 @@ import { NaranCollection } from '@/components/NaranCollection'
 export const metadata: Metadata = {
   title: 'Collect-a-Naran',
   description:
-    "Your personal collection of Nara's finest citizens — every Naran you have pulled from the daily gacha, by rarity.",
+    "Your personal collection of Nara's finest citizens: every Naran you have pulled from the daily gacha, by rarity.",
   alternates: { canonical: '/collect' },
 }
 

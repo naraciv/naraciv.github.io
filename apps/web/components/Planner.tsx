@@ -41,6 +41,11 @@ import {
 
 type Toast = { message: string; tone: 'ok' | 'error' } | null
 
+const panel =
+  'rounded-xl border border-purple/15 bg-[rgba(15,23,42,0.65)] p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.35)] backdrop-blur-md lg:p-4'
+const input =
+  'w-full rounded-lg border border-white/10 bg-[rgba(15,23,42,0.6)] text-white transition-all duration-200 focus:border-purple focus:shadow-[0_0_10px_rgba(224,64,251,0.25)] focus:outline-none'
+
 export default function Planner() {
   const [presetKey, setPresetKey] = useState<PresetKey>('city')
   const [center, setCenter] = useState<Point>({ x: 0, z: 0 })
@@ -111,7 +116,7 @@ export default function Planner() {
         tone: 'ok',
       })
     } catch {
-      setToast({ message: 'Clipboard unavailable — copy blocked by the browser.', tone: 'error' })
+      setToast({ message: 'Clipboard unavailable: the browser blocked the copy.', tone: 'error' })
     }
   }
 
@@ -178,10 +183,15 @@ export default function Planner() {
       <div className="mx-auto flex w-full max-w-[98%] flex-grow flex-col sm:max-w-[95%]">
         <div className="relative mb-6 shrink-0 text-center">
           <div className="relative inline-block">
-            <span className="title-beta">BETA</span>
-            <h1 className="mb-2 bg-gradient-to-r from-orange via-purple to-cyan bg-clip-text text-3xl font-extrabold tracking-tight text-transparent sm:text-5xl">
+            <span className="absolute -top-[0.6rem] -left-8 z-2 -rotate-18 rounded bg-[#dc2626] px-[0.65rem] py-[0.35rem] text-[0.95rem] leading-none tracking-[0.04em] text-white shadow-[0_6px_16px_rgba(0,0,0,0.35)] sm:-top-[0.8rem] sm:-left-[2.7rem] sm:text-[1.1rem]">
+              BETA
+            </span>
+            <div
+              aria-hidden
+              className="mb-2 bg-gradient-to-r from-orange via-purple to-cyan bg-clip-text text-3xl font-extrabold tracking-tight text-transparent sm:text-5xl"
+            >
               Bastion &amp; Snitch Grid Planner
-            </h1>
+            </div>
           </div>
           <p className="text-sm text-ink-3 sm:text-base">
             Visualize coverages, draw or import selection borders, and export exact layout
@@ -192,7 +202,7 @@ export default function Planner() {
         <div className="planner-layout flex flex-col gap-6 lg:flex-row">
           {/* ── Sidebar ── */}
           <div className="scrollable-panel flex w-full shrink-0 flex-col gap-5 lg:w-[420px] lg:gap-3">
-            <section className="glass-panel rounded-xl p-5 lg:p-4">
+            <section className={panel}>
               <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-white lg:mb-2.5">
                 <Settings aria-hidden className="size-5 text-purple" /> Grid Settings
               </h2>
@@ -243,7 +253,7 @@ export default function Planner() {
                       <input
                         id={`center-${axis}`}
                         type="number"
-                        className="planner-input w-full rounded-lg py-1.5 pr-2 pl-7 text-sm"
+                        className={`${input} py-1.5 pr-2 pl-7 text-sm`}
                         value={Math.round(center[axis])}
                         onChange={(e) =>
                           setCenter((c) => ({
@@ -300,7 +310,7 @@ export default function Planner() {
             </section>
 
             {/* ── Selection border ── */}
-            <section className="glass-panel rounded-xl p-5 lg:p-4">
+            <section className={panel}>
               <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-white lg:mb-2.5">
                 <Crop aria-hidden className="size-5 text-green" /> Selection Border
               </h2>
@@ -399,7 +409,7 @@ export default function Planner() {
                       value={json}
                       onChange={(e) => setJson(e.target.value)}
                       placeholder="Paste your civmap.com JSON border payload here..."
-                      className="planner-input w-full rounded-lg p-2 font-mono text-[11px]"
+                      className={`${input} p-2 font-mono text-[11px]`}
                     />
                     <button
                       type="button"
@@ -445,7 +455,7 @@ export default function Planner() {
               }
             >
               <CivMap
-                className="planner-map"
+                className="size-full bg-[#0b0b0f]"
                 showClaims={showClaims}
                 onClick={onMapClick}
                 onMouseMove={onMapMove}
@@ -486,7 +496,7 @@ function Toggle({
     <div className={`flex items-center justify-between ${disabled ? 'opacity-45' : ''}`}>
       <label htmlFor={`toggle-${label}`} className="text-xs text-ink-2">
         {label}
-        {hint && <span className="sr-only"> — {hint}</span>}
+        {hint && <span className="sr-only">, {hint}</span>}
       </label>
       <Switch id={`toggle-${label}`} checked={checked} disabled={disabled} onChange={onChange} />
     </div>

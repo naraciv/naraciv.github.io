@@ -1,0 +1,31 @@
+# Nara
+
+> Nara is a Japanese-themed nation on CivMC, a Minecraft server, located in the +,+ on the continent of Alenarith. Founded on 2 June 2022 on vibes and environmentalism. Its capital is Shiroyama (X 3200, Z 4800).
+
+Coordinates on this site are CivMC world coordinates (Minecraft X, Y, Z), not latitude and longitude. Prices are in diamonds unless stated.
+
+## Nation
+
+- [Home](https://nara.rocks/): Nara's philosophy, its cities and its culture.
+- [Government](https://nara.rocks/government): The feudal shogunate of Nara: Shikken, Rensho, Taishō, the Daimyo who govern each province, the Komuin civil service, and the national organizations.
+- [Joining Nara](https://nara.rocks/joining): How to join Nara on CivMC: what we look for, the three steps to citizenship, and what citizens get.
+
+## Trade and property
+
+- [Shops](https://nara.rocks/shops): Every player shop in Nara: what each one takes and gives, its coordinates, city and owner, as a searchable table and on the CivMC world map.
+- [Head Shop](https://nara.rocks/heads): MitsuHeadCorp's decorative heads for sale: player heads, mob heads, decoration heads and more, with prices and where to find them.
+- [Homes](https://nara.rocks/homes): Property listings across Nara: homes, apartments, shops and hotel rooms for sale or rent, with prices, coordinates and owners.
+
+## Tools
+
+- [Tools](https://nara.rocks/tools): Community tools and utilities for Civ players.
+- [Player Stats](https://nara.rocks/stats): Who is online on CivMC right now, and the weekly, monthly and all-time playtime leaderboard.
+- [Rocket Calculator](https://nara.rocks/rocket): How much rocket fuel a CivMC rocket needs to reach Zorweth and back, for any passengers and cargo.
+- [Grid Planner](https://nara.rocks/planner): Plan bastion, vault, snitch and mob repellator grids on the CivMC world map.
+- [Snitch Viewer](https://nara.rocks/snitches): Open a SnitchMod database and see every snitch on the CivMC map, filtered by group, world and Y level. Runs entirely in the browser.
+
+## Optional
+
+- [Privacy](https://nara.rocks/privacy): Nara collects no personal data and uses no cross-site tracking.
+- [Sitemap](https://nara.rocks/sitemap.xml): Every indexable page, including individual property listings.
+- [Discord](https://discord.gg/M8etHAEyBB): The Nara community server.

@@ -3,8 +3,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Sparkles } from 'lucide-react'
 import { nav, type NavItem } from '@/lib/site'
+
+const dropdownItem =
+  'block whitespace-nowrap text-[#b0bec5] transition-colors hover:bg-purple/12 hover:text-purple'
 
 /** The parent highlights when a child route is open; only an exact match is
  *  aria-current, because a parent is not the page you are on. */
@@ -30,12 +33,12 @@ export function Navbar() {
       .join(' ')
 
   return (
-    <header className="nav-shell fixed inset-x-0 top-0 z-50">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-purple/20 bg-[rgba(18,18,30,0.95)] shadow-[0_2px_20px_rgba(0,0,0,0.3)] backdrop-blur-lg">
       <nav
         aria-label="Main"
         className="mx-auto flex max-w-[1200px] items-center gap-4 px-4 py-4 sm:px-8"
       >
-        <Link href="/" className="nav-logo relative z-10">
+        <Link href="/" className="text-gacha relative z-10 text-[1.7rem] font-black tracking-[3px]">
           NARA
         </Link>
 
@@ -47,6 +50,7 @@ export function Navbar() {
                 aria-current={pathname === item.href ? 'page' : undefined}
                 className={`${linkClass(item)} flex items-center gap-1`}
               >
+                {item.accent && <Sparkles aria-hidden className="size-4" />}
                 {item.label}
                 {item.children && (
                   <ChevronDown
@@ -57,13 +61,13 @@ export function Navbar() {
               </Link>
 
               {item.children && (
-                <ul className="nav-dropdown-menu invisible absolute top-full left-1/2 z-10 mt-2.5 min-w-35 -translate-x-1/2 py-2 opacity-0 transition-[opacity,visibility] duration-300 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 before:absolute before:inset-x-0 before:-top-2.5 before:h-2.5 before:content-['']">
+                <ul className="invisible absolute top-full left-1/2 z-10 mt-2.5 min-w-35 -translate-x-1/2 rounded-lg border border-purple/25 bg-[rgba(18,18,30,0.98)] py-2 opacity-0 shadow-[0_4px_20px_rgba(224,64,251,0.1)] transition-[opacity,visibility] duration-300 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 before:absolute before:inset-x-0 before:-top-2.5 before:h-2.5 before:content-['']">
                   {item.children.map((child) => (
                     <li key={child.href}>
                       <Link
                         href={child.href}
                         aria-current={pathname === child.href ? 'page' : undefined}
-                        className="nav-dropdown-item block px-4 py-2"
+                        className={`${dropdownItem} px-4 py-2`}
                         style={pathname === child.href ? { color: '#e040fb' } : undefined}
                       >
                         {child.label}
@@ -99,7 +103,7 @@ export function Navbar() {
       <div
         id="mobile-nav"
         hidden={!open}
-        className="nav-panel border-t border-purple/20 px-6 pt-4 pb-8 md:hidden"
+        className="border-t border-purple/20 bg-[rgba(18,18,30,0.98)] px-6 pt-4 pb-8 shadow-[-5px_0_20px_rgba(224,64,251,0.08)] md:hidden"
       >
         <ul className="flex flex-col gap-3">
           {nav.map((item) => (
@@ -108,8 +112,9 @@ export function Navbar() {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 aria-current={pathname === item.href ? 'page' : undefined}
-                className={`${linkClass(item)} block py-1 text-[1.25rem]`}
+                className={`${linkClass(item)} flex items-center gap-2 py-1 text-[1.25rem]`}
               >
+                {item.accent && <Sparkles aria-hidden className="size-5" />}
                 {item.label}
               </Link>
               {item.children && (
@@ -120,7 +125,7 @@ export function Navbar() {
                         href={child.href}
                         onClick={() => setOpen(false)}
                         aria-current={pathname === child.href ? 'page' : undefined}
-                        className="nav-dropdown-item block px-2 py-1"
+                        className={`${dropdownItem} px-2 py-1`}
                       >
                         {child.label}
                       </Link>

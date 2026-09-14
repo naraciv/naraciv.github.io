@@ -777,7 +777,7 @@ function LoadEditor({
             <strong className={over ? 'text-danger' : 'text-white'}>
               {count(leg.slots)} / {count(leg.slotCapacity)}
             </strong>
-            {over && ' — more than the chests and inventories hold'}
+            {over && ' (more than the chests and inventories hold)'}
           </span>
         </div>
       </div>

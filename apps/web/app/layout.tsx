@@ -31,19 +31,22 @@ const hiromisake = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — ${site.tagline}`,
+    default: `${site.name} | ${site.tagline}`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
   alternates: { canonical: '/' },
   icons: { icon: '/images/nara_flag_white_border.svg' },
+  /* No title, description or url here: Next fills og:title and og:description
+     from each page's own metadata, and hard-coding them gave every page the
+     homepage's link preview. */
   openGraph: {
     type: 'website',
     siteName: site.name,
-    url: site.url,
-    title: `${site.name} — ${site.tagline}`,
-    description: site.description,
+    locale: 'en_US',
+    images: [{ url: '/images/nara_above.webp', alt: 'Shiroyama, the capital of Nara' }],
   },
+  twitter: { card: 'summary_large_image' },
 }
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {

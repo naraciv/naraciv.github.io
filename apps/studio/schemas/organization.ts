@@ -10,7 +10,7 @@ export const organization = defineType({
       title: 'Name',
       type: 'string',
       description:
-        'Optional while drafting — an organization needs one before it shows on the site.',
+        'Optional while drafting; an organization needs one before it shows on the site.',
     }),
     defineField({
       name: 'description',
@@ -38,7 +38,7 @@ export const organization = defineType({
   preview: {
     select: {title: 'title', subtitle: 'description'},
     prepare: ({title, subtitle}) => ({
-      title: title || 'Untitled organization — not shown on the site',
+      title: title || 'Untitled organization (not shown on the site)',
       subtitle,
     }),
   },

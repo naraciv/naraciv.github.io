@@ -13,7 +13,7 @@ export type NavItem = { href: string; label: string; children?: NavItem[]; accen
 
 export const nav: NavItem[] = [
   { href: '/', label: 'Home' },
-  { href: '/collect', label: '🎰 Collect', accent: true },
+  { href: '/collect', label: 'Collect', accent: true },
   { href: '/government', label: 'Government' },
   { href: '/homes', label: 'Homes' },
   {

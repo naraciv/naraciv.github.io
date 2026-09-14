@@ -9,7 +9,7 @@ import { site } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'Head Shop',
   description:
-    'MitsuHeadCorp — browse decorative heads for sale in Nara: player heads, mob heads, decoration heads and more, with prices and where to find them.',
+    "Browse MitsuHeadCorp's decorative heads for sale in Nara: player heads, mob heads, decoration heads and more, with prices and where to find them.",
   alternates: { canonical: '/heads' },
   openGraph: {
     title: 'Nara | MitsuHeadCorp Shop',

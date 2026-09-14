@@ -15,6 +15,8 @@ export const metadata: Metadata = {
 export default function PlannerPage() {
   return (
     <div className="flex flex-grow flex-col pt-[80px] sm:pt-[100px]">
+      {/* The visible title is drawn by the client-only planner, so crawlers get this one. */}
+      <h1 className="sr-only">Bastion &amp; Snitch Grid Planner</h1>
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -31,7 +33,7 @@ export default function PlannerPage() {
           PlannerLoader only mounts the map from tablet width. */}
       <div className="flex flex-grow flex-col items-center justify-center gap-4 px-6 py-16 text-center md:hidden">
         <Monitor aria-hidden className="size-12 text-primary" />
-        <h1 className="text-2xl font-bold text-white">Not yet available on mobile</h1>
+        <h2 className="text-2xl font-bold text-white">Not yet available on mobile</h2>
         <p className="max-w-sm text-ink-2">
           The Bastion &amp; Snitch Grid Planner needs a bigger screen for now. Please try it on a
           desktop or tablet.

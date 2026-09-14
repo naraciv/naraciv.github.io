@@ -281,7 +281,13 @@ export function ActivityWeek({ history }: { history: History }) {
             hm(s.logout - s.login),
           ]),
           ...(history.onlineSince && history.onlineSince < week.end && now > week.start
-            ? [[`${time(history.onlineSince)} (online now)`, '—', hm(now - history.onlineSince)]]
+            ? [
+                [
+                  `${time(history.onlineSince)} (online now)`,
+                  'still online',
+                  hm(now - history.onlineSince),
+                ],
+              ]
             : []),
         ]}
       />

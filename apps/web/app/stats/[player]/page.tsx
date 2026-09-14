@@ -17,7 +17,7 @@ export async function generateMetadata({
   const { player } = await params
   const name = decodeURIComponent(player)
   return {
-    title: `${name} — Player Stats`,
+    title: `${name}: Player Stats`,
     description: `${name}'s CivMC playtime: hours played, when they are usually online, and their history month by month.`,
     robots: { index: false, follow: true },
   }

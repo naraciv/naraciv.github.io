@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Brain, CircleCheck, Dices, Hourglass } from 'lucide-react'
+import { Stars } from '@/components/Stars'
 import {
   QUIZ_MAX_PER_DAY,
   RARITY,
@@ -18,7 +20,6 @@ import {
   pull,
   quizFailedToday,
   resetPullTimer,
-  starString,
   submitAnswer,
   timeUntilMidnight,
   type Collection,
@@ -34,6 +35,9 @@ import {
  *    /state answers: /state is no-store, so waiting on it would put a round
  *    trip to the origin in front of first paint.
  */
+
+const quizInput =
+  'w-full rounded-lg border-2 border-white/10 bg-[#1a1a2e] p-3 font-semibold text-[#c8cad0] placeholder:text-[#8b95a8]'
 
 const BALL_COLORS = [
   '#FF6B35',
@@ -152,7 +156,7 @@ export function GachaMachine() {
     <>
       <header className="hero-gacha">
         <h1 className="z-10 mb-2 font-display text-7xl font-bold text-[#f8fafc] md:text-8xl">
-          NARA
+          NARA<span className="sr-only">, a Japanese-themed nation on CivMC</span>
         </h1>
         <p className="text-gacha z-10 mb-2 text-xl font-bold tracking-widest md:text-2xl">
           COLLECT-A-NARAN
@@ -162,7 +166,10 @@ export function GachaMachine() {
         </p>
 
         {!canPull && ready && (
-          <div className="countdown z-10 mb-6" role="status">
+          <div
+            className="z-10 mb-6 font-countdown text-[1.1rem] font-semibold text-orange"
+            role="status"
+          >
             Next free pull in <span>{countdown}</span>
           </div>
         )}
@@ -177,9 +184,14 @@ export function GachaMachine() {
             <span />
           </div>
 
-          <div className={`gacha-machine-body ${shaking ? 'machine-shaking' : ''}`}>
+          <div
+            className={`absolute inset-0 overflow-hidden rounded-[30px_30px_16px_16px] border-3 border-purple/40 bg-linear-180/srgb from-[#141425] to-[#0f0f1e] shadow-[0_8px_40px_rgba(224,64,251,0.15),0_0_0_1px_rgba(255,255,255,0.04)] ${shaking ? 'machine-shaking' : ''}`}
+          >
             <div className="gacha-dome">
-              <div className="gacha-balls" aria-hidden>
+              <div
+                className="absolute inset-x-0 bottom-0 flex h-[55%] flex-wrap items-end justify-center gap-1 p-2"
+                aria-hidden
+              >
                 {BALL_COLORS.map((color, i) => (
                   <div
                     key={i}
@@ -197,7 +209,7 @@ export function GachaMachine() {
               <span className="text-gacha text-lg font-bold tracking-widest">NARAN GACHA</span>
             </div>
 
-            <div className="gacha-slot" />
+            <div className="absolute bottom-15 left-1/2 h-[50px] w-20 -translate-x-1/2 rounded-b-[40px] border-2 border-t-0 border-purple/30 bg-[#1a1a2e]" />
 
             <div className="absolute inset-x-0 bottom-5 text-center">
               <span className="text-sm text-ink-2">
@@ -213,7 +225,7 @@ export function GachaMachine() {
             disabled={!canPull}
             aria-label="Pull the lever"
           >
-            <div className="gacha-lever-track">
+            <div className="relative mx-auto h-[100px] w-3 rounded-md bg-linear-180/srgb from-[#b0bec5] to-[#90a4ae]">
               <div className="gacha-lever-handle" />
             </div>
           </button>
@@ -221,11 +233,19 @@ export function GachaMachine() {
 
         <button
           type="button"
-          className="gacha-pull-btn z-10 mt-8"
+          className="gacha-pull-btn z-10 mt-8 inline-flex items-center gap-2"
           onClick={doPull}
           disabled={!canPull || pulling}
         >
-          {canPull ? '🎰 Pull Gacha!' : '⏳ Come Back Tomorrow'}
+          {canPull ? (
+            <>
+              <Dices aria-hidden className="size-5" /> Pull Gacha!
+            </>
+          ) : (
+            <>
+              <Hourglass aria-hidden className="size-5" /> Come Back Tomorrow
+            </>
+          )}
         </button>
 
         {pullError && (
@@ -237,7 +257,7 @@ export function GachaMachine() {
 
       {reveal && rarity && (
         <div
-          className="gacha-reveal-overlay active"
+          className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[rgba(10,10,20,0.95)]"
           onClick={(e) => e.target === e.currentTarget && setReveal(null)}
           role="dialog"
           aria-modal="true"
@@ -268,16 +288,20 @@ export function GachaMachine() {
               boxShadow: `0 0 40px ${rarity.glow}, 0 0 80px ${rarity.glow}`,
             }}
           >
-            <div className="stars" style={{ color: rarity.color }}>
-              {starString(reveal.rarity)}
-            </div>
+            <Stars rarity={reveal.rarity} className="flex text-2xl" />
             {/* eslint-disable-next-line @next/next/no-img-element -- external skin renderer, not a known-size asset */}
-            <img className="skin-render" src={getSkinUrl(reveal.name)} alt={reveal.name} />
-            <div className="naran-name" style={{ color: rarity.color }}>
+            <img
+              className="mx-auto mb-3 h-auto w-[150px] [image-rendering:pixelated]"
+              src={getSkinUrl(reveal.name)}
+              alt={reveal.name}
+            />
+            <div className="mt-2 mb-1 text-2xl font-black" style={{ color: rarity.color }}>
               {reveal.name}
             </div>
-            <div className="naran-title">{reveal.title}</div>
-            <div className="naran-desc">{reveal.description}</div>
+            <div className="text-[0.95rem] opacity-70">{reveal.title}</div>
+            <div className="mt-3 text-[0.85rem] leading-normal opacity-60">
+              {reveal.description}
+            </div>
             <div className="mt-4 text-xs opacity-40">
               {revealCount > 1 ? `Duplicate! (×${revealCount})` : 'NEW!'}
             </div>
@@ -381,8 +405,9 @@ function Quiz({ onTimerReset }: { onTimerReset: () => void }) {
     <section className="gacha-section px-4 py-12">
       <div className="mx-auto max-w-2xl">
         <div className="gacha-banner" style={{ border: '2px solid rgba(0,188,212,0.3)' }}>
-          <h2 className="text-gacha relative z-10 mb-2 text-2xl font-bold">
-            🧠 Nara Quiz — Earn an Extra Pull!
+          <h2 className="relative z-10 mb-2 flex items-center justify-center gap-2 text-2xl font-bold">
+            <Brain aria-hidden className="size-6 text-cyan" />
+            <span className="text-gacha">Nara Quiz: Earn an Extra Pull!</span>
           </h2>
           <p className="relative z-10 mb-2 text-ink-hero">
             Answer correctly to reset your pull timer.
@@ -392,8 +417,9 @@ function Quiz({ onTimerReset }: { onTimerReset: () => void }) {
           </p>
 
           {exhausted ? (
-            <p className="relative z-10 text-ink-hero">
-              ✅ You&rsquo;ve used all {QUIZ_MAX_PER_DAY} quiz attempts today. Come back tomorrow!
+            <p className="relative z-10 flex items-center justify-center gap-2 text-ink-hero">
+              <CircleCheck aria-hidden className="size-5 shrink-0 text-green" /> You&rsquo;ve used
+              all {QUIZ_MAX_PER_DAY} quiz attempts today. Come back tomorrow!
             </p>
           ) : (
             question && (
@@ -431,7 +457,7 @@ function Quiz({ onTimerReset }: { onTimerReset: () => void }) {
                           type="button"
                           aria-pressed={selected === value}
                           onClick={() => setSelected(value)}
-                          className={`quiz-option ${selected === value ? 'quiz-selected' : ''}`}
+                          className="block w-full cursor-pointer rounded-lg border-2 border-white/10 bg-[#1a1a2e] p-3 text-left font-semibold text-[#c8cad0] transition-all duration-200 hover:border-purple aria-pressed:border-purple aria-pressed:bg-purple/18 aria-pressed:text-[#f3e5f5]"
                         >
                           {opt}
                         </button>
@@ -447,7 +473,7 @@ function Quiz({ onTimerReset }: { onTimerReset: () => void }) {
                     </label>
                     <input
                       id="quiz-answer"
-                      className="quiz-input"
+                      className={quizInput}
                       placeholder="Type your answer..."
                       value={text}
                       onChange={(e) => setText(e.target.value)}
@@ -463,7 +489,7 @@ function Quiz({ onTimerReset }: { onTimerReset: () => void }) {
                     <input
                       id="quiz-date"
                       type="date"
-                      className="quiz-input"
+                      className={quizInput}
                       value={text}
                       onChange={(e) => setText(e.target.value)}
                     />
