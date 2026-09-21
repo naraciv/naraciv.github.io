@@ -47,7 +47,7 @@ const nextConfig: NextConfig = {
     // /map is a route handler — see app/map/route.ts.
     {
       source: '/discord',
-      destination: 'https://discord.gg/M8etHAEyBB',
+      destination: 'https://discord.gg/TKxC3qVuu4',
       permanent: false,
     },
     // Legacy .html and directory URLs still linked from elsewhere.

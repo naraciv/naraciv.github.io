@@ -5,7 +5,7 @@ export const site = {
   description:
     'Nara is a Japanese-themed nation on CivMC, located in the +,+ on the continent of Alenarith. Founded on vibes and environmentalism.',
   founded: '2022-06-02',
-  discord: 'https://discord.gg/M8etHAEyBB',
+  discord: 'https://discord.gg/TKxC3qVuu4',
   capital: { name: 'Shiroyama', x: 3200, z: 4800 },
 } as const
 

@@ -28,4 +28,4 @@ Coordinates on this site are CivMC world coordinates (Minecraft X, Y, Z), not la
 
 - [Privacy](https://nara.rocks/privacy): Nara collects no personal data and uses no cross-site tracking.
 - [Sitemap](https://nara.rocks/sitemap.xml): Every indexable page, including individual property listings.
-- [Discord](https://discord.gg/M8etHAEyBB): The Nara community server.
+- [Discord](https://discord.gg/TKxC3qVuu4): The Nara community server.
