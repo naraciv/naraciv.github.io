@@ -1,5 +1,6 @@
 import path from 'node:path'
 import type { NextConfig } from 'next'
+import { site } from './lib/site'
 
 const nextConfig: NextConfig = {
   transpilePackages: ['@nara/lib'],
@@ -47,7 +48,7 @@ const nextConfig: NextConfig = {
     // /map is a route handler — see app/map/route.ts.
     {
       source: '/discord',
-      destination: 'https://discord.gg/TKxC3qVuu4',
+      destination: site.discord,
       permanent: false,
     },
     // Legacy .html and directory URLs still linked from elsewhere.
