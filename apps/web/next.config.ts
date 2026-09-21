@@ -31,6 +31,13 @@ const nextConfig: NextConfig = {
       destination: `${process.env.GACHA_BACKEND_URL ?? 'https://gacha.nara.rocks'}/:path*`,
     },
   ],
+  headers: async () => [
+    {
+      // RFC 9727 agent discovery: point at the llms.txt summary we already publish.
+      source: '/',
+      headers: [{ key: 'Link', value: '</llms.txt>; rel="describedby"' }],
+    },
+  ],
   redirects: async () => [
     // /map is a route handler — see app/map/route.ts.
     {

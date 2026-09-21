@@ -7,7 +7,16 @@ import { site } from '@/lib/site'
  */
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: '*', allow: '/', disallow: ['/collect'] }],
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/collect'],
+        // https://contentsignals.org — we want AI crawling, training and
+        // agent browsing, matching the allow-everything stance above.
+        other: { 'Content-Signal': 'ai-train=yes, search=yes, ai-input=yes' },
+      },
+    ],
     sitemap: `${site.url}/sitemap.xml`,
     host: site.url,
   }
