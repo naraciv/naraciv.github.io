@@ -63,6 +63,7 @@ export function CivMap({
   onMouseMove,
   onZoom,
   onContextMenu,
+  onGrab,
   handleRef,
   className,
   children,
@@ -81,6 +82,10 @@ export function CivMap({
   onZoom?: (zoom: number) => void
   /** A right click, in rounded world coordinates, with the DOM event for its screen position. */
   onContextMenu?: (point: Coords, event: MouseEvent) => void
+  /** A left press, in rounded world coordinates. Return a function to take the gesture:
+   *  the map stops panning, the function gets every position until release, and the
+   *  click that would follow is swallowed. Return nothing to let the map pan as usual. */
+  onGrab?: (point: Coords, zoom: number) => ((point: Coords) => void) | undefined
   handleRef?: RefObject<CivMapHandle | null>
   className?: string
   children?: ReactNode
@@ -91,9 +96,9 @@ export function CivMap({
   const [map, setMap] = useState<L.Map | null>(null)
 
   /* Handlers live in a ref so changing them never tears down the map. */
-  const handlers = useRef({ onClick, onMouseMove, onZoom, onContextMenu })
+  const handlers = useRef({ onClick, onMouseMove, onZoom, onContextMenu, onGrab })
   useLayoutEffect(() => {
-    handlers.current = { onClick, onMouseMove, onZoom, onContextMenu }
+    handlers.current = { onClick, onMouseMove, onZoom, onContextMenu, onGrab }
   })
 
   useEffect(() => {
@@ -138,11 +143,37 @@ export function CivMap({
 
     instance.setView(worldToLatLng(initialCenter.x, initialCenter.z), initialZoom)
 
-    instance.on('click', (event: L.LeafletMouseEvent) => {
+    const rounded = (event: L.LeafletMouseEvent): Coords => {
       const point = latLngToWorld(event.latlng.lat, event.latlng.lng)
-      handlers.current.onClick?.({ x: Math.round(point.x), z: Math.round(point.z) })
+      return { x: Math.round(point.x), z: Math.round(point.z) }
+    }
+
+    /* A grab in progress, and whether the click its release produces should be dropped. */
+    let grab: ((point: Coords) => void) | undefined
+    let swallowClick = false
+    instance.on('mousedown', (event: L.LeafletMouseEvent) => {
+      if (event.originalEvent.button !== 0) return
+      grab = handlers.current.onGrab?.(rounded(event), instance.getZoom())
+      /* Disabling mid-press also ends the pan Leaflet has just started. */
+      if (grab) instance.dragging.disable()
+    })
+    /* On document, so letting go outside the map still ends the grab. */
+    const release = () => {
+      if (!grab) return
+      grab = undefined
+      instance.dragging.enable()
+      swallowClick = true
+      /* A release outside the map produces no click; do not eat the next real one. */
+      setTimeout(() => (swallowClick = false))
+    }
+    document.addEventListener('mouseup', release)
+
+    instance.on('click', (event: L.LeafletMouseEvent) => {
+      if (swallowClick) return void (swallowClick = false)
+      handlers.current.onClick?.(rounded(event))
     })
     instance.on('mousemove', (event: L.LeafletMouseEvent) => {
+      grab?.(rounded(event))
       const point = latLngToWorld(event.latlng.lat, event.latlng.lng)
       handlers.current.onMouseMove?.(point, instance.getZoom())
     })
@@ -163,6 +194,7 @@ export function CivMap({
     alignClaims()
 
     return () => {
+      document.removeEventListener('mouseup', release)
       instance.remove()
       mapRef.current = null
       claimsRef.current = null

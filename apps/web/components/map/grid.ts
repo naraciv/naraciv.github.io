@@ -131,6 +131,17 @@ export function generateGridPoints({
   return points
 }
 
+/** Index of the border vertex closest to a world point, if one is within `reach` blocks; otherwise -1. */
+export function nearestVertex(border: Point[], point: Point, reach: number): number {
+  let best = -1
+  let bestDistance = reach
+  border.forEach((vertex, i) => {
+    const distance = Math.hypot(vertex.x - point.x, vertex.z - point.z)
+    if (distance <= bestDistance) [best, bestDistance] = [i, distance]
+  })
+  return best
+}
+
 /** Ray casting. A polygon of fewer than three vertices contains nothing. */
 export function isPointInPolygon(point: Point, polygon: Point[]): boolean {
   if (polygon.length < 3) return false

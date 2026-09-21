@@ -22,6 +22,7 @@ import {
   PRESETS,
   PRESET_KEYS,
   formatCoordinateList,
+  nearestVertex,
   selectWithinBorder,
   type CivMapHandle,
   type BorderMode,
@@ -55,7 +56,7 @@ export default function Planner() {
   const [showRanges, setShowRanges] = useState(true)
   const [drawLabels, setDrawLabels] = useState(false)
   const [containPref, setContainPref] = useState(false)
-  const [drawing, setDrawing] = useState(false)
+  const [editing, setEditing] = useState(false)
   const [border, setBorder] = useState<Point[]>([])
   const [hover, setHover] = useState<{ point: Point; zoom: number }>({
     point: { x: 0, z: 0 },
@@ -86,15 +87,31 @@ export default function Planner() {
 
   const onMapClick = useCallback(
     (point: Point) => {
-      if (drawing) {
+      if (editing) {
         setBorder((current) => [...current, point])
         return
       }
       if (frozen) return
       setCenter(point)
     },
-    [drawing, frozen],
+    [editing, frozen],
   )
+
+  /* The vertex under the pointer, with 8 px of slop converted to blocks at the
+     zoom (CRS.Simple draws 2^zoom px per block). */
+  const vertexAt = (point: Point, zoom: number) => nearestVertex(border, point, 8 / 2 ** zoom)
+
+  const onMapRightClick = (point: Point) => {
+    const index = vertexAt(point, hover.zoom)
+    if (index >= 0) setBorder((current) => current.filter((_, i) => i !== index))
+  }
+
+  /* Pressing on a vertex in Edit Mode drags it; anywhere else the map pans. */
+  const onMapGrab = (point: Point, zoom: number) => {
+    const index = editing ? vertexAt(point, zoom) : -1
+    if (index < 0) return undefined
+    return (to: Point) => setBorder((current) => current.map((v, i) => (i === index ? to : v)))
+  }
 
   const onMapMove = useCallback((point: Point, zoom: number) => {
     setHover({ point, zoom })
@@ -266,7 +283,7 @@ export default function Planner() {
                   ))}
                 </div>
                 <span className="mt-1 block text-[10px] text-ink-3">
-                  Left click on map to set Center unless Frozen or Drawing.
+                  Left click on map to set Center unless Frozen or in Edit Mode.
                 </span>
               </div>
 
@@ -318,18 +335,18 @@ export default function Planner() {
               <div className="mb-4 flex flex-col gap-2">
                 <div className="flex gap-2">
                   <ToggleButton
-                    pressed={drawing}
-                    onClick={() => setDrawing((v) => !v)}
+                    pressed={editing}
+                    onClick={() => setEditing((v) => !v)}
                     size="sm"
                     className="flex-1"
                   >
-                    {drawing ? (
+                    {editing ? (
                       <>
-                        <Check aria-hidden className="size-3.5" /> Drawing Active
+                        <Check aria-hidden className="size-3.5" /> Edit Mode Active
                       </>
                     ) : (
                       <>
-                        <Edit2 aria-hidden className="size-3.5" /> Draw Border
+                        <Edit2 aria-hidden className="size-3.5" /> Edit Border
                       </>
                     )}
                   </ToggleButton>
@@ -342,8 +359,8 @@ export default function Planner() {
                   </button>
                 </div>
                 <span className="block text-[10px] text-ink-3">
-                  Click Draw Border, then click on the map to place vertices. The shape will close
-                  automatically.
+                  Click Edit Border, then left click on the map to place vertices, drag one to move
+                  it, and right click one to remove it. The shape will close automatically.
                 </span>
               </div>
 
@@ -445,10 +462,10 @@ export default function Planner() {
                     {hover.zoom})
                   </span>
                   <span
-                    className={`mt-0.5 block text-[10px] ${drawing ? 'text-green' : 'text-ink-3'}`}
+                    className={`mt-0.5 block text-[10px] ${editing ? 'text-green' : 'text-ink-3'}`}
                   >
-                    {drawing
-                      ? 'Click on the map to add border points. Click the button again to exit Drawing Mode.'
+                    {editing
+                      ? 'Left click to add a border point, drag one to move it, right click one to remove it. Click the button again to exit Edit Mode.'
                       : 'Click to place Center. Hover to see blocks.'}
                   </span>
                 </>
@@ -458,7 +475,11 @@ export default function Planner() {
                 className="size-full bg-[#0b0b0f]"
                 showClaims={showClaims}
                 onClick={onMapClick}
+                /* Only in Edit Mode; otherwise the browser's own menu is left alone. */
+                onContextMenu={editing ? onMapRightClick : undefined}
+                onGrab={onMapGrab}
                 onMouseMove={onMapMove}
+                onZoom={(zoom) => setHover((current) => ({ ...current, zoom }))}
                 handleRef={mapHandle}
               >
                 <GridOverlay

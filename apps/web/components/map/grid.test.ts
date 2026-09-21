@@ -6,6 +6,7 @@ import {
   generateGridPoints,
   getZoneSamplePoints,
   isPointInPolygon,
+  nearestVertex,
   selectWithinBorder,
 } from './grid.ts'
 
@@ -113,4 +114,21 @@ test('coordinates are formatted one per line, rounded', () => {
     ]),
     '1, -3\n10, 20',
   )
+})
+
+test('right click picks the closest vertex in reach, and nothing outside it', () => {
+  assert.equal(nearestVertex(square, { x: 990, z: 5 }, 20), 1)
+  assert.equal(nearestVertex(square, { x: 500, z: 500 }, 20), -1)
+  assert.equal(
+    nearestVertex(
+      [
+        { x: 0, z: 0 },
+        { x: 8, z: 0 },
+      ],
+      { x: 5, z: 0 },
+      20,
+    ),
+    1,
+  )
+  assert.equal(nearestVertex([], { x: 0, z: 0 }, 20), -1)
 })
