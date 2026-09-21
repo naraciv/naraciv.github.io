@@ -1,0 +1,121 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "Nara API", "version": "1.0.0", "description": "Read-only data behind nara.rocks, for agents to query or calculate with directly instead of scraping pages." },
+  "servers": [{ "url": "https://nara.rocks" }],
+  "paths": {
+    "/api/government": {
+      "get": {
+        "summary": "Government roles and organizations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "roles": { "type": "array", "items": { "type": "object" } },
+                    "organizations": { "type": "array", "items": { "type": "object" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/shops": {
+      "get": {
+        "summary": "Every player shop, its trade, coordinates and stock",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "type": "object" } } } }
+          }
+        }
+      }
+    },
+    "/api/heads": {
+      "get": {
+        "summary": "MitsuHeadCorp's head shop listings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "type": "object" } } } }
+          }
+        }
+      }
+    },
+    "/api/rocket": {
+      "get": {
+        "summary": "The Zorweth rocket equation's constants (dry mass, exhaust velocity, delta-v)",
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      },
+      "post": {
+        "summary": "Calculate a rocket trip's fuel requirements",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["outbound", "returnFuel", "fuelInComputerKg", "deltaV", "margin"],
+                "properties": {
+                  "outbound": { "$ref": "#/components/schemas/Load" },
+                  "inbound": { "$ref": "#/components/schemas/Load" },
+                  "returnFuel": {
+                    "oneOf": [
+                      { "type": "object", "required": ["bringKg"], "properties": { "bringKg": { "type": "number" } } },
+                      { "type": "object", "required": ["atDestinationKg"], "properties": { "atDestinationKg": { "type": "number" } } }
+                    ]
+                  },
+                  "fuelInComputerKg": { "type": "number" },
+                  "deltaV": {
+                    "type": "object",
+                    "required": ["out", "back"],
+                    "properties": { "out": { "type": "number" }, "back": { "type": "number" } }
+                  },
+                  "margin": { "type": "number", "description": "Extra fuel on every burn, as a fraction: 0.05 is 5%." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "The trip plan: legs, fuel to load, fuel remaining on landing", "content": { "application/json": { "schema": { "type": "object" } } } },
+          "400": { "description": "Malformed trip input" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Load": {
+        "type": "object",
+        "required": ["players", "items"],
+        "properties": {
+          "players": { "type": "integer" },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "count"],
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "stack64", "stack16", "unstackable", "compacted64", "compacted16",
+                    "compactedUnstackable", "rocketFuel", "crudeOil"
+                  ]
+                },
+                "count": { "type": "integer" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

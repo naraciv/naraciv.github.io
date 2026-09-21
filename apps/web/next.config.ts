@@ -33,9 +33,14 @@ const nextConfig: NextConfig = {
   ],
   headers: async () => [
     {
-      // RFC 9727 agent discovery: point at the llms.txt summary we already publish.
+      // RFC 9727 agent discovery: point at the llms.txt summary and the API catalog.
       source: '/',
-      headers: [{ key: 'Link', value: '</llms.txt>; rel="describedby"' }],
+      headers: [
+        {
+          key: 'Link',
+          value: '</llms.txt>; rel="describedby", </.well-known/api-catalog>; rel="api-catalog"',
+        },
+      ],
     },
   ],
   redirects: async () => [
