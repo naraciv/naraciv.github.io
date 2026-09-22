@@ -3,31 +3,18 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Clock, LogOut, Search, Users } from 'lucide-react'
-import {
-  duration,
-  mergeAccounts,
-  playersFromSessions,
-  sortPlayers,
-  type AccountsResponse,
-  type Player,
-  type SessionsResponse,
-} from '@nara/lib'
+import { duration, type Player } from '@nara/lib'
 import { PlayerAvatar } from './PlayerAvatar'
 
 /**
  * Who is on CivMC now, then everyone civinfo knows about, newest first.
  *
- *   - No custom headers. civinfo grants access on the Origin and Referer being
- *     nara.rocks, and a custom header would force a CORS preflight on every
- *     request.
+ *   - /api/online-players does the civinfo calls and caches the merged result for
+ *     5 minutes, so this only ever costs a same-origin request — see that route.
  *   - Failed requests retry twice, then offer a Retry button.
  *   - Offline players page in by 30 as you scroll, with native lazy images.
- *
- * civinfo refuses any other origin (localhost, Vercel previews): test against
- * nara.rocks, or stub `fetch`.
  */
 
-const API = 'https://api.civinfo.net'
 const INITIAL = 50
 const PAGE = 30
 
@@ -57,24 +44,11 @@ export function OnlinePlayers() {
 
   /* Never sets state before its first await, so the mount effect can call it. */
   const load = useCallback(async () => {
-    const started = Date.now()
     try {
-      /* Sessions overlapping the last hour — which includes every open one. civinfo returns at
-         most the newest 1,000 by login, so a 24-hour window would cut off whoever had been on
-         longest. The accounts below fill in everyone else. */
-      const sessions = await getJson<SessionsResponse>(
-        `${API}/mc-sessions/all?after=${started - 3_600_000}`,
-      )
-      const map = playersFromSessions(sessions, started)
-      setPlayers(sortPlayers(map.values()))
+      setPlayers(await getJson<Player[]>('/api/online-players'))
       setStatus('ready')
-
-      /* ~4 MB of every account; the online list is useful long before it lands. The
-         limit is well above the account count, so search covers every account. */
-      const accounts = await getJson<AccountsResponse>(`${API}/mc-accounts/all?limit=1000000`)
-      setPlayers(sortPlayers(mergeAccounts(map, accounts, started).values()))
     } catch (error) {
-      console.warn('[nara] civinfo request failed.', error)
+      console.warn('[nara] online-players request failed.', error)
       setStatus((current) => (current === 'ready' ? current : 'error'))
     }
   }, [])
