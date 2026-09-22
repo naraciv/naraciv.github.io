@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { roleHolder, type GovernmentRole, type Head, type Organization, type Shop } from '@nara/lib'
@@ -6,6 +8,8 @@ import { GET as headsGET } from '@/app/api/heads/route'
 import { GET as rocketGET } from '@/app/api/rocket/route'
 import { GET as shopsGET } from '@/app/api/shops/route'
 import { site } from '@/lib/site'
+
+const llmsTxt = readFileSync(path.join(process.cwd(), 'public/llms.txt'), 'utf8')
 
 const GROUP_TITLES: Record<GovernmentRole['group'], string> = {
   leadership: 'Leadership',
@@ -69,6 +73,7 @@ function rocketMarkdown(constants: Record<string, unknown>): string {
 }
 
 const RENDERERS: Record<string, () => Promise<string>> = {
+  '/': async () => llmsTxt,
   '/government': async () => {
     const { roles, organizations } = await (await governmentGET()).json()
     return governmentMarkdown(roles, organizations)
@@ -93,5 +98,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/government', '/shops', '/heads', '/rocket'],
+  matcher: ['/', '/government', '/shops', '/heads', '/rocket'],
 }
