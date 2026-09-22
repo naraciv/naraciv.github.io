@@ -26,15 +26,14 @@ const HEADERS = {
  */
 export const revalidate = 300
 
+const json = <T>(path: string) =>
+  fetch(`${CIVINFO}${path}`, { headers: HEADERS }).then((r) => r.json() as Promise<T>)
+
 export async function GET() {
   const now = Date.now()
   const [sessions, accounts] = await Promise.all([
-    fetch(`${CIVINFO}/mc-sessions/all?after=${now - 3_600_000}`, { headers: HEADERS }).then(
-      (r) => r.json() as Promise<SessionsResponse>,
-    ),
-    fetch(`${CIVINFO}/mc-accounts/all?limit=1000000`, { headers: HEADERS }).then(
-      (r) => r.json() as Promise<AccountsResponse>,
-    ),
+    json<SessionsResponse>(`/mc-sessions/all?after=${now - 3_600_000}`),
+    json<AccountsResponse>(`/mc-accounts/all?limit=1000000`),
   ])
 
   const players = playersFromSessions(sessions, now)
