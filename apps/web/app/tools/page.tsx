@@ -8,7 +8,7 @@ import { site } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'Tools',
   description:
-    'Community tools and utilities for Civ players: snitch viewer, grid planner, and playtime statistics.',
+    'Community tools and utils for Civ players designed by someone who really likes graphs: snitch viewer, grid planner, rocket calc and playtime stats.',
   alternates: { canonical: '/tools' },
 }
 

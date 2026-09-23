@@ -9,7 +9,7 @@ import { benefits, lookFor, steps } from '@/content/joining'
 export const metadata: Metadata = {
   title: 'Join Nara',
   description:
-    'How to join Nara on CivMC: what we look for, the three steps to citizenship, and what citizens get.',
+    'Join Nara now now now now. Join Nara discord Nara.',
   alternates: { canonical: '/joining' },
 }
 

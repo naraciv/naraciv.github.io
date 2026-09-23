@@ -128,7 +128,7 @@ async function main() {
   const rows = Object.values(stats)
     .sort((a, b) => hours(b.weekly) - hours(a.weekly))
     .map((s) => [s.username, hours(s.weekly), hours(s.monthly), hours(s.allTime)].join(','))
-  fs.writeFileSync(csvPath, ['Username,Weekly,Monthly,AllTime', ...rows].join('\r\n'))
+  fs.writeFileSync(csvPath, ['Username,Weekly,Monthly,AllTime', ...rows].join('\n'))
   console.log(`Leaderboard updated successfully with ${rows.length} players.`)
 }
 

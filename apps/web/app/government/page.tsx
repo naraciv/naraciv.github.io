@@ -16,7 +16,7 @@ import { site } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'Government',
   description:
-    'The feudal shogunate of Nara: Shikken, Rensho, Taishō, the Daimyo who govern each province, the Komuin civil service, and the national organizations.',
+    'Overview on the big gobernment and how Nara functions. Plus info on our citizens, national orgs and provinces.',
   alternates: { canonical: '/government' },
 }
 

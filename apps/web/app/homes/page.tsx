@@ -5,9 +5,9 @@ import { JsonLd } from '@/components/JsonLd'
 import { site } from '@/lib/site'
 
 export const metadata: Metadata = {
-  title: 'Homes',
+  title: 'Civ-zillow',
   description:
-    'Property listings across Nara: homes, apartments, shops and hotel rooms for sale or rent, with prices, coordinates and owners, on the CivMC world map.',
+    'Your next home is in Nara',
   alternates: { canonical: '/homes' },
 }
 

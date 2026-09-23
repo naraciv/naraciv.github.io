@@ -6,7 +6,7 @@ import { site } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'Zorweth Rocket Calculator',
   description:
-    'Work out how much rocket fuel a CivMC rocket needs to reach Zorweth and back, for any number of passengers and any cargo, using the same rocket equation the server does.',
+    'Calcumalate how much fuel you need to get to Zorweth or to Main for your CivMC Rocket.',
   alternates: { canonical: '/rocket' },
 }
 

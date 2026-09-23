@@ -9,7 +9,7 @@ import { OnlinePlayers } from '@/components/OnlinePlayers'
 export const metadata: Metadata = {
   title: 'Player Stats',
   description:
-    'Who is online on CivMC right now, and the weekly, monthly and all-time playtime leaderboard.',
+    'Check out your stats, your enemies stats, your allies stats, see who is really online and when. Stalk your next raid target! See if you can get to the top of the weekly leaderboard (you ain\'t making it to all-time)',
   alternates: { canonical: '/stats' },
 }
 

@@ -7,7 +7,7 @@ import { site } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'Shops',
   description:
-    'Every player shop in Nara: what each one takes and gives, its coordinates, city and owner, as a searchable table and on the CivMC world map.',
+    'Shop Nara! Explore prices, trades, shopowners and more, both in List and Map form!',
   alternates: { canonical: '/shops' },
 }
 

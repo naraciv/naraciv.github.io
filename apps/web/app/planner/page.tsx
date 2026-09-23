@@ -8,7 +8,7 @@ import { site } from '@/lib/site'
 export const metadata: Metadata = {
   title: 'Grid Planner',
   description:
-    'Plan bastion, vault, snitch and mob repellator grids on the CivMC world map. Draw or import a selection border and export the exact coordinates of every zone.',
+    'Plan bastions, snitches and mob repellators grids on the CivMC world map. Import or draw borders to lay out exactly what you need.',
   alternates: { canonical: '/planner' },
 }
 

@@ -7,9 +7,9 @@ import { JsonLd } from '@/components/JsonLd'
 import { site } from '@/lib/site'
 
 export const metadata: Metadata = {
-  title: 'Head Shop',
+  title: 'MitsuHead Shop',
   description:
-    "Browse MitsuHeadCorp's decorative heads for sale in Nara: player heads, mob heads, decoration heads and more, with prices and where to find them.",
+    "Browse MitsuHeadCorp's decorative heads for sale in Shiro: player heads, mob heads, decoration heads and more more more.",
   alternates: { canonical: '/heads' },
   openGraph: {
     title: 'Nara | MitsuHeadCorp Shop',
