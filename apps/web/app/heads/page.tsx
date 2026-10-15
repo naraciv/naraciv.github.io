@@ -11,10 +11,7 @@ export const metadata: Metadata = {
   description:
     "Browse MitsuHeadCorp's decorative heads for sale in Shiro: player heads, mob heads, decoration heads and more more more.",
   alternates: { canonical: '/heads' },
-  openGraph: {
-    title: 'Nara | MitsuHeadCorp Shop',
-    images: [{ url: '/images/head_preview.webp', width: 1200, height: 630 }],
-  },
+  openGraph: { title: 'Nara | MitsuHeadCorp Shop' },
 }
 
 /*

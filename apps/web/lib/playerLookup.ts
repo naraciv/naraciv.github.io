@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { parseLeaderboard, topPlayers } from '@nara/lib'
+import { parseLeaderboard, topPlayers, type LeaderboardRow } from '@nara/lib'
 
 /**
  * Server-side player lookups for /stats/[player]. Reads the filesystem, so it
@@ -42,13 +42,20 @@ export function resolvePlayer(input: string): ResolvedPlayer | null {
   return known && known.name.toLowerCase() === input.toLowerCase() ? known : null
 }
 
+let rows: LeaderboardRow[] | null = null
+const leaderboard = () =>
+  (rows ??= parseLeaderboard(readFileSync(path.join(DATA, 'leaderboard.csv'), 'utf8')))
+
 let top: string[] | null = null
 /** 1-based all-time rank if the player is in the top ten, else null. */
 export function allTimeRank(name: string): number | null {
-  top ??= topPlayers(
-    parseLeaderboard(readFileSync(path.join(DATA, 'leaderboard.csv'), 'utf8')),
-    'allTime',
-  ).map((row) => row.username.toLowerCase())
+  top ??= topPlayers(leaderboard(), 'allTime').map((row) => row.username.toLowerCase())
   const index = top.indexOf(name.toLowerCase())
   return index < 0 ? null : index + 1
+}
+
+/** All-time hours from the daily leaderboard, or null when the player is not on it. */
+export function allTimeHours(name: string): number | null {
+  const lower = name.toLowerCase()
+  return leaderboard().find((row) => row.username.toLowerCase() === lower)?.allTime ?? null
 }

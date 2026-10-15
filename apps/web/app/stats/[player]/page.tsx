@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { permanentRedirect } from 'next/navigation'
-import { allTimeRank, resolvePlayer } from '@/lib/playerLookup'
+import { allTimeHours, allTimeRank, resolvePlayer } from '@/lib/playerLookup'
 import { PlayerProfile } from '@/components/PlayerProfile'
 
 /**
@@ -16,10 +16,18 @@ export async function generateMetadata({
 }: PageProps<'/stats/[player]'>): Promise<Metadata> {
   const { player } = await params
   const name = decodeURIComponent(player)
+  const hours = allTimeHours(name)
+  const rank = allTimeRank(name)
+  /* The link preview is one line: hours from the daily leaderboard, rank if top ten. */
+  const preview =
+    hours === null
+      ? 'CivMC playtime stats'
+      : `${Math.round(hours).toLocaleString('en-US')} hours on CivMC${rank ? ` · #${rank} all time` : ''}`
   return {
     title: `${name}: Player Stats`,
     description: `${name}'s CivMC playtime: hours played, when they are usually online, and their history month by month.`,
     robots: { index: false, follow: true },
+    openGraph: { title: name, description: preview, siteName: 'Nara Player Stats' },
   }
 }
 

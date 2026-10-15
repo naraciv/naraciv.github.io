@@ -41,10 +41,7 @@ export async function generateMetadata({ params }: PageProps<'/homes/[id]'>): Pr
       listing.listing_owner || 'the Naran government'
     }.`,
     alternates: { canonical: `/homes/${id}` },
-    openGraph: {
-      title: `${name}: ${kind} ${deal}`,
-      images: listing.images?.[0] ? [listing.images[0]] : undefined,
-    },
+    openGraph: { title: `${name}: ${kind} ${deal}` },
   }
 }
 

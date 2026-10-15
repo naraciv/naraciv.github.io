@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Heart, MapPin, Sun, Users } from 'lucide-react'
@@ -8,6 +9,17 @@ import { JsonLd } from '@/components/JsonLd'
 import { site } from '@/lib/site'
 
 export const revalidate = 300
+
+/* The only page whose link preview carries an image. */
+export const metadata: Metadata = {
+  openGraph: {
+    type: 'website',
+    siteName: site.name,
+    locale: 'en_US',
+    images: [{ url: '/images/nara_above.webp', alt: 'Shiroyama, the capital of Nara' }],
+  },
+  twitter: { card: 'summary_large_image' },
+}
 
 const pillars = [
   {
