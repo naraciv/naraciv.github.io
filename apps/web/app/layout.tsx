@@ -39,14 +39,9 @@ export const metadata: Metadata = {
   icons: { icon: '/images/nara_flag_white_border.svg' },
   /* No title, description or url here: Next fills og:title and og:description
      from each page's own metadata, and hard-coding them gave every page the
-     homepage's link preview. */
-  openGraph: {
-    type: 'website',
-    siteName: site.name,
-    locale: 'en_US',
-    images: [{ url: '/images/nara_above.webp', alt: 'Shiroyama, the capital of Nara' }],
-  },
-  twitter: { card: 'summary_large_image' },
+     homepage's link preview. No image either: only the homepage embeds one. */
+  openGraph: { type: 'website', siteName: site.name, locale: 'en_US' },
+  twitter: { card: 'summary' },
 }
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
