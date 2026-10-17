@@ -7,6 +7,7 @@ import {
   dailyTotals,
   history as toHistory,
   monthlyTotals,
+  sessionTime,
   summary,
   weeklySeries,
   type History,
@@ -119,6 +120,7 @@ export function PlayerProfile({
     const daily = dailyTotals(data.sessions)
     return {
       stats: summary(data, now),
+      session: sessionTime(data, now),
       daily,
       dailyPoints: dailySeries(daily),
       weeklyPoints: weeklySeries(daily),
@@ -166,6 +168,11 @@ export function PlayerProfile({
                   ? 'Unavailable'
                   : 'Loading...'}
             </Field>
+            {derived && (
+              <Field label="Session Time" valueClass="font-mono text-xl text-white">
+                {(derived.session / 3_600_000).toFixed(1)}/10h
+              </Field>
+            )}
             <Field label="First Join">
               {loading
                 ? 'Loading...'
