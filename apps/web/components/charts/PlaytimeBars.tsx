@@ -30,12 +30,16 @@ export function PlaytimeBars({
   weekly,
   firstSeen,
   granularity,
+  timeZone,
 }: {
   daily: Point[]
   weekly: Point[]
   firstSeen: number
   granularity: Granularity
+  timeZone?: 'UTC'
 }) {
+  const utc = timeZone === 'UTC'
+  const tickFormat = { month: 'short', year: '2-digit', timeZone } as const
   const [now] = useState(() => Date.now())
   const [range, setRange] = useState<[number, number] | null>(null)
 
@@ -68,10 +72,8 @@ export function PlaytimeBars({
               type="number"
               scale="time"
               domain={[from, to]}
-              ticks={monthTicks(from, to)}
-              tickFormatter={(t: number) =>
-                new Date(t).toLocaleDateString(undefined, { month: 'short', year: '2-digit' })
-              }
+              ticks={monthTicks(from, to, utc)}
+              tickFormatter={(t: number) => new Date(t).toLocaleDateString(undefined, tickFormat)}
               tick={{ fill: 'var(--color-ink-2)', fontSize: 11 }}
               stroke="rgba(75,85,99,0.6)"
             />
@@ -103,6 +105,7 @@ export function PlaytimeBars({
             month: 'short',
             day: 'numeric',
             year: 'numeric',
+            timeZone,
           })
         }
       />

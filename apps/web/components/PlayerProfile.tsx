@@ -6,7 +6,9 @@ import {
   dailySeries,
   dailyTotals,
   history as toHistory,
+  monthKey,
   monthlyTotals,
+  monthStart,
   sessionTime,
   summary,
   weeklySeries,
@@ -69,6 +71,7 @@ export function PlayerProfile({
   const [granularity, setGranularity] = useState<Granularity>('weekly')
   const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>('percent')
   const [showEmpty, setShowEmpty] = useState(false)
+  const [utc, setUtc] = useState(false)
   const [now] = useState(() => Date.now())
 
   useEffect(() => {
@@ -124,9 +127,11 @@ export function PlayerProfile({
       daily,
       dailyPoints: dailySeries(daily),
       weeklyPoints: weeklySeries(daily),
-      monthly: monthlyTotals(data.sessions),
+      monthly: monthlyTotals(data.sessions, utc),
     }
-  }, [data, now])
+  }, [data, now, utc])
+  const timeZone = utc ? 'UTC' : undefined
+  const fullDate = (t: number) => new Date(t).toLocaleString(undefined, { ...dateTime, timeZone })
 
   const online = data?.onlineSince != null
   const loading = !data && !failed
@@ -177,14 +182,14 @@ export function PlayerProfile({
               {loading
                 ? 'Loading...'
                 : derived?.stats.firstSeen
-                  ? new Date(derived.stats.firstSeen).toLocaleString(undefined, dateTime)
+                  ? fullDate(derived.stats.firstSeen)
                   : 'N/A'}
             </Field>
             <Field label="Last Join">
               {loading
                 ? 'Loading...'
                 : derived?.stats.lastSeen
-                  ? new Date(derived.stats.lastSeen).toLocaleString(undefined, dateTime)
+                  ? fullDate(derived.stats.lastSeen)
                   : 'N/A'}
             </Field>
             {derived?.stats.firstSeen &&
@@ -193,11 +198,7 @@ export function PlayerProfile({
                   Online
                 </Field>
               ) : (
-                data?.lastLogout && (
-                  <Field label="Last Logout">
-                    {new Date(data.lastLogout).toLocaleString(undefined, dateTime)}
-                  </Field>
-                )
+                data?.lastLogout && <Field label="Last Logout">{fullDate(data.lastLogout)}</Field>
               ))}
           </dl>
           <a
@@ -241,15 +242,22 @@ export function PlayerProfile({
       {/* ── Charts: one container, divided into weekly activity, the chart picker and months ── */}
       <div className="w-full divide-y divide-edge rounded-lg border border-edge bg-surface lg:w-3/4">
         <section aria-labelledby="activity-heading" className="p-4">
-          <h2 id="activity-heading" className="mb-3 text-xl font-bold text-white">
-            Hourly Activity
-          </h2>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 id="activity-heading" className="text-xl font-bold text-white">
+              Hourly Activity
+            </h2>
+            <Switch
+              label={<span className="text-xs text-ink-2">UTC</span>}
+              checked={utc}
+              onChange={setUtc}
+            />
+          </div>
           {failed ? (
             <p className="py-20 text-center text-danger">Failed to load player history.</p>
           ) : !data ? (
             <p className="py-20 text-center text-ink-3">Loading history...</p>
           ) : (
-            <ActivityWeek history={data} />
+            <ActivityWeek history={data} timeZone={timeZone} />
           )}
         </section>
 
@@ -298,7 +306,7 @@ export function PlayerProfile({
           ) : !data || !derived ? (
             <p className="py-20 text-center text-ink-3">Loading history...</p>
           ) : chart === 'heatmap' ? (
-            <PlaytimeHeatmap sessions={data.sessions} mode={heatmapMode} />
+            <PlaytimeHeatmap sessions={data.sessions} mode={heatmapMode} timeZone={timeZone} />
           ) : chart === 'calendar' ? (
             <PlaytimeCalendar
               daily={derived.daily}
@@ -312,6 +320,7 @@ export function PlayerProfile({
               weekly={derived.weeklyPoints}
               firstSeen={derived.stats.firstSeen}
               granularity={granularity}
+              timeZone={timeZone}
             />
           ) : (
             <p className="py-20 text-center text-ink-3">No playtime recorded.</p>
@@ -333,6 +342,7 @@ export function PlayerProfile({
               monthly={derived.monthly}
               showEmpty={showEmpty}
               now={now}
+              timeZone={timeZone}
             />
           )}
         </section>
@@ -364,23 +374,21 @@ function MonthlyList({
   monthly,
   showEmpty,
   now,
+  timeZone,
 }: {
   from: number
   monthly: Map<string, number>
   showEmpty: boolean
   now: number
+  timeZone?: 'UTC'
 }) {
+  const utc = timeZone === 'UTC'
+  const format = { month: 'short', year: 'numeric', timeZone } as const
   const rows: [string, number][] = []
-  const start = new Date(from)
-  for (
-    let d = new Date(start.getFullYear(), start.getMonth(), 1);
-    d.getTime() <= now;
-    d.setMonth(d.getMonth() + 1)
-  ) {
-    const hours =
-      monthly.get(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`) ?? 0
+  for (let t = monthStart(from, 0, utc); t <= now; t = monthStart(t, 1, utc)) {
+    const hours = monthly.get(monthKey(t, utc)) ?? 0
     if (showEmpty || hours > 0)
-      rows.push([d.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }), hours])
+      rows.push([new Date(t).toLocaleDateString(undefined, format), hours])
   }
   const columns = Array.from({ length: Math.ceil(rows.length / 6) }, (_, i) =>
     rows.slice(i * 6, i * 6 + 6),

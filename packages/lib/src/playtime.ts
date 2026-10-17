@@ -6,7 +6,8 @@
  * Two clocks are in play: day and week totals are bucketed in UTC
  * (calendar, bar chart, monthly list), while the heatmap and the weekly
  * activity chart use the viewer's local time, because "what hour do they play"
- * only means something in your own timezone.
+ * only means something in your own timezone. Every local-time function takes
+ * `utc` to use UTC instead, for the stats page's UTC toggle.
  */
 
 import { stillOnline, type SessionsResponse } from './players.ts'
@@ -128,12 +129,51 @@ export function weeklySeries(daily: Map<number, number>): Point[] {
     .map(([date, ms]) => ({ date, hours: Math.min(24 * 7, ms / HOUR) }))
 }
 
+/** `t`'s calendar fields in local time, or UTC. */
+function fields(t: number, utc: boolean) {
+  const d = new Date(t)
+  return utc
+    ? {
+        year: d.getUTCFullYear(),
+        month: d.getUTCMonth(),
+        date: d.getUTCDate(),
+        day: d.getUTCDay(),
+        hour: d.getUTCHours(),
+      }
+    : {
+        year: d.getFullYear(),
+        month: d.getMonth(),
+        date: d.getDate(),
+        day: d.getDay(),
+        hour: d.getHours(),
+      }
+}
+
+const midnight = (year: number, month: number, date: number, utc: boolean) =>
+  utc ? Date.UTC(year, month, date) : new Date(year, month, date).getTime()
+
+function hourStart(t: number, utc: boolean) {
+  const d = new Date(t)
+  return utc ? d.setUTCMinutes(0, 0, 0) : d.setMinutes(0, 0, 0)
+}
+
+/** "YYYY-MM" of the month `t` falls in. */
+export function monthKey(t: number, utc = false) {
+  const { year, month } = fields(t, utc)
+  return `${year}-${String(month + 1).padStart(2, '0')}`
+}
+
+/** The 1st of the month `months` after `t`'s. */
+export function monthStart(t: number, months: number, utc = false) {
+  const { year, month } = fields(t, utc)
+  return midnight(year, month + months, 1, utc)
+}
+
 /** Hours per local calendar month, keyed "YYYY-MM", by the month each session began. */
-export function monthlyTotals(sessions: Session[]): Map<string, number> {
+export function monthlyTotals(sessions: Session[], utc = false): Map<string, number> {
   const months = new Map<string, number>()
   for (const { login, logout } of sessions) {
-    const d = new Date(login)
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const key = monthKey(login, utc)
     months.set(key, (months.get(key) ?? 0) + (logout - login) / HOUR)
   }
   return months
@@ -146,14 +186,13 @@ export const clip = (sessions: Session[], from: number, to: number) =>
     .map((s) => ({ login: Math.max(s.login, from), logout: Math.min(s.logout, to) }))
 
 /** Minutes played in each [local weekday 0=Sun][hour] slot. */
-export function heatmap(sessions: Session[]): number[][] {
+export function heatmap(sessions: Session[], utc = false): number[][] {
   const grid = Array.from({ length: 7 }, () => Array<number>(24).fill(0))
   for (const { login, logout } of sessions) {
     for (let t = login; t < logout;) {
-      const d = new Date(t)
-      const pastHour = d.getMinutes() * 60_000 + d.getSeconds() * 1000 + d.getMilliseconds()
-      const end = Math.min(logout, t - pastHour + HOUR)
-      grid[d.getDay()][d.getHours()] += (end - t) / 60_000
+      const { day, hour } = fields(t, utc)
+      const end = Math.min(logout, hourStart(t, utc) + HOUR)
+      grid[day][hour] += (end - t) / 60_000
       t = end
     }
   }
@@ -165,10 +204,10 @@ export function heatmap(sessions: Session[]): number[][] {
  * of the weeks with at least five hours played, the share in which they were
  * online at any point in that hour.
  */
-export function logOnChance(sessions: Session[]): { grid: number[][]; weeks: number } {
+export function logOnChance(sessions: Session[], utc = false): { grid: number[][]; weeks: number } {
   const byWeek = new Map<number, Session[]>()
   for (const s of sessions) {
-    const week = localWeekStart(s.login, false)
+    const week = localWeekStart(s.login, false, utc)
     byWeek.set(week, [...(byWeek.get(week) ?? []), s])
   }
   const qualifying = [...byWeek.values()].filter(
@@ -179,11 +218,9 @@ export function logOnChance(sessions: Session[]): { grid: number[][]; weeks: num
   for (const list of qualifying) {
     const seen = new Set<number>()
     for (const { login, logout } of list) {
-      const cursor = new Date(login)
-      cursor.setMinutes(0, 0, 0)
-      for (let t = cursor.getTime(); t < logout; t += HOUR) {
-        const d = new Date(t)
-        seen.add(d.getDay() * 24 + d.getHours())
+      for (let t = hourStart(login, utc); t < logout; t += HOUR) {
+        const { day, hour } = fields(t, utc)
+        seen.add(day * 24 + hour)
       }
     }
     for (const slot of seen) grid[Math.floor(slot / 24)][slot % 24]++
@@ -239,14 +276,14 @@ export const weekStartsSunday = (timeZone: string) =>
   SUNDAY_START_ZONES.some((zone) => timeZone.startsWith(zone))
 
 /** Local midnight `days` calendar days after `t`'s — not `t + days * 24h`, which drifts an hour across DST. */
-export function addLocalDays(t: number, days: number) {
-  const d = new Date(t)
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + days).getTime()
+export function addLocalDays(t: number, days: number, utc = false) {
+  const { year, month, date } = fields(t, utc)
+  return midnight(year, month, date + days, utc)
 }
 
-export function localWeekStart(t: number, sundayStart: boolean) {
-  const day = new Date(t).getDay()
-  return addLocalDays(t, -(sundayStart ? day : (day + 6) % 7))
+export function localWeekStart(t: number, sundayStart: boolean, utc = false) {
+  const { day } = fields(t, utc)
+  return addLocalDays(t, -(sundayStart ? day : (day + 6) % 7), utc)
 }
 
 export type ActivityWeek = { start: number; end: number; totalMs: number; sessions: Session[] }
@@ -259,11 +296,12 @@ export function activityWeeks(
   { sessions, onlineSince }: History,
   sundayStart: boolean,
   now: number,
+  utc = false,
 ): ActivityWeek[] {
   const weeks = new Map<number, ActivityWeek>()
   const add = (from: number, to: number, session?: Session) => {
-    for (let start = localWeekStart(from, sundayStart); start < to;) {
-      const end = addLocalDays(start, 7)
+    for (let start = localWeekStart(from, sundayStart, utc); start < to;) {
+      const end = addLocalDays(start, 7, utc)
       if (!weeks.has(start)) weeks.set(start, { start, end, totalMs: 0, sessions: [] })
       const week = weeks.get(start)!
       week.totalMs += Math.min(to, end) - Math.max(from, start)
@@ -277,16 +315,15 @@ export function activityWeeks(
 }
 
 /** Month labels for a date range: every 1, 2, 4 or 6 months as the span grows. */
-export function monthTicks(from: number, to: number): number[] {
+export function monthTicks(from: number, to: number, utc = false): number[] {
   const months = (to - from) / (30.44 * DAY)
   const step = months <= 6 ? 1 : months <= 12 ? 2 : months <= 24 ? 4 : 6
-  const start = new Date(from)
-  let cursor = new Date(start.getFullYear(), start.getMonth(), 1)
-  if (cursor.getTime() < from) cursor = new Date(start.getFullYear(), start.getMonth() + step, 1)
+  let cursor = monthStart(from, 0, utc)
+  if (cursor < from) cursor = monthStart(from, step, utc)
   const ticks: number[] = []
-  while (cursor.getTime() <= to) {
-    ticks.push(cursor.getTime())
-    cursor = new Date(cursor.getFullYear(), cursor.getMonth() + step, 1)
+  while (cursor <= to) {
+    ticks.push(cursor)
+    cursor = monthStart(cursor, step, utc)
   }
   return ticks
 }
