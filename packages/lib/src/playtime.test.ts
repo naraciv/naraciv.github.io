@@ -112,6 +112,25 @@ test('local days and weeks survive a DST change', () => {
   process.env.TZ = zone
 })
 
+test('utc mode ignores the local timezone', () => {
+  const zone = process.env.TZ
+  process.env.TZ = 'America/New_York'
+  const s = { login: at('2026-09-07T02:30Z'), logout: at('2026-09-07T03:00Z') }
+  /* Monday 02:30 UTC is still Sunday 22:30 in New York. */
+  assert.equal(heatmap([s], true)[1][2], 30)
+  assert.equal(heatmap([s])[0][22], 30)
+  assert.equal(localWeekStart(s.login, false, true), at('2026-09-07T00:00Z'))
+  assert.deepEqual(
+    [...monthlyTotals([{ login: at('2026-10-01T01:00Z'), logout: at('2026-10-01T02:00Z') }], true)],
+    [['2026-10', 1]],
+  )
+  assert.deepEqual(monthTicks(at('2026-01-15T00:00Z'), at('2026-03-02T00:00Z'), true), [
+    at('2026-02-01T00:00Z'),
+    at('2026-03-01T00:00Z'),
+  ])
+  process.env.TZ = zone
+})
+
 test('colours and ticks', () => {
   assert.equal(heatColor(0, 10), 'rgba(55, 65, 81, 0.3)')
   assert.equal(heatColor(10, 10), 'hsla(0, 75%, 60%, 1)')
@@ -133,9 +152,12 @@ test('session time resets at 10:15 UTC and after a 10-hour kick', () => {
   assert.equal(off([s(-1, 2)]), 2)
   /* Logins add up. */
   assert.equal(off([s(1, 3), s(4, 5.5)]), 3.5)
-  /* Kicked at ~10h (9h50 here), then two more hours: a new session. */
-  assert.equal(off([s(1, 10 + 50 / 60), s(11, 13)]), 2)
-  /* Online now, 11h since the reset with no logout: one hour into the second session. */
+  /* Kicked at ~10h (9h57 here), then two more hours: a new session. */
+  assert.equal(off([s(1, 10 + 57 / 60), s(11, 13)]), 2)
+  /* Logged off at 9h50: no kick, so the next hour fills the session. */
+  assert.equal(off([s(1, 10 + 50 / 60), s(11, 12)]), 10)
+  /* 11h straight without a kick (bypass): full, not a new session. */
+  assert.equal(off([s(0, 11), s(12, 13)]), 10)
   const online = { sessions: [], onlineSince: r, lastLogout: null }
-  assert.equal(sessionTime(online, r + 11 * H) / H, 1)
+  assert.equal(sessionTime(online, r + 11 * H) / H, 10)
 })

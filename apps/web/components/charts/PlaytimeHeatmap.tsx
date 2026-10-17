@@ -7,7 +7,7 @@ import { DataTable } from './DataTable'
 import { Tooltip, useTooltip } from './Tooltip'
 
 /**
- * Hour-of-week heatmap in the viewer's local time, over a chosen date range.
+ * Hour-of-week heatmap in the viewer's local time (or UTC), over a chosen date range.
  * Three readings: share of total playtime, total hours, or the chance they
  * are online in that hour in a typical active week.
  */
@@ -16,10 +16,19 @@ export type HeatmapMode = 'percent' | 'total' | 'chance'
 
 const DAY = 86_400_000
 const TWO_MONTHS = 60 * DAY
-const monthYear = (t: number) =>
-  new Date(t).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+const monthYear = (t: number, timeZone?: 'UTC') =>
+  new Date(t).toLocaleDateString(undefined, { month: 'long', year: 'numeric', timeZone })
 
-export function PlaytimeHeatmap({ sessions, mode }: { sessions: Session[]; mode: HeatmapMode }) {
+export function PlaytimeHeatmap({
+  sessions,
+  mode,
+  timeZone,
+}: {
+  sessions: Session[]
+  mode: HeatmapMode
+  timeZone?: 'UTC'
+}) {
+  const utc = timeZone === 'UTC'
   const { tip, bind } = useTooltip()
   const first = sessions[0]?.login ?? 0
   const last = sessions.at(-1)?.logout ?? 0
@@ -34,8 +43,8 @@ export function PlaytimeHeatmap({ sessions, mode }: { sessions: Session[]; mode:
       last,
     ]
     const inRange = clip(sessions, range[0], range[1])
-    const minutes = heatmap(inRange)
-    const chance = logOnChance(inRange)
+    const minutes = heatmap(inRange, utc)
+    const chance = logOnChance(inRange, utc)
     const shown = mode === 'chance' ? chance.grid : minutes
     return {
       range,
@@ -44,7 +53,7 @@ export function PlaytimeHeatmap({ sessions, mode }: { sessions: Session[]; mode:
       total: minutes.flat().reduce((a, b) => a + b, 0),
       weeks: chance.weeks,
     }
-  }, [sessions, first, last, chosen, mode])
+  }, [sessions, first, last, chosen, mode, utc])
 
   const labels = useMemo(() => {
     const use12h = /[ap]/i.test(
@@ -57,9 +66,9 @@ export function PlaytimeHeatmap({ sessions, mode }: { sessions: Session[]; mode:
       hours: Array.from({ length: 24 }, (_, h) =>
         new Date(2000, 0, 1, h).toLocaleTimeString(undefined, { hour: 'numeric', hour12: use12h }),
       ),
-      zone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'local',
+      zone: timeZone ?? (Intl.DateTimeFormat().resolvedOptions().timeZone || 'local'),
     }
-  }, [])
+  }, [timeZone])
 
   if (!sessions.length)
     return <p className="py-20 text-center text-ink-3">No heatmap data available.</p>
@@ -135,7 +144,7 @@ export function PlaytimeHeatmap({ sessions, mode }: { sessions: Session[]; mode:
         </div>
       </div>
       <p className="mt-2 text-center text-xs text-ink-3">
-        Times shown in your local timezone ({labels.zone})
+        Times shown in {utc ? 'UTC' : `your local timezone (${labels.zone})`}
       </p>
 
       <RangeSlider
@@ -145,8 +154,8 @@ export function PlaytimeHeatmap({ sessions, mode }: { sessions: Session[]; mode:
         step={DAY}
         value={range}
         onChange={setChosen}
-        ticks={monthTicks(first, last)}
-        format={monthYear}
+        ticks={monthTicks(first, last, utc)}
+        format={(t) => monthYear(t, timeZone)}
       />
 
       {mode === 'chance' && (

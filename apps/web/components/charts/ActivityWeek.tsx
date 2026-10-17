@@ -13,18 +13,19 @@ import { DataTable } from './DataTable'
 import { Tooltip, useTooltip } from './Tooltip'
 
 /**
- * One week of sessions as blocks on a 24-hour grid, in local time, with the
+ * One week of sessions as blocks on a 24-hour grid, in local time (or UTC), with the
  * live session drawn in green up to now.
  */
 const CHART_H = 400
 const HOUR_H = CHART_H / 24
 
-export function ActivityWeek({ history }: { history: History }) {
+export function ActivityWeek({ history, timeZone }: { history: History; timeZone?: 'UTC' }) {
   const [now] = useState(() => Date.now())
-  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'local'
+  const utc = timeZone === 'UTC'
+  const zone = timeZone ?? (Intl.DateTimeFormat().resolvedOptions().timeZone || 'local')
   const weeks = useMemo(
-    () => activityWeeks(history, weekStartsSunday(zone), now),
-    [history, zone, now],
+    () => activityWeeks(history, weekStartsSunday(zone), now, utc),
+    [history, zone, now, utc],
   )
   const [chosen, setChosen] = useState<number | null>(null)
   const picker = useRef<HTMLDialogElement>(null)
@@ -38,7 +39,7 @@ export function ActivityWeek({ history }: { history: History }) {
     chosen === null ? weeks.length - 1 : weeks.findIndex((w) => w.start === chosen),
   )
   const week = weeks[index]
-  const todayStart = localWeekStart(now, weekStartsSunday(zone))
+  const todayStart = localWeekStart(now, weekStartsSunday(zone), utc)
   const today = weeks.some((w) => w.start === todayStart) ? todayStart : weeks.at(-1)!.start
 
   const use12h = /[ap]/i.test(
@@ -49,8 +50,9 @@ export function ActivityWeek({ history }: { history: History }) {
       hour: 'numeric',
       minute: '2-digit',
       hour12: use12h,
+      timeZone,
     })
-  const short = { month: 'short', day: 'numeric' } as const
+  const short = { month: 'short', day: 'numeric', timeZone } as const
   const span = (w: (typeof weeks)[number], opts: Intl.DateTimeFormatOptions = short) =>
     `${new Date(w.start).toLocaleDateString(undefined, opts)} – ${new Date(w.end - 1).toLocaleDateString(undefined, opts)}`
   const hm = (ms: number) => {
@@ -79,7 +81,8 @@ export function ActivityWeek({ history }: { history: History }) {
             aria-label="Pick a week"
             className="rounded-md px-3 py-1.5 text-sm font-semibold text-[#e5e7eb] transition-colors hover:bg-surface-2"
           >
-            {span(week)}, {new Date(week.end - 1).getFullYear()}
+            {span(week)},{' '}
+            {new Date(week.end - 1).toLocaleDateString(undefined, { year: 'numeric', timeZone })}
           </button>
           <button
             type="button"
@@ -118,13 +121,13 @@ export function ActivityWeek({ history }: { history: History }) {
         >
           <span />
           {Array.from({ length: 7 }, (_, i) => {
-            const d = new Date(addLocalDays(week.start, i))
+            const d = new Date(addLocalDays(week.start, i, utc))
             return (
               <span
                 key={i}
                 className="flex h-9 flex-col items-center justify-center text-[11px] leading-[18px] font-semibold text-ink-2"
               >
-                <span>{d.toLocaleDateString(undefined, { weekday: 'short' })}</span>
+                <span>{d.toLocaleDateString(undefined, { weekday: 'short', timeZone })}</span>
                 <span className="text-[10px] font-normal text-ink-3">
                   {d.toLocaleDateString(undefined, short)}
                 </span>
@@ -154,8 +157,8 @@ export function ActivityWeek({ history }: { history: History }) {
 
           {Array.from({ length: 7 }, (_, i) => {
             /* Calendar days, not 24h steps: a DST day is 23 or 25 hours. */
-            const dayStart = addLocalDays(week.start, i)
-            const dayEnd = addLocalDays(week.start, i + 1)
+            const dayStart = addLocalDays(week.start, i, utc)
+            const dayEnd = addLocalDays(week.start, i + 1, utc)
             const dayMs = dayEnd - dayStart
             const block = (from: number, to: number) => ({
               top: ((Math.max(from, dayStart) - dayStart) / dayMs) * CHART_H,
@@ -228,7 +231,7 @@ export function ActivityWeek({ history }: { history: History }) {
         </div>
       </div>
       <p className="mt-3 text-center text-xs text-ink-3">
-        Times shown in your local timezone ({zone})
+        Times shown in {utc ? 'UTC' : `your local timezone (${zone})`}
       </p>
 
       <dialog
@@ -250,7 +253,7 @@ export function ActivityWeek({ history }: { history: History }) {
             <X aria-hidden className="size-5" />
           </button>
         </div>
-        {byMonth(weeks).map(([month, list]) => (
+        {byMonth(weeks, timeZone).map(([month, list]) => (
           <div key={month} className="mb-3">
             <div className="mb-1 text-xs font-semibold text-ink-3">{month}</div>
             {list.map((w) => (
@@ -264,7 +267,7 @@ export function ActivityWeek({ history }: { history: History }) {
                 }}
                 className={`flex w-full justify-between rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-surface-2 ${w.start === week.start ? 'bg-surface-2 font-semibold text-white' : 'text-ink'}`}
               >
-                <span>{span(w, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                <span>{span(w, { weekday: 'short', ...short })}</span>
                 <span className="text-ink-2">{(w.totalMs / 3_600_000).toFixed(1)}h</span>
               </button>
             ))}
@@ -297,12 +300,13 @@ export function ActivityWeek({ history }: { history: History }) {
 }
 
 /** Newest month first, newest week first within it. Map.groupBy would do this, but not in Safari < 17.4. */
-function byMonth<T extends { start: number }>(weeks: T[]): [string, T[]][] {
+function byMonth<T extends { start: number }>(weeks: T[], timeZone?: string): [string, T[]][] {
   const groups = new Map<string, T[]>()
   for (const week of [...weeks].reverse()) {
     const month = new Date(week.start).toLocaleDateString(undefined, {
       month: 'long',
       year: 'numeric',
+      timeZone,
     })
     groups.set(month, [...(groups.get(month) ?? []), week])
   }
