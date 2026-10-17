@@ -43,7 +43,8 @@ export function CanvasLayer({
   const repaintRef = useRef<() => void>(() => {})
 
   useEffect(() => {
-    if (!map) return
+    /* A map torn down mid-remount (StrictMode, fast refresh) has no panes; the new one re-runs this. */
+    if (!map?.getPanes()) return
 
     const canvas = L.DomUtil.create('canvas', className ?? '')
     canvas.style.position = 'absolute'

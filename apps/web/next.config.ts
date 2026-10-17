@@ -33,6 +33,11 @@ const nextConfig: NextConfig = {
     },
   ],
   headers: async () => [
+    // The ice road page and its JSMacros script change often; keep Vercel's CDN from caching them.
+    {
+      source: '/iceroads/:path*',
+      headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }],
+    },
     {
       // RFC 9727 agent discovery: point at the llms.txt summary and the API catalog.
       source: '/',

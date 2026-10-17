@@ -15,6 +15,7 @@ import {
   logOnChance,
   monthlyTotals,
   monthTicks,
+  sessionTime,
   summary,
   weeklySeries,
   weekStartsSunday,
@@ -119,4 +120,22 @@ test('colours and ticks', () => {
     at('2026-03-01T00:00Z'),
     at('2026-04-01T00:00Z'),
   ])
+})
+
+test('session time resets at 10:15 UTC and after a 10-hour kick', () => {
+  /* Hours relative to the 10:15 UTC reset. */
+  const r = at('2026-09-02T10:15Z')
+  const s = (from: number, to: number) => ({ login: r + from * H, logout: r + to * H })
+  const off = (sessions: ReturnType<typeof s>[]) =>
+    sessionTime({ sessions, onlineSince: null, lastLogout: null }, r + 13 * H) / H
+  /* Before the reset doesn't count; a session across it counts from 10:15. */
+  assert.equal(off([s(-5, -1)]), 0)
+  assert.equal(off([s(-1, 2)]), 2)
+  /* Logins add up. */
+  assert.equal(off([s(1, 3), s(4, 5.5)]), 3.5)
+  /* Kicked at ~10h (9h50 here), then two more hours: a new session. */
+  assert.equal(off([s(1, 10 + 50 / 60), s(11, 13)]), 2)
+  /* Online now, 11h since the reset with no logout: one hour into the second session. */
+  const online = { sessions: [], onlineSince: r, lastLogout: null }
+  assert.equal(sessionTime(online, r + 11 * H) / H, 1)
 })

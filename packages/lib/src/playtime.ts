@@ -73,6 +73,26 @@ export function summary({ sessions, onlineSince }: History, now: number): Summar
   }
 }
 
+/** Sessions reset daily at 10:15 UTC (06:15 Eastern), when players can log back in after the restart. */
+const RESTART = 10 * HOUR + 15 * 60_000
+const SESSION_LIMIT = 10 * HOUR
+
+/**
+ * ms used of the current 10-hour session. The budget resets at each restart,
+ * and on any logout within 15 minutes of (or past) the 10-hour kick — whatever
+ * runs past 10h is the start of the next session.
+ */
+export function sessionTime({ sessions, onlineSince }: History, now: number): number {
+  const restart = Math.floor((now - RESTART) / DAY) * DAY + RESTART
+  let used = 0
+  for (const s of clip(sessions, restart, now)) {
+    used += s.logout - s.login
+    if (used >= SESSION_LIMIT - 15 * 60_000) used = Math.max(0, used - SESSION_LIMIT)
+  }
+  if (onlineSince) used += now - Math.max(onlineSince, restart)
+  return used % SESSION_LIMIT
+}
+
 /** ms played per UTC day, a session split across midnight counting on both days. */
 export function dailyTotals(sessions: Session[]): Map<number, number> {
   const days = new Map<number, number>()

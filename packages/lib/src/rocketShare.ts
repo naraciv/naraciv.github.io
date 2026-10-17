@@ -117,16 +117,16 @@ function unpackLoad([players, ...flat]: unknown[]): TripLoad {
   return { players, rows } as TripLoad
 }
 
-async function pipe(bytes: Uint8Array, stream: CompressionStream | DecompressionStream) {
+export async function pipe(bytes: Uint8Array, stream: CompressionStream | DecompressionStream) {
   const out = new Response(new Blob([bytes as BlobPart]).stream().pipeThrough(stream))
   return new Uint8Array(await out.arrayBuffer())
 }
-const toBase64Url = (bytes: Uint8Array) =>
+export const toBase64Url = (bytes: Uint8Array) =>
   btoa(String.fromCharCode(...bytes))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '')
-const fromBase64Url = (code: string) =>
+export const fromBase64Url = (code: string) =>
   Uint8Array.from(atob(code.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0))
 
 export async function encodeTrip(config: TripConfig): Promise<string> {

@@ -61,7 +61,8 @@ export function MarkerLayer<T>({
   })
 
   useEffect(() => {
-    if (!map) return
+    /* A map torn down mid-remount (StrictMode, fast refresh) has no panes; the new one re-runs this. */
+    if (!map?.getPanes()) return
 
     markersRef.current = new Map()
     const markers = items.map((item) => {
