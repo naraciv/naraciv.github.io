@@ -133,9 +133,12 @@ test('session time resets at 10:15 UTC and after a 10-hour kick', () => {
   assert.equal(off([s(-1, 2)]), 2)
   /* Logins add up. */
   assert.equal(off([s(1, 3), s(4, 5.5)]), 3.5)
-  /* Kicked at ~10h (9h50 here), then two more hours: a new session. */
-  assert.equal(off([s(1, 10 + 50 / 60), s(11, 13)]), 2)
-  /* Online now, 11h since the reset with no logout: one hour into the second session. */
+  /* Kicked at ~10h (9h57 here), then two more hours: a new session. */
+  assert.equal(off([s(1, 10 + 57 / 60), s(11, 13)]), 2)
+  /* Logged off at 9h50: no kick, so the next hour fills the session. */
+  assert.equal(off([s(1, 10 + 50 / 60), s(11, 12)]), 10)
+  /* 11h straight without a kick (bypass): full, not a new session. */
+  assert.equal(off([s(0, 11), s(12, 13)]), 10)
   const online = { sessions: [], onlineSince: r, lastLogout: null }
-  assert.equal(sessionTime(online, r + 11 * H) / H, 1)
+  assert.equal(sessionTime(online, r + 11 * H) / H, 10)
 })

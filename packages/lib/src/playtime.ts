@@ -79,18 +79,18 @@ const SESSION_LIMIT = 10 * HOUR
 
 /**
  * ms used of the current 10-hour session. The budget resets at each restart,
- * and on any logout within 15 minutes of (or past) the 10-hour kick — whatever
- * runs past 10h is the start of the next session.
+ * and on a logout within 5 minutes of the 10-hour mark (the kick). Playing well
+ * past 10h without a kick (staff bypass) just reads as full.
  */
 export function sessionTime({ sessions, onlineSince }: History, now: number): number {
   const restart = Math.floor((now - RESTART) / DAY) * DAY + RESTART
   let used = 0
   for (const s of clip(sessions, restart, now)) {
     used += s.logout - s.login
-    if (used >= SESSION_LIMIT - 15 * 60_000) used = Math.max(0, used - SESSION_LIMIT)
+    if (Math.abs(used - SESSION_LIMIT) <= 5 * 60_000) used = 0
   }
   if (onlineSince) used += now - Math.max(onlineSince, restart)
-  return used % SESSION_LIMIT
+  return Math.min(used, SESSION_LIMIT)
 }
 
 /** ms played per UTC day, a session split across midnight counting on both days. */
