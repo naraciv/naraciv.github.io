@@ -45,10 +45,11 @@ export function DiscordButton({
   )
 }
 
-/** The pill fixed to the bottom-left of every page, expanding on hover. */
+/** The pill fixed to the bottom-left of every page, expanding on hover.
+ *  A page can opt out with a `data-hide-discord` element (/iceroads, where it covers the map). */
 export function DiscordFloatingButton({ href, label }: { href: string; label: string }) {
   return (
-    <div className="group fixed bottom-4 left-4 z-50 sm:bottom-10 sm:left-6">
+    <div className="group fixed bottom-4 left-4 z-50 sm:bottom-10 sm:left-6 [body:has([data-hide-discord])_&]:hidden">
       <a
         href={href}
         target="_blank"

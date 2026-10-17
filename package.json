@@ -12,7 +12,7 @@
     "start": "pnpm --filter web start",
     "prepare": "git config core.hooksPath .githooks",
     "lint": "pnpm --filter web --filter studio lint",
-    "test": "node --test packages/**/src/*.test.ts apps/web/components/map/*.test.ts",
+    "test": "node --test packages/**/src/*.test.ts apps/web/components/map/*.test.ts apps/web/app/iceroads/*.test.mjs",
     "studio": "pnpm --filter studio dev",
     "studio:build": "pnpm --filter studio build",
     "studio:deploy": "pnpm --filter studio deploy",
