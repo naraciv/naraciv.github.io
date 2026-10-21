@@ -64,7 +64,7 @@ function readItem(text: string, lore: string, icon: string | null): ShopItem {
   ] as const) {
     if (!rest.includes(keyword)) continue
     label += ` (${marker})`
-    rest = rest.replace(new RegExp(`${keyword},?\s*`, 'gi'), '').trim()
+    rest = rest.replace(new RegExp(`${keyword},?\\s*`, 'gi'), '').trim()
   }
 
   return {

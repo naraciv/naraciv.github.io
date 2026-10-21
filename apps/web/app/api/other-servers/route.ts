@@ -34,7 +34,9 @@ const get = (url: string) => fetch(url, { cache: 'no-store' })
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams
-  const lookup = lookups[params.get('server') ?? '']
+  const server = params.get('server') ?? ''
+  /* Own keys only, so `?server=constructor` is a 400 rather than a call to Object. */
+  const lookup = Object.hasOwn(lookups, server) ? lookups[server] : undefined
   const name = params.get('name') ?? ''
   const uuid = params.get('uuid')?.replace(/-/g, '').toLowerCase() || null
   if (!lookup || !/^\w{1,16}$/.test(name) || (uuid && !/^[0-9a-f]{32}$/.test(uuid)))

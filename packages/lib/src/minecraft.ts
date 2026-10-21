@@ -58,7 +58,7 @@ const slug = (name: string) =>
 export function itemRegistryName(item: string | undefined, lore = ''): string | null {
   if (!item) return null
 
-  const quotedVariant = item.match(/"([^"]*)"?\s*$/)?.[1]
+  const quotedVariant = item.trimEnd().match(/"([^"]*)"?$/)?.[1]
   const cleaned = item
     .trim()
     /* A leading count, including ranges: "42-62 Iron Ingot". */
