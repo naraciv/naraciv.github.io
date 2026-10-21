@@ -34,7 +34,7 @@ import { PlaytimeHeatmap, type HeatmapMode } from './charts/PlaytimeHeatmap'
 
 const API = 'https://api.civinfo.net'
 /** Servers checked by /api/other-servers, one request each so each caches on its own. */
-const OTHER_SERVERS = ['hcfr', 'loka'] as const
+const OTHER_SERVERS = ['hcfr', 'loka', 'hypixel'] as const
 const CHARTS = [
   ['heatmap', 'Heatmap'],
   ['calendar', 'Calendar'],
@@ -61,10 +61,13 @@ export function PlayerProfile({
   name,
   uuid: knownUuid,
   rank,
+  hypixel,
 }: {
   name: string
   uuid: string | null
   rank: number | null
+  /** Whether the server has a Hypixel API key; without one Hypixel is left out. */
+  hypixel: boolean
 }) {
   const [data, setData] = useState<History | null>(null)
   const [failed, setFailed] = useState(false)
@@ -75,8 +78,9 @@ export function PlayerProfile({
   const [showEmpty, setShowEmpty] = useState(false)
   const [utc, setUtc] = useState(false)
   const [now] = useState(() => Date.now())
+  /* 'off' is a server this site can't check at all, left out of the row. */
   const [servers, setServers] = useState<
-    Partial<Record<(typeof OTHER_SERVERS)[number], string | boolean | null>>
+    Partial<Record<(typeof OTHER_SERVERS)[number], string | boolean | null | 'off'>>
   >({})
 
   useEffect(() => {
@@ -126,18 +130,25 @@ export function PlayerProfile({
   useEffect(() => {
     let alive = true
     for (const server of OTHER_SERVERS) {
+      /* Hypixel can only be asked by UUID; if one turns up later, this runs again. */
+      if (server === 'hypixel' && !(hypixel && uuid)) continue
       const query = new URLSearchParams({ server, name, ...(uuid && { uuid }) })
-      const set = (played: string | boolean | null) =>
+      const set = (played: string | boolean | null | 'off') =>
         alive && setServers((prev) => ({ ...prev, [server]: played }))
       fetch(`/api/other-servers?${query}`)
-        .then((res) => (res.ok ? res.json() : Promise.reject()))
-        .then((json: { played: string | boolean | null }) => set(json.played))
+        /* 503: the site can't check this server at all (a rejected key), so hide it. */
+        .then((res) =>
+          res.ok ? res.json() : res.status === 503 ? { played: 'off' } : Promise.reject(),
+        )
+        .then((json: { played: string | boolean | null | 'off' }) => set(json.played))
         .catch(() => set(null))
     }
     return () => {
       alive = false
     }
-  }, [name, uuid])
+  }, [name, uuid, hypixel])
+
+  const showHypixel = hypixel && uuid && servers.hypixel !== 'off'
 
   const derived = useMemo(() => {
     if (!data) return null
@@ -222,9 +233,10 @@ export function PlayerProfile({
                 data?.lastLogout && <Field label="Last Logout">{fullDate(data.lastLogout)}</Field>
               ))}
             <Field label="Also Played On">
-              <ul className="flex gap-6">
+              <ul className="flex flex-wrap gap-x-6 gap-y-2">
                 <ServerCheck label="HCFR" played={servers.hcfr} />
                 <ServerCheck label="Loka" played={servers.loka} />
+                {showHypixel && <ServerCheck label="Hypixel" played={servers.hypixel} />}
               </ul>
             </Field>
           </dl>
@@ -263,6 +275,10 @@ export function PlayerProfile({
             .
           </p>
           <p className="text-sm">Performance errors are likely my fault.</p>
+          {/* Hypixel's API policy requires saying so. */}
+          {showHypixel && (
+            <p className="text-sm font-bold">Not affiliated with or endorsed by Hypixel.</p>
+          )}
         </section>
       </aside>
 
