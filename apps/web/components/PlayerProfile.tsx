@@ -274,9 +274,11 @@ export function PlayerProfile({
             </a>
             .
           </p>
-          {/* Hypixel's API policy requires saying so. */}
-          {showHypixel && <p className="text-sm">Not affiliated with or endorsed by Hypixel.</p>}
           <p className="text-sm">Performance errors are likely my fault.</p>
+          {/* Hypixel's API policy requires saying so. */}
+          {showHypixel && (
+            <p className="text-sm font-bold">Not affiliated with or endorsed by Hypixel.</p>
+          )}
         </section>
       </aside>
 
