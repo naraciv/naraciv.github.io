@@ -148,6 +148,8 @@ export function PlayerProfile({
     }
   }, [name, uuid, hypixel])
 
+  const showHypixel = hypixel && uuid && servers.hypixel !== 'off'
+
   const derived = useMemo(() => {
     if (!data) return null
     const daily = dailyTotals(data.sessions)
@@ -234,10 +236,14 @@ export function PlayerProfile({
               <ul className="flex flex-wrap gap-x-6 gap-y-2">
                 <ServerCheck label="HCFR" played={servers.hcfr} />
                 <ServerCheck label="Loka" played={servers.loka} />
-                {hypixel && uuid && servers.hypixel !== 'off' && (
-                  <ServerCheck label="Hypixel" played={servers.hypixel} />
-                )}
+                {showHypixel && <ServerCheck label="Hypixel" played={servers.hypixel} />}
               </ul>
+              {/* Hypixel's API policy requires it wherever its data is shown. */}
+              {showHypixel && (
+                <p className="mt-2 text-xs text-ink-2">
+                  Not affiliated with or endorsed by Hypixel.
+                </p>
+              )}
             </Field>
           </dl>
           <a

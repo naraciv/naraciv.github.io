@@ -33,8 +33,6 @@ export function Footer() {
 
       <div className="mx-auto mt-8 max-w-[1200px] border-t border-[#333] pt-4 text-[0.9rem] text-[#797979]">
         &copy; {new Date().getFullYear()} {site.name}. All rights reserved.
-        {/* Hypixel's API policy requires saying so; player profiles show who played there. */}
-        <p className="mt-1">Not affiliated with or endorsed by Hypixel, HCFR or LokaMC.</p>
       </div>
     </footer>
   )
