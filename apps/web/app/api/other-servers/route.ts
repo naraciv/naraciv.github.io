@@ -1,0 +1,48 @@
+import { type NextRequest } from 'next/server'
+
+/**
+ * Whether a player has played on one other server (`?server=hcfr|loka`): `{ played }`,
+ * false if not, null when that server's API could not say; HCFR's yes is the date they
+ * were first seen there when it gives one. Server-side because neither API sends CORS
+ * headers. Looked up by UUID when one is given, else by exact name. One server per
+ * request so each caches on its own: a yes never changes, a no can.
+ */
+
+const DAY = 86_400
+const YEAR = 365 * DAY
+
+type Played = string | boolean | null
+
+const lookups: Record<string, (id: { name: string; uuid: string | null }) => Promise<Played>> = {
+  /* The player's first join on HCFR (ISO date) or true, false if never. */
+  hcfr: ({ name, uuid }) =>
+    get(`https://api.hcfr.gg/players/${uuid ?? name}`)
+      .then((r) => (r.ok ? r.json() : r.status === 404 ? false : null))
+      .then((player: { firstSeen?: string } | false | null) =>
+        player ? (player.firstSeen ?? true) : player,
+      ),
+  loka: ({ name, uuid }) =>
+    get(
+      uuid
+        ? `https://api.lokamc.com/players/search/findByUuid?uuid=${uuid.replace(/^(.{8})(.{4})(.{4})(.{4})/, '$1-$2-$3-$4-')}`
+        : `https://api.lokamc.com/players/search/findByName?name=${name}`,
+    ).then((r) => (r.ok ? true : r.status === 404 ? false : null)),
+}
+
+/* Uncached: the response's Cache-Control decides how long each answer lives. */
+const get = (url: string) => fetch(url, { cache: 'no-store' })
+
+export async function GET(request: NextRequest) {
+  const params = request.nextUrl.searchParams
+  const lookup = lookups[params.get('server') ?? '']
+  const name = params.get('name') ?? ''
+  const uuid = params.get('uuid')?.replace(/-/g, '').toLowerCase() || null
+  if (!lookup || !/^\w{1,16}$/.test(name) || (uuid && !/^[0-9a-f]{32}$/.test(uuid)))
+    return Response.json({ error: 'Bad server, name or uuid' }, { status: 400 })
+
+  const played = await lookup({ name, uuid }).catch(() => null)
+  /* A yes holds forever, a no until they join, and a failure should be retried. */
+  const cache =
+    played === null ? 'no-store' : `public, s-maxage=${played ? YEAR : DAY}`
+  return Response.json({ played }, { headers: { 'Cache-Control': cache } })
+}

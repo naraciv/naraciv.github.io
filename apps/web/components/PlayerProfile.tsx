@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { ExternalLink } from 'lucide-react'
+import { Check, ExternalLink } from 'lucide-react'
 import {
   dailySeries,
   dailyTotals,
@@ -33,6 +33,8 @@ import { PlaytimeHeatmap, type HeatmapMode } from './charts/PlaytimeHeatmap'
  */
 
 const API = 'https://api.civinfo.net'
+/** Servers checked by /api/other-servers, one request each so each caches on its own. */
+const OTHER_SERVERS = ['hcfr', 'loka'] as const
 const CHARTS = [
   ['heatmap', 'Heatmap'],
   ['calendar', 'Calendar'],
@@ -73,6 +75,9 @@ export function PlayerProfile({
   const [showEmpty, setShowEmpty] = useState(false)
   const [utc, setUtc] = useState(false)
   const [now] = useState(() => Date.now())
+  const [servers, setServers] = useState<
+    Partial<Record<(typeof OTHER_SERVERS)[number], string | boolean | null>>
+  >({})
 
   useEffect(() => {
     const type = new URLSearchParams(window.location.search).get('graph_type')
@@ -117,6 +122,22 @@ export function PlayerProfile({
       alive = false
     }
   }, [name, knownUuid, now])
+
+  useEffect(() => {
+    let alive = true
+    for (const server of OTHER_SERVERS) {
+      const query = new URLSearchParams({ server, name, ...(uuid && { uuid }) })
+      const set = (played: string | boolean | null) =>
+        alive && setServers((prev) => ({ ...prev, [server]: played }))
+      fetch(`/api/other-servers?${query}`)
+        .then((res) => (res.ok ? res.json() : Promise.reject()))
+        .then((json: { played: string | boolean | null }) => set(json.played))
+        .catch(() => set(null))
+    }
+    return () => {
+      alive = false
+    }
+  }, [name, uuid])
 
   const derived = useMemo(() => {
     if (!data) return null
@@ -200,6 +221,12 @@ export function PlayerProfile({
               ) : (
                 data?.lastLogout && <Field label="Last Logout">{fullDate(data.lastLogout)}</Field>
               ))}
+            <Field label="Also Played On">
+              <ul className="flex gap-6">
+                <ServerCheck label="HCFR" played={servers.hcfr} />
+                <ServerCheck label="Loka" played={servers.loka} />
+              </ul>
+            </Field>
           </dl>
           <a
             href={`https://namemc.com/profile/${uuid ? uuid.replace(/-/g, '') : encodeURIComponent(name)}`}
@@ -365,6 +392,46 @@ function Field({
       <dt className="mb-1 text-xs tracking-wider text-ink-2 uppercase">{label}</dt>
       <dd className={valueClass}>{children}</dd>
     </div>
+  )
+}
+
+/**
+ * A read-only checkbox: ticked when the player has played there. Not an <input>,
+ * which would look clickable; the state is spelled out for screen readers.
+ * `played` is undefined while loading, null when the server's API failed, and
+ * may be the first-join date.
+ */
+function ServerCheck({ label, played }: { label: string; played?: string | boolean | null }) {
+  const since = typeof played === 'string' && played
+  const state =
+    played === undefined
+      ? 'checking'
+      : played === null
+        ? 'unknown'
+        : played
+          ? 'played'
+          : 'not played'
+  const firstJoin =
+    since && `First join: ${new Date(since).toLocaleDateString(undefined, { dateStyle: 'medium' })}`
+  return (
+    <li
+      className="flex items-center gap-2"
+      title={played === null ? "Couldn't check" : firstJoin || undefined}
+    >
+      <span
+        aria-hidden
+        className={`flex size-5 items-center justify-center rounded border-2 ${
+          played ? 'border-primary bg-primary text-surface' : 'border-ink-2'
+        } ${played === undefined ? 'animate-pulse' : ''}`}
+      >
+        {played ? <Check className="size-4" strokeWidth={3} /> : played === null && '?'}
+      </span>
+      <span className="text-white">{label}</span>
+      <span className="sr-only">
+        : {state}
+        {firstJoin && `, ${firstJoin}`}
+      </span>
+    </li>
   )
 }
 
