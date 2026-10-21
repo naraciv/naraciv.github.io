@@ -1,11 +1,12 @@
 import { type NextRequest } from 'next/server'
 
 /**
- * Whether a player has played on one other server (`?server=hcfr|loka`): `{ played }`,
- * false if not, null when that server's API could not say; HCFR's yes is the date they
- * were first seen there when it gives one. Server-side because neither API sends CORS
- * headers. Looked up by UUID when one is given, else by exact name. One server per
- * request so each caches on its own: a yes never changes, a no can.
+ * Whether a player has played on one other server (`?server=hcfr|loka|hypixel`):
+ * `{ played }`, false if not, null when that server's API could not say; HCFR's and
+ * Hypixel's yes is the date they first joined when it gives one. Server-side because
+ * the APIs send no CORS headers, and Hypixel's needs a secret key. Looked up by UUID
+ * when one is given, else by exact name. One server per request so each caches on its
+ * own: a yes never changes, a no can.
  */
 
 const DAY = 86_400
@@ -27,10 +28,29 @@ const lookups: Record<string, (id: { name: string; uuid: string | null }) => Pro
         ? `https://api.lokamc.com/players/search/findByUuid?uuid=${uuid.replace(/^(.{8})(.{4})(.{4})(.{4})/, '$1-$2-$3-$4-')}`
         : `https://api.lokamc.com/players/search/findByName?name=${name}`,
     ).then((r) => (r.ok ? true : r.status === 404 ? false : null)),
+  /* The player's first login on Hypixel (ISO date) or true, false if never. Needs a key
+     (HYPIXEL_API_KEY) and a UUID, so a bare name is looked up on Mojang first. */
+  hypixel: async ({ name, uuid }) => {
+    const key = process.env.HYPIXEL_API_KEY
+    if (!key) return null
+    const id = uuid ?? (await mojangUuid(name))
+    if (!id) return id
+    const r = await get(`https://api.hypixel.net/v2/player?uuid=${id}`, { 'API-Key': key })
+    if (!r.ok) return null
+    const { player } = (await r.json()) as { player: { firstLogin?: number } | null }
+    if (!player) return false
+    return player.firstLogin ? new Date(player.firstLogin).toISOString() : true
+  },
 }
 
 /* Uncached: the response's Cache-Control decides how long each answer lives. */
-const get = (url: string) => fetch(url, { cache: 'no-store' })
+const get = (url: string, headers?: HeadersInit) => fetch(url, { cache: 'no-store', headers })
+
+/* The account's UUID, false if no account has that name, null if Mojang could not say. */
+const mojangUuid = (name: string): Promise<string | false | null> =>
+  get(`https://api.minecraftservices.com/minecraft/profile/lookup/name/${name}`)
+    .then((r) => (r.ok ? r.json() : r.status === 404 ? false : null))
+    .then((profile: { id: string } | false | null) => (profile ? profile.id : profile))
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams
@@ -44,7 +64,6 @@ export async function GET(request: NextRequest) {
 
   const played = await lookup({ name, uuid }).catch(() => null)
   /* A yes holds forever, a no until they join, and a failure should be retried. */
-  const cache =
-    played === null ? 'no-store' : `public, s-maxage=${played ? YEAR : DAY}`
+  const cache = played === null ? 'no-store' : `public, s-maxage=${played ? YEAR : DAY}`
   return Response.json({ played }, { headers: { 'Cache-Control': cache } })
 }

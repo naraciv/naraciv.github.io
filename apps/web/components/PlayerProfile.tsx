@@ -34,7 +34,7 @@ import { PlaytimeHeatmap, type HeatmapMode } from './charts/PlaytimeHeatmap'
 
 const API = 'https://api.civinfo.net'
 /** Servers checked by /api/other-servers, one request each so each caches on its own. */
-const OTHER_SERVERS = ['hcfr', 'loka'] as const
+const OTHER_SERVERS = ['hcfr', 'loka', 'hypixel'] as const
 const CHARTS = [
   ['heatmap', 'Heatmap'],
   ['calendar', 'Calendar'],
@@ -222,9 +222,10 @@ export function PlayerProfile({
                 data?.lastLogout && <Field label="Last Logout">{fullDate(data.lastLogout)}</Field>
               ))}
             <Field label="Also Played On">
-              <ul className="flex gap-6">
+              <ul className="flex flex-wrap gap-x-6 gap-y-2">
                 <ServerCheck label="HCFR" played={servers.hcfr} />
                 <ServerCheck label="Loka" played={servers.loka} />
+                <ServerCheck label="Hypixel" played={servers.hypixel} />
               </ul>
             </Field>
           </dl>
