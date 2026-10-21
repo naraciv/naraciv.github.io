@@ -32,16 +32,22 @@ const lookups: Record<string, (id: { name: string; uuid: string | null }) => Pro
      (HYPIXEL_API_KEY) and a UUID, so a bare name is looked up on Mojang first. */
   hypixel: async ({ name, uuid }) => {
     const key = process.env.HYPIXEL_API_KEY
-    if (!key) return null
+    if (!key) throw new Unavailable()
     const id = uuid ?? (await mojangUuid(name))
     if (!id) return id
     const r = await get(`https://api.hypixel.net/v2/player?uuid=${id}`, { 'API-Key': key })
+    /* 403 is a missing, expired or revoked key, not this player. */
+    if (r.status === 403) throw new Unavailable()
     if (!r.ok) return null
     const { player } = (await r.json()) as { player: { firstLogin?: number } | null }
     if (!player) return false
     return player.firstLogin ? new Date(player.firstLogin).toISOString() : true
   },
 }
+
+/* This site can't check that server at all (Hypixel without a working key), so the
+   profile leaves it out rather than showing "?". */
+class Unavailable extends Error {}
 
 /* Uncached: the response's Cache-Control decides how long each answer lives. */
 const get = (url: string, headers?: HeadersInit) => fetch(url, { cache: 'no-store', headers })
@@ -62,7 +68,17 @@ export async function GET(request: NextRequest) {
   if (!lookup || !/^\w{1,16}$/.test(name) || (uuid && !/^[0-9a-f]{32}$/.test(uuid)))
     return Response.json({ error: 'Bad server, name or uuid' }, { status: 400 })
 
-  const played = await lookup({ name, uuid }).catch(() => null)
+  let played: Played
+  try {
+    played = await lookup({ name, uuid })
+  } catch (error) {
+    if (error instanceof Unavailable)
+      return Response.json(
+        { error: 'Unavailable' },
+        { status: 503, headers: { 'Cache-Control': 'no-store' } },
+      )
+    played = null
+  }
   /* A yes holds forever, a no until they join, and a failure should be retried. */
   const cache = played === null ? 'no-store' : `public, s-maxage=${played ? YEAR : DAY}`
   return Response.json({ played }, { headers: { 'Cache-Control': cache } })

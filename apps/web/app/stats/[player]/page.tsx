@@ -42,7 +42,13 @@ export default async function PlayerPage({ params }: PageProps<'/stats/[player]'
   const name = resolved?.name ?? requested
   return (
     <div className="px-4 pt-[100px]">
-      <PlayerProfile name={name} uuid={resolved?.uuid ?? null} rank={allTimeRank(name)} />
+      <PlayerProfile
+        name={name}
+        uuid={resolved?.uuid ?? null}
+        rank={allTimeRank(name)}
+        /* Without a key Hypixel can't be checked, so it isn't shown at all. */
+        hypixel={Boolean(process.env.HYPIXEL_API_KEY)}
+      />
     </div>
   )
 }
