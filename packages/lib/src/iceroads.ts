@@ -16,6 +16,8 @@ export type IceLayer = {
   updated: number
   color?: string
   paths: IcePath[]
+  /** Points of interest on this group's roads. Optional: files from before markers have none. */
+  markers?: IceMarker[]
 }
 
 const TEXT_MAX = 80
@@ -61,7 +63,8 @@ function sanitizeLayer(value: unknown): IceLayer | null {
     .slice(0, MAX_PATHS)
     .map(sanitizePath)
     .filter((p): p is IcePath => !!p)
-  if (!paths.length) return null
+  const markers = sanitizeMarkers(l.markers)
+  if (!paths.length && !markers.length) return null
   /* No id or name: identify it by its paths, so re-importing the same file is "already loaded". */
   const id = text(l.id) || text(l.name) || `imported-${hash(JSON.stringify(paths))}`
   const date = typeof l.updated === 'string' ? Date.parse(l.updated) : Number(l.updated ?? NaN)
@@ -77,6 +80,7 @@ function sanitizeLayer(value: unknown): IceLayer | null {
     updated: Number.isFinite(date) && date > 0 ? Math.round(date) : Date.now(),
     ...(color && { color }),
     paths: tidy(paths),
+    ...(markers.length && { markers }),
   }
 }
 
@@ -105,6 +109,40 @@ const pathLength = (p: IcePath) =>
 /** Total length of a layer's paths, in blocks. */
 export const layerLength = (layer: IceLayer) =>
   layer.paths.reduce((sum, p) => sum + pathLength(p), 0)
+
+/* ── Markers ──────────────────────────────────────────── */
+
+export const MARKER_TYPES = ['portal', 'bunker', 'vault', 'exit', 'potbunk', 'trap'] as const
+export type IceMarkerType = (typeof MARKER_TYPES)[number]
+export type IceMarker = { type: IceMarkerType; x: number; z: number; name?: string }
+
+const MAX_MARKERS = 5000
+const isMarkerType = (t: unknown): t is IceMarkerType => MARKER_TYPES.includes(t as IceMarkerType)
+const markerKey = (m: IceMarker) => `${m.type},${m.x},${m.z}`
+
+/* A group's "markers": the valid ones, duplicates dropped. Anything else is none. */
+function sanitizeMarkers(value: unknown): IceMarker[] {
+  const markers = (Array.isArray(value) ? value : []).slice(0, MAX_MARKERS).flatMap((m) => {
+    const x = coord(m?.x)
+    const z = coord(m?.z)
+    const name = text(m?.name)
+    return isMarkerType(m?.type) && x !== null && z !== null
+      ? [{ type: m.type, x, z, ...(name && { name }) }]
+      : []
+  })
+  return mergeMarkers([], markers)
+}
+
+/** Union, existing order kept: the same type at the same block is the same marker. */
+export function mergeMarkers(existing: IceMarker[] = [], incoming: IceMarker[] = []): IceMarker[] {
+  const seen = new Set(existing.map(markerKey))
+  return [
+    ...existing,
+    ...incoming.filter((m) => !seen.has(markerKey(m)) && !!seen.add(markerKey(m))),
+  ]
+}
+/* Only set when there are some, so groups without markers keep their old JSON shape. */
+const withMarkers = (markers: IceMarker[]) => (markers.length ? { markers } : {})
 
 /* ── Smoothing, gaps and overlap ──────────────────────── */
 
@@ -397,7 +435,12 @@ export function planImport(existing: IceLayer[], incoming: IceLayer[]): ImportPl
     seen = mergeLayers(seen, [layer])
     if (!old) return { layer, status: 'new' }
     const road = roadBlocks(old.paths)
-    if (layer.paths.every((p) => isMapped(road, p))) return { layer, status: 'same' }
+    const known = new Set((old.markers ?? []).map(markerKey))
+    if (
+      layer.paths.every((p) => isMapped(road, p)) &&
+      (layer.markers ?? []).every((m) => known.has(markerKey(m)))
+    )
+      return { layer, status: 'same' }
     return { layer, status: layer.updated > old.updated ? 'update' : 'older' }
   })
 }
@@ -427,6 +470,7 @@ export function mergeLayers(existing: IceLayer[], incoming: IceLayer[]): IceLaye
       ...(color && { color }),
       /* Existing road first, so it stays whole and the incoming copy loses the repeats. */
       paths: joinPaths(healGaps(removeRepeats([...old.paths, ...layer.paths]))),
+      ...withMarkers(mergeMarkers(old.markers, layer.markers)),
     }
   }
   return out
@@ -443,6 +487,7 @@ export function mergeGroups(groups: IceLayer[], fromId: string, intoId: string):
     ...into,
     updated: Math.max(from.updated, into.updated),
     paths: joinPaths(healGaps(removeRepeats([...into.paths, ...from.paths]))),
+    ...withMarkers(mergeMarkers(into.markers, from.markers)),
   }
   return groups.filter((g) => g !== from).map((g) => (g === into ? merged : g))
 }
@@ -453,7 +498,7 @@ export type IceSection = { id: string; path: number; segment: number }
 /**
  * Cut one section out of its road and add it to another group, or to a new group when
  * `to` is `{ name }`. The source road is split around it; the section joins the target's
- * network. A group left with no road is removed.
+ * network. A group left with no road and no markers is removed.
  */
 export function moveSection(
   groups: IceLayer[],
@@ -483,7 +528,7 @@ export function moveSection(
   out = out.map((g) =>
     g.id === targetId ? { ...g, updated: now, paths: joinPaths(healGaps([...g.paths, piece])) } : g,
   )
-  return out.filter((g) => g.paths.length)
+  return out.filter((g) => g.paths.length || g.markers?.length)
 }
 
 /* ── Link codes ───────────────────────────────────────── */
@@ -491,7 +536,8 @@ export function moveSection(
 /** Bump when the positional layout changes; old codes then fail to decode, not misread. */
 const VERSION = 2
 
-// layer = [id, name, updated, color without '#', [[dx0, dz0, dx1, dz1, ...], ...]]
+// layer = [id, name, updated, color without '#', [[dx0, dz0, dx1, dz1, ...], ...], markers?]
+// markers = [[type, x, z, name?], ...]: appended later, so codes from before have none.
 // Points are delta-encoded from the previous point (the first from 0,0): about 25%
 // shorter links than plain JSON, since small deltas repeat and deflate well.
 const packPath = (path: IcePath) => {
@@ -519,7 +565,16 @@ const unpackPath = (flat: unknown[]) => {
 export async function encodeLayers(layers: IceLayer[]): Promise<string> {
   const packed = [
     VERSION,
-    ...layers.map((l) => [l.id, l.name, l.updated, l.color?.slice(1) ?? '', l.paths.map(packPath)]),
+    ...layers.map((l) => [
+      l.id,
+      l.name,
+      l.updated,
+      l.color?.slice(1) ?? '',
+      l.paths.map(packPath),
+      ...(l.markers?.length
+        ? [l.markers.map((m) => [m.type, m.x, m.z, ...(m.name ? [m.name] : [])])]
+        : []),
+    ]),
   ]
   const json = new TextEncoder().encode(JSON.stringify(packed))
   return toBase64Url(await pipe(json, new CompressionStream('deflate-raw')))
@@ -534,12 +589,18 @@ export async function decodeLayers(code: string): Promise<IceLayer[] | null> {
     const [v, ...layers] = JSON.parse(json)
     if (v !== VERSION) return null
     const out = parseIceFile({
-      layers: layers.map(([id, name, updated, color, paths]: unknown[]) => ({
+      layers: layers.map(([id, name, updated, color, paths, markers]: unknown[]) => ({
         id,
         name,
         updated,
         color: color ? `#${color}` : undefined,
         paths: (paths as unknown[][]).map(unpackPath),
+        markers: ((markers ?? []) as unknown[][]).map(([type, x, z, name]) => ({
+          type,
+          x,
+          z,
+          name,
+        })),
       })),
     })
     return out.length ? out : null

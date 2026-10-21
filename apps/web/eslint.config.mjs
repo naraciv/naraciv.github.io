@@ -49,6 +49,7 @@ const eslintConfig = defineConfig([
             'gacha-.*',
             'hero-gacha',
             'homes-portal',
+            'iceroads-view',
             'item-icon',
             'leaflet-.*',
             'machine-.*',

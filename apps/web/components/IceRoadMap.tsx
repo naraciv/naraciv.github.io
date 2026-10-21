@@ -1,15 +1,25 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { eachBlock, layerLength, type Coords, type IceLayer, type IceSection } from '@nara/lib'
+import { renderToStaticMarkup } from 'react-dom/server'
+import {
+  eachBlock,
+  layerLength,
+  type Coords,
+  type IceLayer,
+  type IceMarker,
+  type IceSection,
+} from '@nara/lib'
 import {
   CanvasLayer,
   CivMap,
   MapFrame,
+  MarkerLayer,
   MIN_ZOOM,
   type CivMapHandle,
   type DrawArgs,
 } from '@/components/map'
+import { MARKERS, markerLabel } from './iceRoadMarkers'
 
 /**
  * The ice road map: CivMap tiles with every visible road painted through CanvasLayer,
@@ -27,6 +37,17 @@ const eastFirst = (a: Point, b: Point): [Point, Point] =>
 type Box = { minX: number; maxX: number; minZ: number; maxZ: number }
 
 const HIT_PX = 8
+
+/* A marker's pin: just its icon, centred on the block, with a shadow to stand out from the
+   tiles. Rendered by React so a name from someone else's file is escaped, not markup. */
+const pin = (m: IceMarker) => ({
+  html: renderToStaticMarkup(
+    <div title={markerLabel(m)} className="text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+      {MARKERS[m.type].icon}
+    </div>,
+  ),
+  anchor: [12, 12] as [number, number],
+})
 /* Empty map: the whole world, filling the frame. */
 const START = { x: 0, z: 0 }
 const START_ZOOM = -4
@@ -77,6 +98,9 @@ export default function IceRoadMap({
   showClaims,
   selected = null,
   onPick,
+  focus,
+  onEditMarker,
+  onPlace,
 }: {
   layers: IceLayer[]
   showClaims: boolean
@@ -84,8 +108,20 @@ export default function IceRoadMap({
   selected?: IceSection | null
   /** When set, clicking a road picks the section under the pointer. */
   onPick?: (section: IceSection) => void
+  /** The map moves here whenever this changes (a new object each time). */
+  focus?: Coords | null
+  /** When set, a marker's popup has an Edit button that calls this. */
+  onEditMarker?: (groupId: string, marker: IceMarker) => void
+  /** When set, a click on the map is a spot for a marker, not a road pick. */
+  onPlace?: (point: Coords) => void
 }) {
   const handle = useRef<CivMapHandle>(null)
+  const zoomRef = useRef(START_ZOOM)
+  /* Centred on it, zoomed in far enough to see the road around it. */
+  useEffect(() => {
+    if (focus)
+      handle.current?.setView({ x: focus.x + 0.5, z: focus.z + 0.5 }, Math.max(zoomRef.current, 0))
+  }, [focus])
   const box = useRef<HTMLDivElement>(null)
   const [cursor, setCursor] = useState<Coords>({ x: 0, z: 0 })
   const [hover, setHover] = useState<(Hit & { flipX: boolean; flipY: boolean }) | null>(null)
@@ -93,6 +129,10 @@ export default function IceRoadMap({
   /* Last pointer position inside the frame; Leaflet's mousemove gives world coordinates only. */
   const pointerAt = useRef({ x: 0, y: 0 })
 
+  const markers = useMemo(
+    () => layers.flatMap((group) => (group.markers ?? []).map((marker) => ({ marker, group }))),
+    [layers],
+  )
   const boxes = useMemo(() => layers.map((l) => l.paths.map(bounds)), [layers])
   const all = useMemo(() => boxes.flat(), [boxes])
 
@@ -197,7 +237,8 @@ export default function IceRoadMap({
     return rect ? { x: clientX - rect.left, y: clientY - rect.top } : { x: clientX, y: clientY }
   }
 
-  /* The section nearest the pointer, within HIT_PX, and its layer. */
+  /* The section nearest the pointer, within HIT_PX, and its layer. On a tie (groups sharing
+     road) the later group wins: it is drawn on top, so it is the one you see. */
   const hitAt = (point: Coords, zoom: number) => {
     const reach = HIT_PX / 2 ** zoom
     let best: { layer: IceLayer; section: IceSection; d: number } | null = null
@@ -213,19 +254,18 @@ export default function IceRoadMap({
           return
         for (let i = 1; i < path.length; i++) {
           const d = segmentDistance(point.x, point.z, path[i - 1], path[i])
-          if (d <= reach && (!best || d < best.d))
+          if (d <= reach && (!best || d <= best.d))
             best = { layer, section: { id: layer.id, path: ri, segment: i - 1 }, d }
         }
       }),
     )
     return best as { layer: IceLayer; section: IceSection } | null
   }
-  const zoomRef = useRef(START_ZOOM)
 
   return (
     <div
       ref={box}
-      className="relative size-full"
+      className="iceroads-view relative size-full [--popup-accent:56_189_248]"
       onPointerMove={(e) => (pointerAt.current = localPoint(e.clientX, e.clientY))}
       onPointerLeave={() => setHover(null)}
     >
@@ -270,6 +310,7 @@ export default function IceRoadMap({
             )
           }}
           onClick={(point) => {
+            if (onPlace) return onPlace(point)
             const hit = onPick && hitAt(point, zoomRef.current)
             if (hit) onPick!(hit.section)
           }}
@@ -287,6 +328,37 @@ export default function IceRoadMap({
           handleRef={handle}
         >
           <CanvasLayer draw={draw} />
+          <MarkerLayer
+            items={markers}
+            position={({ marker }) => ({ x: marker.x + 0.5, z: marker.z + 0.5 })}
+            icon={({ marker }) => pin(marker)}
+            panToOnClick={false}
+            popup={({ marker: m, group }) => (
+              <div className="flex min-w-[150px] flex-col gap-1 p-3 pr-10 text-xs">
+                <span className="font-semibold text-white">{markerLabel(m)}</span>
+                <span className="flex items-center gap-2 text-ink-2">
+                  <span
+                    aria-hidden
+                    className="size-2.5 rounded-full"
+                    style={{ background: group.color }}
+                  />
+                  {group.name}
+                </span>
+                <span className="font-mono text-white">
+                  {m.x}, {m.z}
+                </span>
+                {onEditMarker && (
+                  <button
+                    type="button"
+                    onClick={() => onEditMarker(group.id, m)}
+                    className="mt-1 rounded border border-[#6b7280] bg-surface-2 px-2 py-0.5 font-medium text-ink hover:border-primary hover:text-white"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+            )}
+          />
         </CivMap>
 
         {hover && (
