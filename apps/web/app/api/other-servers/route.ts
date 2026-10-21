@@ -29,13 +29,11 @@ const lookups: Record<string, (id: { name: string; uuid: string | null }) => Pro
         : `https://api.lokamc.com/players/search/findByName?name=${name}`,
     ).then((r) => (r.ok ? true : r.status === 404 ? false : null)),
   /* The player's first login on Hypixel (ISO date) or true, false if never. Needs a key
-     (HYPIXEL_API_KEY) and a UUID, so a bare name is looked up on Mojang first. */
-  hypixel: async ({ name, uuid }) => {
+     (HYPIXEL_API_KEY) and a UUID; Hypixel can't be asked by name. */
+  hypixel: async ({ uuid }) => {
     const key = process.env.HYPIXEL_API_KEY
-    if (!key) throw new Unavailable()
-    const id = uuid ?? (await mojangUuid(name))
-    if (!id) return id
-    const r = await get(`https://api.hypixel.net/v2/player?uuid=${id}`, { 'API-Key': key })
+    if (!key || !uuid) throw new Unavailable()
+    const r = await get(`https://api.hypixel.net/v2/player?uuid=${uuid}`, { 'API-Key': key })
     /* 403 is a missing, expired or revoked key, not this player. */
     if (r.status === 403) throw new Unavailable()
     if (!r.ok) return null
@@ -45,18 +43,12 @@ const lookups: Record<string, (id: { name: string; uuid: string | null }) => Pro
   },
 }
 
-/* This site can't check that server at all (Hypixel without a working key), so the
-   profile leaves it out rather than showing "?". */
+/* This site can't check that server at all (Hypixel without a working key or a UUID),
+   so the profile leaves it out rather than showing "?". */
 class Unavailable extends Error {}
 
 /* Uncached: the response's Cache-Control decides how long each answer lives. */
 const get = (url: string, headers?: HeadersInit) => fetch(url, { cache: 'no-store', headers })
-
-/* The account's UUID, false if no account has that name, null if Mojang could not say. */
-const mojangUuid = (name: string): Promise<string | false | null> =>
-  get(`https://api.minecraftservices.com/minecraft/profile/lookup/name/${name}`)
-    .then((r) => (r.ok ? r.json() : r.status === 404 ? false : null))
-    .then((profile: { id: string } | false | null) => (profile ? profile.id : profile))
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams

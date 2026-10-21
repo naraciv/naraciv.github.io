@@ -130,7 +130,8 @@ export function PlayerProfile({
   useEffect(() => {
     let alive = true
     for (const server of OTHER_SERVERS) {
-      if (server === 'hypixel' && !hypixel) continue
+      /* Hypixel can only be asked by UUID; if one turns up later, this runs again. */
+      if (server === 'hypixel' && !(hypixel && uuid)) continue
       const query = new URLSearchParams({ server, name, ...(uuid && { uuid }) })
       const set = (played: string | boolean | null | 'off') =>
         alive && setServers((prev) => ({ ...prev, [server]: played }))
@@ -233,7 +234,7 @@ export function PlayerProfile({
               <ul className="flex flex-wrap gap-x-6 gap-y-2">
                 <ServerCheck label="HCFR" played={servers.hcfr} />
                 <ServerCheck label="Loka" played={servers.loka} />
-                {hypixel && servers.hypixel !== 'off' && (
+                {hypixel && uuid && servers.hypixel !== 'off' && (
                   <ServerCheck label="Hypixel" played={servers.hypixel} />
                 )}
               </ul>
