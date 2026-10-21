@@ -1,15 +1,19 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react'
 import {
   Braces,
+  ChevronDown,
   Code,
   Download,
   FileDown,
   Check,
   Link2,
+  MapPin,
   Merge,
+  Crosshair,
+  Pencil,
   PencilRuler,
   Trash2,
   Upload,
@@ -21,16 +25,21 @@ import {
   encodeLayers,
   layerLength,
   mergeGroups,
+  MARKER_TYPES,
   mergeLayers,
+  mergeMarkers,
   moveSection,
   parseIceFile,
   planImport,
   type IceLayer,
+  type IceMarker,
+  type IceMarkerType,
   type IceSection,
   type ImportPlan,
 } from '@nara/lib'
 import { Switch } from '@/components/ui'
 import { MapSidePanel } from '@/components/map/MapSidePanel'
+import { MARKERS, markerLabel } from './iceRoadMarkers'
 
 /**
  * Load ice road groups (JSON from the JSMacros mapper, a share link, or another player),
@@ -49,6 +58,7 @@ const IceRoadMap = dynamic(() => import('./IceRoadMap'), {
 
 const LAYERS_KEY = 'iceroads-layers'
 const HIDDEN_KEY = 'iceroads-hidden'
+const MARKER_GROUP_KEY = 'iceroads-marker-group'
 const PALETTE = [
   '#38bdf8',
   '#f472b6',
@@ -77,6 +87,9 @@ const EXAMPLE = `{
       "paths": [
         [[120, 350], [600, 350], [600, 1200]],
         [[600, 350], [600, -900], [1800, -1500]]
+      ],
+      "markers": [
+        { "type": "portal", "x": 600, "z": 350, "name": "Spawn" }
       ]
     }
   ]
@@ -96,13 +109,16 @@ Rules:
 - "color": optional "#rrggbb". Leave it out to let the map pick one.
 - Points are overworld block coordinates [x, z] (or {"x": .., "z": ..}) as whole numbers between -30000 and 30000. A path needs at least 2 points or it is dropped. Only the corners matter: points along a straight line can be left out.
 - At most 20000 paths per group and 20000 points per path.
+- "markers": optional list of points of interest in the group, each {"type", "x", "z", "name"}. "type" is one of ${MARKER_TYPES.map((t) => `"${t}"`).join(', ')}; x, z are whole block coordinates like the paths; "name" is optional, max 80 characters. Leave "markers" out if there are none.
 
 Output only the JSON.`
 
+/* Outlines are #6b7280, 3.7:1 against the panel, so buttons and boxes read as controls
+   (WCAG 1.4.11 asks 3:1); the fill and text are Planner's. */
 const button =
-  'flex w-full items-center justify-center gap-1.5 rounded-md border border-edge px-2 py-1.5 text-xs text-ink-2 transition-colors hover:border-primary hover:text-white'
+  'flex w-full items-center justify-center gap-1.5 rounded-md border border-[#6b7280] bg-surface-2 px-2 py-1.5 text-xs font-medium text-ink transition-colors hover:border-primary hover:text-white'
 /* Dropdowns and text boxes, and small icon buttons: one look everywhere in the panel. */
-const field = 'rounded border border-[#374151] bg-ground px-1.5 py-1 text-xs text-white'
+const field = 'rounded border border-[#6b7280] bg-ground px-1.5 py-1 text-xs text-white'
 const iconButton =
   'rounded p-1 text-ink-2 transition-colors hover:bg-[#374151] hover:text-white disabled:opacity-40'
 const dialogClass =
@@ -146,6 +162,33 @@ const blocks = (layer: IceLayer) => {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k blocks` : `${Math.round(n)} blocks`
 }
 const copyText = async (text: string) => navigator.clipboard.writeText(text)
+/* "x, z", or "x y z" as F3 shows it: the middle number is the height, dropped. */
+const parseCoords = (text: string) => {
+  const n = text.match(/-?\d+(\.\d+)?/g)?.map(Number) ?? []
+  return n.length === 2 || n.length === 3 ? { x: Math.round(n[0]), z: Math.round(n.at(-1)!) } : null
+}
+const UNDO_STEPS = 20
+/* A group's marker list starts open when it has this many or fewer. */
+const OPEN_LIST_MAX = 5
+/* The marker dialog's fields. `from` is the marker being edited; none means a new one. */
+type Draft = {
+  from?: { groupId: string; marker: IceMarker }
+  group: string
+  type: IceMarkerType
+  name: string
+  x: string
+  z: string
+}
+const markersOf = (groups: IceLayer[], id: string) => groups.find((l) => l.id === id)?.markers ?? []
+/* A group with its markers replaced. None left: no key, so its JSON looks as it did before
+   markers. */
+const setMarkers = (groups: IceLayer[], id: string, markers: IceMarker[]) =>
+  groups.map((l) => {
+    if (l.id !== id) return l
+    const group: IceLayer = { ...l, markers }
+    if (!markers.length) delete group.markers
+    return group
+  })
 
 export function IceRoadViewer() {
   const [layers, setLayers] = useState<IceLayer[]>([])
@@ -160,9 +203,21 @@ export function IceRoadViewer() {
   /* The group whose merge row is open, and the group chosen to merge into it. */
   const [mergingId, setMergingId] = useState<string | null>(null)
   const [mergeWith, setMergeWith] = useState('')
-  /* What just happened, and the groups as they were before it, if it can be undone. */
-  const [notice, setNotice] = useState<{ text: string; undo?: IceLayer[] } | null>(null)
+  /* The marker dialog's contents, kept here so they survive picking a spot on the map. */
+  const [draft, setDraft] = useState<Draft | null>(null)
+  const [picking, setPicking] = useState(false)
+  /* The group new markers go in: the last one used, else the top one. */
+  const [placeIn, setPlaceIn] = useState('')
+  /* Groups whose marker list was opened or closed by hand; short lists start open. */
+  const [toggledMarkers, setToggledMarkers] = useState<Set<string>>(new Set())
+  /* Where the map last moved to: a marker clicked in a list, or one just saved. */
+  const [focus, setFocus] = useState<{ x: number; z: number } | null>(null)
+  const mapBox = useRef<HTMLDivElement>(null)
+  /* What just happened, and whether Undo goes with it. */
+  const [notice, setNotice] = useState<{ text: string; undo?: boolean } | null>(null)
   const noticeTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  /* The groups before each change, newest last. */
+  const undoStack = useRef<IceLayer[][]>([])
   const [error, setError] = useState('')
   const [promptCopied, setPromptCopied] = useState('')
   const [pending, setPending] = useState<ImportPlan | null>(null)
@@ -177,36 +232,56 @@ export function IceRoadViewer() {
     layersRef.current = layers
   })
 
-  const notify = (text: string, undo?: IceLayer[]) => {
+  const notify = (text: string, undo?: boolean) => {
     setError('')
     setNotice({ text, undo })
     clearTimeout(noticeTimer.current)
     noticeTimer.current = setTimeout(() => setNotice(null), undo ? 8000 : 2500)
   }
-  /* Every change to the groups goes through here, so each one can be undone. */
+  /* Every change to the groups goes through here, so each one can be undone, back to the
+     last UNDO_STEPS changes. */
   const change = (next: IceLayer[], text: string) => {
-    notify(text, layersRef.current)
+    undoStack.current = [...undoStack.current, layersRef.current].slice(-UNDO_STEPS)
+    notify(text, true)
     setLayers(next)
   }
   const undo = () => {
-    if (!notice?.undo) return
-    setLayers(notice.undo)
+    const before = undoStack.current.pop()
+    if (!before) return
+    setLayers(before)
     setSelected(null)
     setMergingId(null)
-    notify('Undone')
+    notify('Undone', undoStack.current.length > 0)
   }
+  /* Ctrl+Z (Cmd+Z) undoes too, as often as there is history, except while typing. */
+  const undoRef = useRef(undo)
+  useEffect(() => {
+    undoRef.current = undo
+  })
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const typing = (e.target as Element).closest?.('input, textarea, select, dialog')
+      if (e.key !== 'z' || !(e.ctrlKey || e.metaKey) || e.shiftKey || typing) return
+      e.preventDefault()
+      undoRef.current()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
   const copied = (text: string) => {
     setPromptCopied(text)
     setTimeout(() => setPromptCopied(''), 2000)
   }
 
-  /* Escape backs out of whatever is half-done in Modify. */
+  /* Escape backs out of whatever is half-done in Modify; picking a spot goes back to the
+     dialog. */
   useEffect(() => {
     if (!modifying) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return
       setSelected(null)
       setMergingId(null)
+      setPicking(false)
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
@@ -241,6 +316,7 @@ export function IceRoadViewer() {
     setLayers(parseIceFile(readStored(LAYERS_KEY)))
     const ids = readStored(HIDDEN_KEY)
     if (Array.isArray(ids)) setHidden(new Set(ids.map(String)))
+    setPlaceIn(String(readStored(MARKER_GROUP_KEY) ?? ''))
     setLoaded(true)
     /* eslint-enable react-hooks/set-state-in-effect */
     const code = /^#d=(.+)$/.exec(window.location.hash)?.[1]
@@ -260,7 +336,8 @@ export function IceRoadViewer() {
     if (!loaded) return
     writeStored(LAYERS_KEY, { version: 2, layers })
     writeStored(HIDDEN_KEY, [...hidden])
-  }, [layers, hidden, loaded])
+    writeStored(MARKER_GROUP_KEY, placeIn)
+  }, [layers, hidden, placeIn, loaded])
 
   /* Accept a file dropped anywhere on the page. */
   useEffect(() => {
@@ -322,6 +399,59 @@ export function IceRoadViewer() {
     setSelected(null)
     setNewName('')
   }
+  const markerGroup = layers.some((l) => l.id === placeIn) ? placeIn : layers[0]?.id
+  const newMarker = (type: IceMarkerType) =>
+    setDraft({ group: markerGroup, type, name: '', x: '', z: '' })
+  const editMarker = (groupId: string, marker: IceMarker) =>
+    setDraft({
+      from: { groupId, marker },
+      group: groupId,
+      type: marker.type,
+      name: marker.name ?? '',
+      x: String(marker.x),
+      z: String(marker.z),
+    })
+  /* The dialog's Save. An edited marker keeps its place in the list unless it moves group;
+     a new or moved one goes at the end. Then the map shows it. */
+  const saveDraft = (d: Draft) => {
+    const at = parseCoords(`${d.x} ${d.z}`)
+    if (!at) return
+    const name = d.name.trim()
+    const next: IceMarker = { type: d.type, ...at, ...(name && { name }) }
+    const source = d.from ? markersOf(layers, d.from.groupId) : []
+    const i = d.from ? source.indexOf(d.from.marker) : -1
+    const out = d.from ? setMarkers(layers, d.from.groupId, source.toSpliced(i, 1)) : layers
+    const target = markersOf(out, d.group)
+    if (mergeMarkers(target, [next]).length === target.length)
+      return notify('That group already has this marker')
+    const to = d.from?.groupId === d.group ? i : target.length
+    change(
+      setMarkers(out, d.group, target.toSpliced(to, 0, next)),
+      `${d.from ? 'Saved' : 'Added'} ${markerLabel(next)}`,
+    )
+    setPlaceIn(d.group)
+    setDraft(null)
+    showOnMap(at)
+  }
+  const deleteMarker = (groupId: string, marker: IceMarker) => {
+    change(
+      setMarkers(
+        layers,
+        groupId,
+        markersOf(layers, groupId).filter((m) => m !== marker),
+      ),
+      `Deleted ${markerLabel(marker)}`,
+    )
+    setDraft(null)
+  }
+  /* On phones the map sits under the panel, so bring it into view first. */
+  const showOnMap = (at: { x: number; z: number }) => {
+    setFocus(at)
+    mapBox.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+  const listOpen = (layer: IceLayer) =>
+    !!layer.markers?.length &&
+    toggledMarkers.has(layer.id) !== layer.markers.length <= OPEN_LIST_MAX
   const mergeInto = (id: string) => {
     change(mergeGroups(layers, mergeWith, id), 'Groups merged')
     setMergingId(null)
@@ -428,7 +558,7 @@ export function IceRoadViewer() {
               className={`${button} disabled:opacity-40 ${modifying ? 'border-primary! text-white!' : ''}`}
             >
               <PencilRuler aria-hidden className="size-4" />
-              {modifying ? 'Done modifying' : 'Modify ice roads'}
+              {modifying ? 'Done modifying' : 'Modify'}
             </button>
           </section>
           {statusBar}
@@ -489,13 +619,34 @@ export function IceRoadViewer() {
               )}
             </section>
           )}
+          {modifying && (
+            <section className="flex flex-col gap-3 p-3 text-xs">
+              <h2 className="text-sm font-semibold text-white">Markers</h2>
+              <div className="grid grid-cols-3 gap-2">
+                {MARKER_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => newMarker(type)}
+                    className={button}
+                  >
+                    {MARKERS[type].label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-ink-3">
+                Pick a type to add a marker. Click a marker on the map, or the pencil in a
+                group&apos;s list, to edit it.
+              </p>
+            </section>
+          )}
           {!modifying && (
             <section className="flex flex-col gap-2 p-3">
               <h2 className="text-sm font-semibold text-white">Upload</h2>
               <button
                 type="button"
                 onClick={() => input.current?.click()}
-                className="flex flex-col items-center gap-1 rounded-md border-2 border-dashed border-[#374151] p-3 text-sm text-ink-2 transition-colors hover:border-primary hover:text-white"
+                className="flex flex-col items-center gap-1 rounded-md border-2 border-dashed border-[#6b7280] p-3 text-sm text-ink-2 transition-colors hover:border-primary hover:text-white"
               >
                 <Upload aria-hidden className="size-5" />
                 Upload groups
@@ -543,6 +694,27 @@ export function IceRoadViewer() {
                         </time>
                       </span>
                     </span>
+                    {!!layer.markers?.length && (
+                      <button
+                        type="button"
+                        aria-label={`Markers in ${layer.name}`}
+                        title="Markers"
+                        aria-expanded={listOpen(layer)}
+                        onClick={() => {
+                          const next = new Set(toggledMarkers)
+                          if (!next.delete(layer.id)) next.add(layer.id)
+                          setToggledMarkers(next)
+                        }}
+                        className={`${iconButton} flex items-center gap-0.5`}
+                      >
+                        <MapPin aria-hidden className="size-4" />
+                        {layer.markers.length}
+                        <ChevronDown
+                          aria-hidden
+                          className={`size-3 transition-transform ${listOpen(layer) ? 'rotate-180' : ''}`}
+                        />
+                      </button>
+                    )}
                     {modifying && layers.length > 1 && (
                       <button
                         type="button"
@@ -571,6 +743,36 @@ export function IceRoadViewer() {
                     >
                       <Trash2 aria-hidden className="size-4" />
                     </ConfirmButton>
+                    {listOpen(layer) && (
+                      <ul className="flex basis-full flex-col border-l border-[#6b7280] pl-1">
+                        {layer.markers!.map((m, i) => (
+                          <li key={i} className="flex items-center gap-1 text-xs">
+                            <button
+                              type="button"
+                              title="Show on the map"
+                              onClick={() => showOnMap(m)}
+                              className="flex min-w-0 flex-1 items-baseline justify-between gap-2 rounded px-1.5 py-1 text-left hover:bg-surface-2"
+                            >
+                              <span className="truncate text-ink">{markerLabel(m)}</span>
+                              <span className="shrink-0 font-mono text-ink-2">
+                                {m.x}, {m.z}
+                              </span>
+                            </button>
+                            {modifying && (
+                              <button
+                                type="button"
+                                aria-label={`Edit ${markerLabel(m)}`}
+                                title="Edit"
+                                onClick={() => editMarker(layer.id, m)}
+                                className={iconButton}
+                              >
+                                <Pencil aria-hidden className="size-3.5" />
+                              </button>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                     {modifying && mergingId === layer.id && (
                       <div className="flex basis-full items-center gap-2 pl-12">
                         <span className="text-ink-3">Merge in</span>
@@ -617,10 +819,28 @@ export function IceRoadViewer() {
           </section>
         </MapSidePanel>
 
-        <div className="h-[calc(100vh-150px)] min-h-[400px]">
+        <div ref={mapBox} className="relative h-[calc(100vh-150px)] min-h-[400px]">
+          {picking && (
+            <p
+              role="status"
+              className="absolute top-3 left-1/2 z-[1100] -translate-x-1/2 rounded-md border border-[#6b7280] bg-surface px-3 py-1.5 text-xs text-ink shadow-lg"
+            >
+              Click the map to place the marker · Esc to go back
+            </p>
+          )}
           <IceRoadMap
             layers={visible}
             showClaims={claims}
+            focus={focus}
+            onEditMarker={modifying ? editMarker : undefined}
+            onPlace={
+              picking && draft
+                ? ({ x, z }) => {
+                    setDraft({ ...draft, x: String(x), z: String(z) })
+                    setPicking(false)
+                  }
+                : undefined
+            }
             selected={modifying ? selected : null}
             onPick={
               modifying
@@ -676,7 +896,7 @@ export function IceRoadViewer() {
             <button
               type="button"
               onClick={() => setPending(null)}
-              className="rounded-md border border-edge px-3 py-1 text-sm text-ink-2 hover:text-white"
+              className="rounded-md border border-[#6b7280] bg-surface-2 px-3 py-1 text-sm font-medium text-ink hover:border-primary hover:text-white"
             >
               Cancel
             </button>
@@ -700,6 +920,18 @@ export function IceRoadViewer() {
           </div>
         </div>
       </dialog>
+
+      {draft && !picking && (
+        <MarkerDialog
+          draft={draft}
+          groups={layers}
+          onChange={(edit) => setDraft({ ...draft, ...edit })}
+          onPick={() => setPicking(true)}
+          onSave={() => saveDraft(draft)}
+          onDelete={() => draft.from && deleteMarker(draft.from.groupId, draft.from.marker)}
+          onClose={() => setDraft(null)}
+        />
+      )}
 
       {/* ── JSON format help ── */}
       <dialog
@@ -804,6 +1036,145 @@ function GroupName({ name, onRename }: { name: string; onRename: (name: string) 
       }}
       className={`${field} w-full`}
     />
+  )
+}
+
+/* Add or edit one marker: name, type, group and coordinates, typed or picked on the map.
+   Nothing changes until Save, which is one change, so Undo puts it back. */
+function MarkerDialog({
+  draft,
+  groups,
+  onChange,
+  onPick,
+  onSave,
+  onDelete,
+  onClose,
+}: {
+  draft: Draft
+  groups: IceLayer[]
+  onChange: (edit: Partial<Draft>) => void
+  onPick: () => void
+  onSave: () => void
+  onDelete: () => void
+  onClose: () => void
+}) {
+  const ref = useRef<HTMLDialogElement>(null)
+  useEffect(() => ref.current?.showModal(), [])
+  const at = parseCoords(`${draft.x} ${draft.z}`)
+  const title = draft.from
+    ? `Edit ${markerLabel(draft.from.marker)}`
+    : `Add ${MARKERS[draft.type].label}`
+  const label = 'flex flex-col gap-1 text-xs text-ink-2'
+  const text = (key: 'name' | 'x' | 'z') => ({
+    value: draft[key],
+    onChange: (e: ChangeEvent<HTMLInputElement>) => onChange({ [key]: e.target.value }),
+  })
+  return (
+    <dialog
+      ref={ref}
+      onClose={onClose}
+      onClick={(e) => e.target === ref.current && ref.current.close()}
+      aria-labelledby="iceroads-marker-title"
+      className={`${dialogClass} max-w-sm`}
+    >
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (at) onSave()
+        }}
+        className="flex flex-col gap-3"
+      >
+        <div className="flex items-center justify-between">
+          <h2 id="iceroads-marker-title" className="font-bold text-white">
+            {title}
+          </h2>
+          <button type="button" aria-label="Close" onClick={onClose} className={iconButton}>
+            <X aria-hidden className="size-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <label className={label}>
+            X
+            <input
+              autoFocus={!draft.from}
+              inputMode="numeric"
+              {...text('x')}
+              className={`${field} font-mono`}
+            />
+          </label>
+          <label className={label}>
+            Z
+            <input inputMode="numeric" {...text('z')} className={`${field} font-mono`} />
+          </label>
+        </div>
+        <button type="button" onClick={onPick} className={button}>
+          <Crosshair aria-hidden className="size-4" /> Pick on map
+        </button>
+        <label className={label}>
+          Name (optional)
+          <input
+            autoFocus={!!draft.from}
+            maxLength={80}
+            {...text('name')}
+            placeholder={MARKERS[draft.type].label}
+            className={field}
+          />
+        </label>
+        <div className="grid grid-cols-2 gap-2">
+          <label className={label}>
+            Type
+            <select
+              value={draft.type}
+              onChange={(e) => onChange({ type: e.target.value as IceMarkerType })}
+              className={field}
+            >
+              {MARKER_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {MARKERS[t].label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={label}>
+            Group
+            <select
+              value={draft.group}
+              onChange={(e) => onChange({ group: e.target.value })}
+              className={field}
+            >
+              {groups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className={`grid gap-2 ${draft.from ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          {draft.from && (
+            <ConfirmButton
+              label={`Delete ${markerLabel(draft.from.marker)}`}
+              confirmLabel="Delete?"
+              onConfirm={onDelete}
+              className={`${button} hover:border-danger! hover:text-danger!`}
+            >
+              <Trash2 aria-hidden className="size-4" /> Delete
+            </ConfirmButton>
+          )}
+          <button type="button" onClick={onClose} className={button}>
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={!at}
+            title={at ? undefined : 'Enter X and Z, or pick a spot on the map'}
+            className="rounded-md bg-primary px-2 py-1.5 text-xs font-semibold text-ground disabled:opacity-40"
+          >
+            {draft.from ? 'Save' : 'Add'}
+          </button>
+        </div>
+      </form>
+    </dialog>
   )
 }
 

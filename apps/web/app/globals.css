@@ -918,10 +918,10 @@
   z-index: 450;
 }
 /*
- * Leaflet's popup chrome is light by default. /homes and /shops share one dark
+ * Leaflet's popup chrome is light by default. /homes, /shops and /iceroads share one dark
  * treatment, each in its own accent (--popup-accent, an "r g b" triple).
  */
-:is(.homes-portal, .shops-view) .leaflet-popup-content-wrapper {
+:is(.homes-portal, .shops-view, .iceroads-view) .leaflet-popup-content-wrapper {
   background: rgb(9 13 22 / 98%);
   backdrop-filter: blur(16px);
   color: #f1f5f9;
@@ -931,17 +931,17 @@
   padding: 0;
   overflow: hidden;
 }
-:is(.homes-portal, .shops-view) .leaflet-popup-content {
+:is(.homes-portal, .shops-view, .iceroads-view) .leaflet-popup-content {
   margin: 0;
   width: auto !important;
   line-height: inherit;
 }
-:is(.homes-portal, .shops-view) .leaflet-popup-tip {
+:is(.homes-portal, .shops-view, .iceroads-view) .leaflet-popup-tip {
   background: rgb(9 13 22 / 98%);
   border-left: 1px solid rgb(var(--popup-accent) / 50%);
   border-bottom: 1px solid rgb(var(--popup-accent) / 50%);
 }
-:is(.homes-portal, .shops-view) a.leaflet-popup-close-button {
+:is(.homes-portal, .shops-view, .iceroads-view) a.leaflet-popup-close-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -958,7 +958,7 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 5000;
 }
-:is(.homes-portal, .shops-view) a.leaflet-popup-close-button:hover {
+:is(.homes-portal, .shops-view, .iceroads-view) a.leaflet-popup-close-button:hover {
   color: #ffffff;
   background: rgb(var(--popup-accent));
   border-color: rgb(var(--popup-accent));

@@ -8,10 +8,12 @@ import {
   layerLength,
   mergeGroups,
   mergeLayers,
+  mergeMarkers,
   moveSection,
   parseIceFile,
   planImport,
   type IceLayer,
+  type IceMarker,
   type IcePath,
 } from './iceroads.ts'
 
@@ -156,13 +158,51 @@ test('mergeLayers unions paths and the newer copy wins name, colour and time', (
 })
 
 test('link code round trip', async () => {
-  const layers = [layer(), layer({ id: 'w', name: 'Whiskia', paths: [B, A] })]
+  const layers = [
+    layer({ markers: [{ type: 'portal', x: 5, z: -7, name: 'Hub' }] }),
+    layer({ id: 'w', name: 'Whiskia', paths: [B, A] }),
+  ]
   const code = await encodeLayers(layers)
   assert.match(code, /^[\w-]+$/)
   assert.deepEqual(await decodeLayers(code), layers)
   assert.equal(await decodeLayers('garbage!'), null)
   assert.equal(await decodeLayers(''), null)
   assert.deepEqual(parseIceFile({ version: 2, layers }), layers)
+})
+
+test('markers: per group, optional, cleaned, merged as a union', () => {
+  const [plain] = parseIceFile({ layers: [{ id: 'a', paths: [A] }] })
+  assert.equal(plain.markers, undefined)
+  const [g] = parseIceFile({
+    layers: [
+      {
+        id: 'a',
+        paths: [A],
+        markers: [
+          { type: 'trap', x: '12', z: 40.6, name: ' Pit ' },
+          { type: 'trap', x: 12, z: 41 },
+          { type: 'nope', x: 1, z: 1 },
+          { type: 'vault', x: 1 },
+          { type: 'exit', x: 99999, z: 0 },
+        ],
+      },
+    ],
+  })
+  const markers: IceMarker[] = [
+    { type: 'trap', x: 12, z: 41, name: 'Pit' },
+    { type: 'exit', x: 30000, z: 0 },
+  ]
+  assert.deepEqual(g.markers, markers)
+  /* A group with markers but no road is kept. */
+  assert.equal(parseIceFile({ id: 'm', paths: [], markers }).length, 1)
+  const extra = layer({ id: 'a', paths: [A], markers: [{ type: 'bunker', x: 0, z: 0 }] })
+  assert.equal(planImport([g], [extra])[0].status, 'older')
+  assert.equal(planImport([g], [layer({ id: 'a', paths: [A] })])[0].status, 'same')
+  assert.deepEqual(mergeLayers([g], [extra])[0].markers, [
+    ...markers,
+    { type: 'bunker', x: 0, z: 0 },
+  ])
+  assert.deepEqual(mergeMarkers(markers, [markers[1]]), markers)
 })
 
 /* Recorded in-game: each long run was saved in pieces that stop 4-5 blocks short of the next. */
