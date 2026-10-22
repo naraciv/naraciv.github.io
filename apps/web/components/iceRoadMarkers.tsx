@@ -2,12 +2,9 @@ import type { ReactNode } from 'react'
 import { itemIconUrlFor, type IceMarker, type IceMarkerType } from '@nara/lib'
 import { ItemIcon } from './ItemIcon'
 
-type MarkerSymbol = { label: string; icon: ReactNode }
-
-/* 24px (ItemIcon's size), block so no line box pads it and the pin stays centred. */
-const item = (name: string) => <ItemIcon src={itemIconUrlFor(name)} className="block size-6" />
+const item = (name: string) => <ItemIcon src={itemIconUrlFor(name)} />
 // eslint-disable-next-line @next/next/no-img-element
-const image = (src: string) => <img src={src} alt="" className="block size-6 object-contain" />
+const image = (src: string) => <img src={src} alt="" className="size-6" />
 /* Doors are mostly see-through: on a black tile they read on any map. */
 const door = (wood: string) => ({
   label: `${wood.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase())} door`,
@@ -18,7 +15,10 @@ const door = (wood: string) => ({
  * Each marker type's name, and the symbols it can show on the map. A marker's `mk` is its
  * index in `symbols`, stored in files and links: only ever append.
  */
-export const MARKERS: Record<IceMarkerType, { label: string; symbols: MarkerSymbol[] }> = {
+export const MARKERS: Record<
+  IceMarkerType,
+  { label: string; symbols: { label: string; icon: ReactNode }[] }
+> = {
   portal: { label: 'Portal', symbols: [{ label: 'Portal', icon: image('/iceroads/portal.png') }] },
   bunker: { label: 'Bunker', symbols: [{ label: 'Obsidian', icon: item('obsidian') }] },
   vault: { label: 'Vault', symbols: [{ label: 'Obsidian', icon: item('obsidian') }] },
@@ -38,10 +38,8 @@ export const MARKERS: Record<IceMarkerType, { label: string; symbols: MarkerSymb
 }
 
 /** The marker's symbol on the map; an unknown one (from a newer file) shows the first. */
-export const markerIcon = (m: IceMarker) => {
-  const { symbols } = MARKERS[m.type]
-  return (symbols[m.mk ?? 0] ?? symbols[0]).icon
-}
+export const markerIcon = (m: IceMarker) =>
+  (MARKERS[m.type].symbols[m.mk ?? 0] ?? MARKERS[m.type].symbols[0]).icon
 
 /** "Name (Type)", or just the type when unnamed. */
 export const markerLabel = (m: IceMarker) =>
