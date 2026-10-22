@@ -12,6 +12,7 @@ import {
   moveSection,
   parseIceFile,
   planImport,
+  toIceFile,
   type IceLayer,
   type IceMarker,
   type IcePath,
@@ -152,7 +153,20 @@ test('mergeLayers unions paths and the newer copy wins name, colour and time', (
   assert.equal(o.updated, 1000)
 
   assert.deepEqual(
-    mergeLayers([old], [layer({ id: 'new' })]).map((l) => l.id),
+    mergeLayers(
+      [old],
+      [
+        layer({
+          id: 'new',
+          paths: [
+            [
+              [0, 500],
+              [90, 500],
+            ],
+          ],
+        }),
+      ],
+    ).map((l) => l.id),
     ['nara', 'new'],
   )
 })
@@ -160,14 +174,187 @@ test('mergeLayers unions paths and the newer copy wins name, colour and time', (
 test('link code round trip', async () => {
   const layers = [
     layer({ markers: [{ type: 'portal', x: 5, z: -7, name: 'Hub' }] }),
-    layer({ id: 'w', name: 'Whiskia', paths: [B, A] }),
-  ]
+    // No colour, an odd-angle segment, and a name that is not ASCII.
+    {
+      id: 'w',
+      name: 'Whiskia',
+      updated: 1792626475596,
+      paths: [
+        [
+          [-20000, 500],
+          [-20090, 410],
+          [-20090, 300],
+          [-20000, 290],
+        ],
+      ],
+      markers: [{ type: 'trap', x: -20000, z: 500, name: 'Ünïcode ✓' }],
+    },
+  ] satisfies IceLayer[]
   const code = await encodeLayers(layers)
-  assert.match(code, /^[\w-]+$/)
+  assert.match(code, /^~[\w-]+$/)
   assert.deepEqual(await decodeLayers(code), layers)
   assert.equal(await decodeLayers('garbage!'), null)
   assert.equal(await decodeLayers(''), null)
   assert.deepEqual(parseIceFile({ version: 2, layers }), layers)
+  assert.equal(await decodeLayers('~AAA'), null, 'truncated')
+  assert.equal(await decodeLayers('~Ag'), null, 'unknown flag')
+})
+
+test('version 2 link codes still open', async () => {
+  // Made by the version 2 encoder: Nara, one path, an exit marker named Door.
+  const code =
+    'izbSiVbKSyxKVNJR8gNThuZmBiYWZiYGIKCjZGyRlJJmoaQTHW2gY6BjaAAiDXR0TQ1iY3Wio5VSKzJLlKDCSi75-UVKsbGxsQA'
+  assert.deepEqual(await decodeLayers(code), [
+    layer({ updated: 1760486400000, markers: [{ type: 'exit', x: 100, z: 0, name: 'Door' }] }),
+  ])
+})
+
+test('files save markers as [type, x, z, name?] and still read version 2 objects', () => {
+  const layers = [
+    layer({
+      markers: [
+        { type: 'bunker', x: 1, z: 2, name: 'Fort' },
+        { type: 'exit', x: 3, z: 4 },
+      ],
+    }),
+  ]
+  const file = toIceFile(layers)
+  assert.equal(file.version, 3)
+  assert.deepEqual(file.layers[0].markers, [
+    [1, 1, 2, 'Fort'],
+    [3, 3, 4],
+  ])
+  assert.deepEqual(parseIceFile(JSON.parse(JSON.stringify(file))), layers)
+  // The JsMacros mapper writes "version": 2 back over a file it appended to.
+  assert.deepEqual(parseIceFile({ ...file, version: 2 }), layers)
+  assert.deepEqual(
+    parseIceFile({
+      layers: [
+        {
+          paths: [A],
+          markers: [
+            [99, 0, 0],
+            [0, 'x', 0],
+          ],
+        },
+      ],
+    })[0].markers,
+    undefined,
+  )
+})
+
+test('road two groups share stays only in the one with more road', () => {
+  const naraFile = {
+    id: 'nara',
+    updated: 1,
+    paths: [
+      [
+        [1984, 7830],
+        [3701, 7830],
+        [3701, 7827],
+        [4154, 7827],
+      ],
+      [
+        [2080, 8019],
+        [2080, 7561],
+      ],
+      [
+        [3701, 4908],
+        [3701, 8377],
+      ],
+    ],
+  }
+  const [nara, whiskia] = parseIceFile({
+    layers: [
+      naraFile,
+      // The same roads mapped again, 3 blocks off in places, plus a road of its own.
+      {
+        id: 'whiskia',
+        paths: [
+          [
+            [1984, 7830],
+            [4154, 7830],
+          ],
+          [
+            [2080, 8019],
+            [2080, 7561],
+          ],
+          [
+            [0, 0],
+            [50, 0],
+          ],
+        ],
+        markers: [{ type: 'potbunk', x: 1976, z: 7832 }],
+      },
+      {
+        id: 'copy',
+        paths: [
+          [
+            [2080, 8000],
+            [2080, 7600],
+          ],
+        ],
+      },
+    ],
+  })
+  assert.deepEqual(nara, parseIceFile(naraFile)[0], 'Nara keeps all its road')
+  assert.deepEqual(whiskia.paths, [
+    [
+      [0, 0],
+      [50, 0],
+    ],
+  ])
+  assert.equal(whiskia.markers?.length, 1)
+  // A group with nothing left of its own is gone.
+  assert.equal(
+    parseIceFile({
+      layers: [
+        { id: 'n', paths: [A] },
+        { id: 'c', paths: [A] },
+      ],
+    }).length,
+    1,
+  )
+  // Importing the copy again changes nothing, though its road is in another group.
+  const all = parseIceFile({
+    layers: [
+      { id: 'n', paths: [A] },
+      { id: 'c', paths: [B] },
+    ],
+  })
+  assert.deepEqual(
+    planImport(all, [layer({ id: 'c', updated: 5000, paths: [A, B] })]).map((p) => p.status),
+    ['same'],
+  )
+  // A road branching off another group's road at 45° keeps its start.
+  const [, branch] = parseIceFile({
+    layers: [
+      {
+        id: 'n',
+        paths: [
+          [
+            [0, 0],
+            [300, 0],
+          ],
+        ],
+      },
+      {
+        id: 'b',
+        paths: [
+          [
+            [100, 0],
+            [150, 50],
+          ],
+        ],
+      },
+    ],
+  })
+  assert.deepEqual(branch.paths, [
+    [
+      [100, 0],
+      [150, 50],
+    ],
+  ])
 })
 
 test('markers: per group, optional, cleaned, merged as a union', () => {

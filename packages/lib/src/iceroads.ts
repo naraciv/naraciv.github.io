@@ -86,7 +86,8 @@ function sanitizeLayer(value: unknown): IceLayer | null {
 
 /**
  * Any parsed JSON in; valid layers out (possibly empty). Accepts the full file, a bare
- * layer, an array of layers, an array of paths (one layer), or a single path.
+ * layer, an array of layers, an array of paths (one layer), or a single path. Road that
+ * groups share is kept by one of them only (`dedupeGroups`).
  */
 export function parseIceFile(value: unknown): IceLayer[] {
   const v = (value ?? {}) as Record<string, unknown>
@@ -101,8 +102,31 @@ export function parseIceFile(value: unknown): IceLayer[] {
       : v.paths !== undefined
         ? [value]
         : []
-  return raw.map(sanitizeLayer).filter((l): l is IceLayer => !!l)
+  return dedupeGroups(raw.map(sanitizeLayer).filter((l): l is IceLayer => !!l))
 }
+
+/** The current file version. Paths stay `[[x, z], ...]` and the layer keys stay as they
+    are, so the JsMacros mapper (which writes "version": 2 back) reads and keeps it. */
+export const FILE_VERSION = 3
+
+/**
+ * Layers as a file to save or share: markers as `[type, x, z, name?]`, the type being its
+ * index in MARKER_TYPES. Stringify it without indentation; that is most of the saving.
+ */
+export const toIceFile = (layers: IceLayer[]) => ({
+  version: FILE_VERSION,
+  layers: layers.map(({ markers, ...l }) => ({
+    ...l,
+    ...(markers?.length && {
+      markers: markers.map((m) => [
+        MARKER_TYPES.indexOf(m.type),
+        m.x,
+        m.z,
+        ...(m.name ? [m.name] : []),
+      ]),
+    }),
+  })),
+})
 
 const pathLength = (p: IcePath) =>
   p.slice(1).reduce((s, [x, z], i) => s + Math.hypot(x - p[i][0], z - p[i][1]), 0)
@@ -112,6 +136,7 @@ export const layerLength = (layer: IceLayer) =>
 
 /* ── Markers ──────────────────────────────────────────── */
 
+/* Files and links store a marker's type as its index here: only ever append. */
 export const MARKER_TYPES = ['portal', 'bunker', 'vault', 'exit', 'potbunk', 'trap'] as const
 export type IceMarkerType = (typeof MARKER_TYPES)[number]
 export type IceMarker = { type: IceMarkerType; x: number; z: number; name?: string }
@@ -120,14 +145,20 @@ const MAX_MARKERS = 5000
 const isMarkerType = (t: unknown): t is IceMarkerType => MARKER_TYPES.includes(t as IceMarkerType)
 const markerKey = (m: IceMarker) => `${m.type},${m.x},${m.z}`
 
-/* A group's "markers": the valid ones, duplicates dropped. Anything else is none. */
+/* A group's "markers": the valid ones, duplicates dropped. Anything else is none. Each is
+   `[type index, x, z, name?]`, or a `{ type, x, z, name }` object as version 2 files and
+   LLM-made JSON have. TODO: drop the object form by December 2026 (and switch LLM_PROMPT
+   in IceRoadViewer to the array form first). */
 function sanitizeMarkers(value: unknown): IceMarker[] {
   const markers = (Array.isArray(value) ? value : []).slice(0, MAX_MARKERS).flatMap((m) => {
-    const x = coord(m?.x)
-    const z = coord(m?.z)
-    const name = text(m?.name)
-    return isMarkerType(m?.type) && x !== null && z !== null
-      ? [{ type: m.type, x, z, ...(name && { name }) }]
+    const [type, rx, rz, rname] = Array.isArray(m)
+      ? [MARKER_TYPES[m[0]], m[1], m[2], m[3]]
+      : [m?.type, m?.x, m?.z, m?.name]
+    const x = coord(rx)
+    const z = coord(rz)
+    const name = text(rname)
+    return isMarkerType(type) && x !== null && z !== null
+      ? [{ type, x, z, ...(name && { name }) }]
       : []
   })
   return mergeMarkers([], markers)
@@ -332,15 +363,14 @@ function roadBlocks(paths: IcePath[]) {
   for (const p of paths) eachBlock(p, (x, z) => void set.add(blockKey(x, z)))
   return set
 }
-/* Already mapped: every block of the path is within SAME_ROAD of existing road. */
-const nearRoad = (road: Set<number>, x: number, z: number) => {
-  for (let dx = -SAME_ROAD; dx <= SAME_ROAD; dx++)
-    for (let dz = -SAME_ROAD; dz <= SAME_ROAD; dz++)
-      if (road.has(blockKey(x + dx, z + dz))) return true
+/* Already mapped: every block of the path is within `radius` of existing road. */
+const nearRoad = (road: Set<number>, x: number, z: number, radius = SAME_ROAD) => {
+  for (let dx = -radius; dx <= radius; dx++)
+    for (let dz = -radius; dz <= radius; dz++) if (road.has(blockKey(x + dx, z + dz))) return true
   return false
 }
-const isMapped = (road: Set<number>, path: IcePath) =>
-  eachBlock(path, (x, z) => nearRoad(road, x, z) || false)
+const isMapped = (road: Set<number>, path: IcePath, radius = SAME_ROAD) =>
+  eachBlock(path, (x, z) => nearRoad(road, x, z, radius) || false)
 
 /* Points closer to straight back than this (cos < -0.85, about 150°) are a turnaround. */
 const TURNAROUND = -0.85
@@ -376,16 +406,18 @@ const REPEAT_RUN = 6
  * `road`. Shorter runs are where a road meets another and are kept. Null if the whole
  * path is road already there.
  */
-function trimRepeats(path: IcePath, road: Set<number>): IcePath | null {
+function trimRepeats(path: IcePath, road: Set<number>, radius = SAME_ROAD): IcePath | null {
   const blocks: [number, number, number][] = [] // x, z, segment
   for (let i = 1; i < path.length; i++)
     eachBlock([path[i - 1], path[i]], (x, z) => void blocks.push([x, z, i - 1]))
-  const near = blocks.map(([x, z]) => nearRoad(road, x, z))
+  const near = blocks.map(([x, z]) => nearRoad(road, x, z, radius))
   if (near.every(Boolean)) return null
   let a = near.indexOf(false)
   let b = near.lastIndexOf(false)
-  if (a < REPEAT_RUN) a = 0
-  if (blocks.length - 1 - b < REPEAT_RUN) b = blocks.length - 1
+  /* A wider radius makes a junction look longer (a 45° branch runs close for a while). */
+  const run = (REPEAT_RUN * radius) / SAME_ROAD
+  if (a < run) a = 0
+  if (blocks.length - 1 - b < run) b = blocks.length - 1
   const [ax, az, ai] = blocks[a]
   const [bx, bz, bi] = blocks[b]
   const out = dropRepeatedPoints([[ax, az], ...path.slice(ai + 1, bi + 1), [bx, bz]])
@@ -407,6 +439,30 @@ export function removeRepeats(paths: IcePath[]): IcePath[] {
     eachBlock(kept, (x, z) => void road.add(blockKey(x, z)))
   }
   return out
+}
+
+/** Another group's road this close is the same road: two mappers drift a few blocks apart. */
+const OTHER_GROUP_ROAD = 4
+
+/**
+ * Road that several groups have stays only in the group with the most road; the others
+ * lose it (the same end-trimming as `removeRepeats`). A group left with no road and no
+ * markers goes. Groups that lose nothing come back as they were.
+ */
+export function dedupeGroups(groups: IceLayer[]): IceLayer[] {
+  const road = new Set<number>()
+  const lengths = new Map(groups.map((g) => [g, layerLength(g)]))
+  const trimmed = new Map<IceLayer, IceLayer>()
+  for (const g of [...groups].sort((a, b) => lengths.get(b)! - lengths.get(a)!)) {
+    const kept = g.paths
+      .map((p) => trimRepeats(p, road, OTHER_GROUP_ROAD))
+      .filter((p): p is IcePath => !!p)
+    const same = JSON.stringify(kept) === JSON.stringify(g.paths)
+    /* Only after the whole group: its own overlaps are removeRepeats' business. */
+    for (const p of kept) eachBlock(p, (x, z) => void road.add(blockKey(x, z)))
+    trimmed.set(g, same ? g : { ...g, paths: joinPaths(healGaps(kept)) })
+  }
+  return groups.map((g) => trimmed.get(g)!).filter((g) => g.paths.length || g.markers?.length)
 }
 
 /* A group's paths, cleaned: split where they double back, smoothed, repeats removed
@@ -431,13 +487,16 @@ export function planImport(existing: IceLayer[], incoming: IceLayer[]): ImportPl
      in one file reads as older/newer, not new. */
   let seen = existing
   return incoming.map((layer) => {
+    const before = seen
     const old = seen.find((e) => e.id === layer.id)
     seen = mergeLayers(seen, [layer])
     if (!old) return { layer, status: 'new' }
     const road = roadBlocks(old.paths)
+    /* Road another group has is dropped on merge, so it changes nothing either. */
+    const others = roadBlocks(before.filter((e) => e !== old).flatMap((e) => e.paths))
     const known = new Set((old.markers ?? []).map(markerKey))
     if (
-      layer.paths.every((p) => isMapped(road, p)) &&
+      layer.paths.every((p) => isMapped(road, p) || isMapped(others, p, OTHER_GROUP_ROAD)) &&
       (layer.markers ?? []).every((m) => known.has(markerKey(m)))
     )
       return { layer, status: 'same' }
@@ -449,6 +508,7 @@ export function planImport(existing: IceLayer[], incoming: IceLayer[]): ImportPl
  * Merge incoming layers into existing: a new array, existing order kept, new layers
  * appended. Same id: incoming paths that run over road already mapped are dropped, the
  * rest added and their gaps healed, and the newer copy's name, colour and timestamp win.
+ * Then road shared between groups is left to one of them (`dedupeGroups`).
  */
 export function mergeLayers(existing: IceLayer[], incoming: IceLayer[]): IceLayer[] {
   const out = [...existing]
@@ -473,7 +533,7 @@ export function mergeLayers(existing: IceLayer[], incoming: IceLayer[]): IceLaye
       ...withMarkers(mergeMarkers(old.markers, layer.markers)),
     }
   }
-  return out
+  return dedupeGroups(out)
 }
 
 /* ── Editing groups ───────────────────────────────────── */
@@ -533,23 +593,162 @@ export function moveSection(
 
 /* ── Link codes ───────────────────────────────────────── */
 
-/** Bump when the positional layout changes; old codes then fail to decode, not misread. */
+/*
+ * Version 3: "~" (never in base64url, so no version 2 code starts with it), then base64url
+ * of one flag byte and the bytes below, deflated when the flag is 1 (only when that is
+ * shorter: small groups don't deflate well). All numbers are varints; signed ones zigzag.
+ *
+ *   layer count, then per layer:
+ *     id ('' when it equals the name), name, updated (ms), color (0xrrggbb + 1, 0 = none),
+ *     path count, then per path: point count, points
+ *     marker count, then per marker: type index, dx, dz (from the previous marker), name
+ *   strings: UTF-8 byte length, then the bytes
+ *   points: the step from the previous point (across paths and layers, from 0,0), packed
+ *     with its direction, since ice roads run straight or at 45°:
+ *     4·|dx| + 0 along x, 4·|dz| + 1 along z, 4·(2·|dx| + same sign? 0 : 1) + 2 diagonal,
+ *     4·|dx| + 3 then dz for anything else (|n| meaning zigzag n).
+ */
+const V3 = '~'
+const zig = (n: number) => (n < 0 ? -2 * n - 1 : 2 * n)
+const unzig = (n: number) => (n % 2 ? -(n + 1) / 2 : n / 2)
+
+function packV3(layers: IceLayer[]): Uint8Array {
+  const out: number[] = []
+  const uint = (n: number) => {
+    for (; n >= 128; n = Math.floor(n / 128)) out.push((n % 128) + 128)
+    out.push(n)
+  }
+  const str = (s = '') => {
+    const bytes = new TextEncoder().encode(s)
+    uint(bytes.length)
+    out.push(...bytes)
+  }
+  let [px, pz] = [0, 0]
+  uint(layers.length)
+  for (const l of layers) {
+    str(l.id === l.name ? '' : l.id)
+    str(l.name)
+    uint(l.updated)
+    uint(l.color ? parseInt(l.color.slice(1), 16) + 1 : 0)
+    uint(l.paths.length)
+    for (const path of l.paths) {
+      uint(path.length)
+      for (const [x, z] of path) {
+        const [dx, dz] = [x - px, z - pz]
+        ;[px, pz] = [x, z]
+        if (dz === 0) uint(4 * zig(dx))
+        else if (dx === 0) uint(4 * zig(dz) + 1)
+        else if (Math.abs(dx) === Math.abs(dz)) uint(4 * (2 * zig(dx) + (dx === dz ? 0 : 1)) + 2)
+        else {
+          uint(4 * zig(dx) + 3)
+          uint(zig(dz))
+        }
+      }
+    }
+    const markers = l.markers ?? []
+    let [mx, mz] = [0, 0]
+    uint(markers.length)
+    for (const m of markers) {
+      uint(MARKER_TYPES.indexOf(m.type))
+      uint(zig(m.x - mx))
+      uint(zig(m.z - mz))
+      ;[mx, mz] = [m.x, m.z]
+      str(m.name)
+    }
+  }
+  return new Uint8Array(out)
+}
+
+/* Raw layers (parseIceFile sanitizes them); throws on bytes that run out. */
+function unpackV3(bytes: Uint8Array): unknown[] {
+  let at = 0
+  const uint = () => {
+    let n = 0
+    for (let scale = 1; ; scale *= 128) {
+      if (at >= bytes.length || scale > 2 ** 56) throw new Error('bad link code')
+      const b = bytes[at++]
+      n += (b % 128) * scale
+      if (b < 128) return n
+    }
+  }
+  const str = () => {
+    const n = uint()
+    if (at + n > bytes.length) throw new Error('bad link code')
+    return new TextDecoder().decode(bytes.subarray(at, (at += n)))
+  }
+  const count = (max: number) => Math.min(uint(), max)
+  let [px, pz] = [0, 0]
+  return Array.from({ length: count(1000) }, () => {
+    const id = str()
+    const name = str()
+    const updated = uint()
+    const color = uint()
+    const paths = Array.from({ length: count(MAX_PATHS) }, () =>
+      Array.from({ length: count(MAX_POINTS) }, () => {
+        const v = uint()
+        const n = Math.floor(v / 4)
+        const tag = v % 4
+        if (tag === 0) px += unzig(n)
+        else if (tag === 1) pz += unzig(n)
+        else if (tag === 2) {
+          const d = unzig(Math.floor(n / 2))
+          px += d
+          pz += n % 2 ? -d : d
+        } else {
+          px += unzig(n)
+          pz += unzig(uint())
+        }
+        return [px, pz]
+      }),
+    )
+    let [mx, mz] = [0, 0]
+    const markers = Array.from({ length: count(MAX_MARKERS) }, () => {
+      const type = MARKER_TYPES[uint()]
+      mx += unzig(uint())
+      mz += unzig(uint())
+      return { type, x: mx, z: mz, name: str() }
+    })
+    return {
+      id: id || name,
+      name,
+      updated,
+      color: color ? `#${(color - 1).toString(16).padStart(6, '0')}` : undefined,
+      paths,
+      markers,
+    }
+  })
+}
+
+export async function encodeLayers(layers: IceLayer[]): Promise<string> {
+  const raw = packV3(layers)
+  const deflated = await pipe(raw, new CompressionStream('deflate-raw'))
+  const [flag, body] = deflated.length < raw.length ? [1, deflated] : [0, raw]
+  return V3 + toBase64Url(new Uint8Array([flag, ...body]))
+}
+
+/** Layers from a link code, or null if it is not one. */
+export async function decodeLayers(code: string): Promise<IceLayer[] | null> {
+  if (!code.startsWith(V3)) return decodeV2(code)
+  try {
+    const bytes = fromBase64Url(code.slice(V3.length))
+    const body = bytes.subarray(1)
+    if (bytes[0] > 1) return null
+    const raw = bytes[0] ? await pipe(body, new DecompressionStream('deflate-raw')) : body
+    const out = parseIceFile({ layers: unpackV3(raw) })
+    return out.length ? out : null
+  } catch {
+    return null
+  }
+}
+
+/* ── Version 2 link codes ──────────────────────────────
+   TODO: remove by December 2026. Links made before version 3 still open until then. */
+
 const VERSION = 2
 
 // layer = [id, name, updated, color without '#', [[dx0, dz0, dx1, dz1, ...], ...], markers?]
 // markers = [[type, x, z, name?], ...]: appended later, so codes from before have none.
-// Points are delta-encoded from the previous point (the first from 0,0): about 25%
-// shorter links than plain JSON, since small deltas repeat and deflate well.
-const packPath = (path: IcePath) => {
-  let px = 0
-  let pz = 0
-  return path.flatMap(([x, z]) => {
-    const d = [x - px, z - pz]
-    px = x
-    pz = z
-    return d
-  })
-}
+// Points are delta-encoded from the previous point (the first from 0,0).
 const unpackPath = (flat: unknown[]) => {
   const path: IcePath = []
   let x = 0
@@ -562,26 +761,7 @@ const unpackPath = (flat: unknown[]) => {
   return path
 }
 
-export async function encodeLayers(layers: IceLayer[]): Promise<string> {
-  const packed = [
-    VERSION,
-    ...layers.map((l) => [
-      l.id,
-      l.name,
-      l.updated,
-      l.color?.slice(1) ?? '',
-      l.paths.map(packPath),
-      ...(l.markers?.length
-        ? [l.markers.map((m) => [m.type, m.x, m.z, ...(m.name ? [m.name] : [])])]
-        : []),
-    ]),
-  ]
-  const json = new TextEncoder().encode(JSON.stringify(packed))
-  return toBase64Url(await pipe(json, new CompressionStream('deflate-raw')))
-}
-
-/** Layers from a link code, or null if it is not one. */
-export async function decodeLayers(code: string): Promise<IceLayer[] | null> {
+async function decodeV2(code: string): Promise<IceLayer[] | null> {
   try {
     const json = new TextDecoder().decode(
       await pipe(fromBase64Url(code), new DecompressionStream('deflate-raw')),

@@ -31,6 +31,7 @@ import {
   moveSection,
   parseIceFile,
   planImport,
+  toIceFile,
   type IceLayer,
   type IceMarker,
   type IceMarkerType,
@@ -334,7 +335,8 @@ export function IceRoadViewer() {
 
   useEffect(() => {
     if (!loaded) return
-    writeStored(LAYERS_KEY, { version: 2, layers })
+    /* Version 2 data saved before is rewritten in the current format here. */
+    writeStored(LAYERS_KEY, toIceFile(layers))
     writeStored(HIDDEN_KEY, [...hidden])
     writeStored(MARKER_GROUP_KEY, placeIn)
   }, [layers, hidden, placeIn, loaded])
@@ -377,7 +379,7 @@ export function IceRoadViewer() {
 
   const exportJson = () => {
     const url = URL.createObjectURL(
-      new Blob([JSON.stringify({ version: 2, layers }, null, 2)], { type: 'application/json' }),
+      new Blob([JSON.stringify(toIceFile(layers))], { type: 'application/json' }),
     )
     const a = document.createElement('a')
     a.href = url
