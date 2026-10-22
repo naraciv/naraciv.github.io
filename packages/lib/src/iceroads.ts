@@ -107,11 +107,12 @@ export function parseIceFile(value: unknown): IceLayer[] {
 
 /** The current file version. Paths stay `[[x, z], ...]` and the layer keys stay as they
     are, so the JsMacros mapper (which writes "version": 2 back) reads and keeps it. */
-export const FILE_VERSION = 3
+export const FILE_VERSION = 4
 
 /**
- * Layers as a file to save or share: markers as `[type, x, z, name?]`, the type being its
- * index in MARKER_TYPES. Stringify it without indentation; that is most of the saving.
+ * Layers as a file to save or share: markers as `[type, x, z, name?, mk?]`, the type being
+ * its index in MARKER_TYPES and mk its symbol (left out for the first). Stringify it
+ * without indentation; that is most of the saving.
  */
 export const toIceFile = (layers: IceLayer[]) => ({
   version: FILE_VERSION,
@@ -123,6 +124,7 @@ export const toIceFile = (layers: IceLayer[]) => ({
         m.x,
         m.z,
         ...(m.name ? [m.name] : []),
+        ...(m.mk ? [m.mk] : []),
       ]),
     }),
   })),
@@ -139,26 +141,39 @@ export const layerLength = (layer: IceLayer) =>
 /* Files and links store a marker's type as its index here: only ever append. */
 export const MARKER_TYPES = ['portal', 'bunker', 'vault', 'exit', 'potbunk', 'trap'] as const
 export type IceMarkerType = (typeof MARKER_TYPES)[number]
-export type IceMarker = { type: IceMarkerType; x: number; z: number; name?: string }
+/** mk: which of its type's symbols it shows (0 or none: the first). */
+export type IceMarker = { type: IceMarkerType; x: number; z: number; name?: string; mk?: number }
 
 const MAX_MARKERS = 5000
+/* Link codes pack the type and symbol into one number: type + mk * 64. */
+const MAX_TYPES = 64
+const symbol = (v: unknown) =>
+  Number.isInteger(v) && (v as number) > 0 && (v as number) < 1000 ? (v as number) : 0
 const isMarkerType = (t: unknown): t is IceMarkerType => MARKER_TYPES.includes(t as IceMarkerType)
 const markerKey = (m: IceMarker) => `${m.type},${m.x},${m.z}`
 
 /* A group's "markers": the valid ones, duplicates dropped. Anything else is none. Each is
-   `[type index, x, z, name?]`, or a `{ type, x, z, name }` object as version 2 files and
-   LLM-made JSON have. TODO: drop the object form by December 2026 (and switch LLM_PROMPT
-   in IceRoadViewer to the array form first). */
+   `[type index, x, z, name?, mk?]` (a string after z is the name, a number the symbol), or a
+   `{ type, x, z, name, mk }` object as version 2 files and LLM-made JSON have. TODO: drop
+   the object form by December 2026 (and switch LLM_PROMPT in IceRoadViewer to the array
+   form first). */
 function sanitizeMarkers(value: unknown): IceMarker[] {
   const markers = (Array.isArray(value) ? value : []).slice(0, MAX_MARKERS).flatMap((m) => {
-    const [type, rx, rz, rname] = Array.isArray(m)
-      ? [MARKER_TYPES[m[0]], m[1], m[2], m[3]]
-      : [m?.type, m?.x, m?.z, m?.name]
+    const [type, rx, rz, rname, rmk] = Array.isArray(m)
+      ? [
+          MARKER_TYPES[m[0]],
+          m[1],
+          m[2],
+          m.slice(3).find((v) => typeof v === 'string'),
+          m.slice(3).find((v) => typeof v === 'number'),
+        ]
+      : [m?.type, m?.x, m?.z, m?.name, m?.mk]
     const x = coord(rx)
     const z = coord(rz)
     const name = text(rname)
+    const mk = symbol(rmk)
     return isMarkerType(type) && x !== null && z !== null
-      ? [{ type, x, z, ...(name && { name }) }]
+      ? [{ type, x, z, ...(name && { name }), ...(mk && { mk }) }]
       : []
   })
   return mergeMarkers([], markers)
@@ -601,7 +616,8 @@ export function moveSection(
  *   layer count, then per layer:
  *     id ('' when it equals the name), name, updated (ms), color (0xrrggbb + 1, 0 = none),
  *     path count, then per path: point count, points
- *     marker count, then per marker: type index, dx, dz (from the previous marker), name
+ *     marker count, then per marker: type index + 64 * symbol, dx, dz (from the previous
+ *     marker), name
  *   strings: UTF-8 byte length, then the bytes
  *   points: the step from the previous point (across paths and layers, from 0,0), packed
  *     with its direction, since ice roads run straight or at 45°:
@@ -649,7 +665,7 @@ function packV3(layers: IceLayer[]): Uint8Array {
     let [mx, mz] = [0, 0]
     uint(markers.length)
     for (const m of markers) {
-      uint(MARKER_TYPES.indexOf(m.type))
+      uint(MARKER_TYPES.indexOf(m.type) + MAX_TYPES * (m.mk ?? 0))
       uint(zig(m.x - mx))
       uint(zig(m.z - mz))
       ;[mx, mz] = [m.x, m.z]
@@ -703,10 +719,16 @@ function unpackV3(bytes: Uint8Array): unknown[] {
     )
     let [mx, mz] = [0, 0]
     const markers = Array.from({ length: count(MAX_MARKERS) }, () => {
-      const type = MARKER_TYPES[uint()]
+      const v = uint()
       mx += unzig(uint())
       mz += unzig(uint())
-      return { type, x: mx, z: mz, name: str() }
+      return {
+        type: MARKER_TYPES[v % MAX_TYPES],
+        mk: Math.floor(v / MAX_TYPES),
+        x: mx,
+        z: mz,
+        name: str(),
+      }
     })
     return {
       id: id || name,

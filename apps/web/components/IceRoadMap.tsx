@@ -19,7 +19,7 @@ import {
   type CivMapHandle,
   type DrawArgs,
 } from '@/components/map'
-import { MARKERS, markerLabel } from './iceRoadMarkers'
+import { markerIcon, markerLabel } from './iceRoadMarkers'
 
 /**
  * The ice road map: CivMap tiles with every visible road painted through CanvasLayer,
@@ -39,11 +39,16 @@ type Box = { minX: number; maxX: number; minZ: number; maxZ: number }
 const HIT_PX = 8
 
 /* A marker's pin: just its icon, centred on the block, with a shadow to stand out from the
-   tiles. Rendered by React so a name from someone else's file is escaped, not markup. */
+   tiles. Rendered by React so a name from someone else's file is escaped, not markup. Fixed
+   at 24px, with the icon centred: Leaflet makes marker images width: auto, so a narrow one
+   (the portal) would sit left of its anchor. */
 const pin = (m: IceMarker) => ({
   html: renderToStaticMarkup(
-    <div title={markerLabel(m)} className="text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-      {MARKERS[m.type].icon}
+    <div
+      title={markerLabel(m)}
+      className="grid size-6 place-items-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+    >
+      {markerIcon(m)}
     </div>,
   ),
   anchor: [12, 12] as [number, number],
