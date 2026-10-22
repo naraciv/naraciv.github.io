@@ -46,7 +46,9 @@ export function CanvasLayer({
     /* A map torn down mid-remount (StrictMode, fast refresh) has no panes; the new one re-runs this. */
     if (!map?.getPanes()) return
 
-    const canvas = L.DomUtil.create('canvas', className ?? '')
+    /* leaflet-zoom-animated: Leaflet transitions its transform during a zoom, as it does the
+       tiles', so the drawing scales with them instead of sitting still and then jumping. */
+    const canvas = L.DomUtil.create('canvas', `leaflet-zoom-animated ${className ?? ''}`)
     canvas.style.position = 'absolute'
     canvas.style.pointerEvents = 'none'
     const ctx = canvas.getContext('2d')
@@ -84,12 +86,26 @@ export function CanvasLayer({
       })
     }
 
+    /* Where the canvas's top-left ends up at the new zoom, scaled by it: what Leaflet's own
+       image overlay does. The repaint at the end of the zoom resets the transform. */
+    const animate = (e: L.ZoomAnimEvent) => {
+      const corner = map.containerPointToLatLng([0, 0])
+      const to = (
+        map as unknown as {
+          _latLngToNewLayerPoint: (ll: L.LatLng, zoom: number, center: L.LatLng) => L.Point
+        }
+      )._latLngToNewLayerPoint(corner, e.zoom, e.center)
+      L.DomUtil.setTransform(canvas, to, map.getZoomScale(e.zoom))
+    }
+
     repaintRef.current = repaint
     map.on('move zoom resize zoomend moveend', repaint)
+    map.on('zoomanim', animate)
     repaint()
 
     return () => {
       map.off('move zoom resize zoomend moveend', repaint)
+      map.off('zoomanim', animate)
       canvas.remove()
       repaintRef.current = () => {}
     }

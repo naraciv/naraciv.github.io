@@ -176,6 +176,7 @@ type Draft = {
   from?: { groupId: string; marker: IceMarker }
   group: string
   type: IceMarkerType
+  mk: number
   name: string
   x: string
   z: string
@@ -403,12 +404,13 @@ export function IceRoadViewer() {
   }
   const markerGroup = layers.some((l) => l.id === placeIn) ? placeIn : layers[0]?.id
   const newMarker = (type: IceMarkerType) =>
-    setDraft({ group: markerGroup, type, name: '', x: '', z: '' })
+    setDraft({ group: markerGroup, type, mk: 0, name: '', x: '', z: '' })
   const editMarker = (groupId: string, marker: IceMarker) =>
     setDraft({
       from: { groupId, marker },
       group: groupId,
       type: marker.type,
+      mk: marker.mk ?? 0,
       name: marker.name ?? '',
       x: String(marker.x),
       z: String(marker.z),
@@ -419,7 +421,12 @@ export function IceRoadViewer() {
     const at = parseCoords(`${d.x} ${d.z}`)
     if (!at) return
     const name = d.name.trim()
-    const next: IceMarker = { type: d.type, ...at, ...(name && { name }) }
+    const next: IceMarker = {
+      type: d.type,
+      ...at,
+      ...(name && { name }),
+      ...(d.mk && { mk: d.mk }),
+    }
     const source = d.from ? markersOf(layers, d.from.groupId) : []
     const i = d.from ? source.indexOf(d.from.marker) : -1
     const out = d.from ? setMarkers(layers, d.from.groupId, source.toSpliced(i, 1)) : layers
@@ -1067,6 +1074,7 @@ function MarkerDialog({
     ? `Edit ${markerLabel(draft.from.marker)}`
     : `Add ${MARKERS[draft.type].label}`
   const label = 'flex flex-col gap-1 text-xs text-ink-2'
+  const { symbols } = MARKERS[draft.type]
   const text = (key: 'name' | 'x' | 'z') => ({
     value: draft[key],
     onChange: (e: ChangeEvent<HTMLInputElement>) => onChange({ [key]: e.target.value }),
@@ -1122,12 +1130,12 @@ function MarkerDialog({
             className={field}
           />
         </label>
-        <div className="grid grid-cols-2 gap-2">
+        <div className={`grid gap-2 ${symbols.length > 1 ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <label className={label}>
             Type
             <select
               value={draft.type}
-              onChange={(e) => onChange({ type: e.target.value as IceMarkerType })}
+              onChange={(e) => onChange({ type: e.target.value as IceMarkerType, mk: 0 })}
               className={field}
             >
               {MARKER_TYPES.map((t) => (
@@ -1137,6 +1145,22 @@ function MarkerDialog({
               ))}
             </select>
           </label>
+          {symbols.length > 1 && (
+            <label className={label}>
+              Symbol
+              <select
+                value={draft.mk}
+                onChange={(e) => onChange({ mk: Number(e.target.value) })}
+                className={field}
+              >
+                {symbols.map((s, i) => (
+                  <option key={i} value={i}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <label className={label}>
             Group
             <select

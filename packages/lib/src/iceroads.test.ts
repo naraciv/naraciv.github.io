@@ -209,21 +209,34 @@ test('version 2 link codes still open', async () => {
   ])
 })
 
-test('files save markers as [type, x, z, name?] and still read version 2 objects', () => {
+test('files save markers as [type, x, z, name?, mk?] and still read version 2 objects', async () => {
   const layers = [
     layer({
       markers: [
         { type: 'bunker', x: 1, z: 2, name: 'Fort' },
         { type: 'exit', x: 3, z: 4 },
+        { type: 'exit', x: 5, z: 6, mk: 4 },
+        { type: 'trap', x: 7, z: 8, name: 'Pit', mk: 2 },
       ],
     }),
   ]
   const file = toIceFile(layers)
-  assert.equal(file.version, 3)
+  assert.equal(file.version, 4)
   assert.deepEqual(file.layers[0].markers, [
     [1, 1, 2, 'Fort'],
     [3, 3, 4],
+    [3, 5, 6, 4],
+    [5, 7, 8, 'Pit', 2],
   ])
+  assert.deepEqual(await decodeLayers(await encodeLayers(layers)), layers)
+  assert.deepEqual(
+    parseIceFile({ paths: [A], markers: [{ type: 'exit', x: 0, z: 0, mk: 1 }, [3, 1, 1, -2]] })[0]
+      .markers,
+    [
+      { type: 'exit', x: 0, z: 0, mk: 1 },
+      { type: 'exit', x: 1, z: 1 },
+    ],
+  )
   assert.deepEqual(parseIceFile(JSON.parse(JSON.stringify(file))), layers)
   // The JsMacros mapper writes "version": 2 back over a file it appended to.
   assert.deepEqual(parseIceFile({ ...file, version: 2 }), layers)
