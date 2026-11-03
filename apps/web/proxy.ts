@@ -86,17 +86,25 @@ const RENDERERS: Record<string, () => Promise<string>> = {
 /** Markdown for agents on the pages we already have structured data for; everyone else gets the normal page. */
 export async function proxy(request: NextRequest) {
   const render = RENDERERS[request.nextUrl.pathname]
-  if (!render || !request.headers.get('accept')?.includes('text/markdown')) {
-    const response = NextResponse.next()
-    response.headers.set('Vary', 'Accept')
-    return response
-  }
+  if (!render) return NextResponse.next()
 
   return new Response(await render(), {
     headers: { 'Content-Type': 'text/markdown; charset=utf-8', Vary: 'Accept' },
   })
 }
 
+/*
+ * Only markdown requests reach the proxy. It runs as a Vercel Function, so
+ * matching every visit and nav-link prefetch of these pages cost an invocation
+ * each just to pass the request through. Literals, because Next reads the
+ * matcher statically at build time.
+ */
 export const config = {
-  matcher: ['/', '/government', '/shops', '/heads', '/rocket'],
+  matcher: [
+    { source: '/', has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }] },
+    { source: '/government', has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }] },
+    { source: '/shops', has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }] },
+    { source: '/heads', has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }] },
+    { source: '/rocket', has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }] },
+  ],
 }
