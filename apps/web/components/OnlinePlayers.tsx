@@ -3,14 +3,22 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Clock, LogOut, Search, Users } from 'lucide-react'
-import { duration, type Player } from '@nara/lib'
+import {
+  duration,
+  mergeAccounts,
+  playersFromSessions,
+  sortPlayers,
+  type AccountsResponse,
+  type Player,
+  type SessionsResponse,
+} from '@nara/lib'
 import { PlayerAvatar } from './PlayerAvatar'
 
 /**
  * Who is on CivMC now, then everyone civinfo knows about, newest first.
  *
- *   - /api/online-players does the civinfo calls and caches the merged result for
- *     5 minutes, so this only ever costs a same-origin request — see that route.
+ *   - Two same-origin requests, merged here: /api/online-players (the last hour's
+ *     sessions) and /api/accounts (everyone). Both are at most 5 minutes old.
  *   - Failed requests retry twice, then offer a Retry button.
  *   - Offline players page in by 30 as you scroll, with native lazy images.
  */
@@ -45,7 +53,13 @@ export function OnlinePlayers() {
   /* Never sets state before its first await, so the mount effect can call it. */
   const load = useCallback(async () => {
     try {
-      setPlayers(await getJson<Player[]>('/api/online-players'))
+      const [sessions, accounts] = await Promise.all([
+        getJson<SessionsResponse>('/api/online-players'),
+        getJson<AccountsResponse>('/api/accounts'),
+      ])
+      const now = Date.now()
+      const online = playersFromSessions(sessions, now)
+      setPlayers(sortPlayers(mergeAccounts(online, accounts, now).values()))
       setStatus('ready')
     } catch (error) {
       console.warn('[nara] online-players request failed.', error)
